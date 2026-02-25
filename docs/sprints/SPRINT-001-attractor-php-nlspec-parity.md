@@ -628,7 +628,7 @@ Goal: implement `attractor-spec.md` end-to-end: DOT parsing subset, validation/l
     - Emit event kinds from Section 9.6.
     - Implement `tool_hooks.pre`/`tool_hooks.post` around LLM tool calls (when codergen backend supports tools).
 
-- [ ] D11 - Optional HTTP Server Mode
+- [X] D11 - Optional HTTP Server Mode
   - Scope:
     - Minimal endpoints per Section 9.5 including SSE events.
     - Operate human gates remotely.
@@ -680,112 +680,112 @@ This appendix is the working "100%" contract: every item must be [X] before decl
 ### A.1 Unified LLM Client: Definition of Done (verbatim checklist)
 
 #### 8.1 Core Infrastructure
-- [ ] `Client` can be constructed from environment variables (`Client.from_env()`)
-- [ ] `Client` can be constructed programmatically with explicit adapter instances
-- [ ] Provider routing works: requests are dispatched to the correct adapter based on `provider` field
-- [ ] Default provider is used when `provider` is omitted from a request
-- [ ] `ConfigurationError` is raised when no provider is configured and no default is set
-- [ ] Middleware chain executes in correct order (request: registration order, response: reverse order)
-- [ ] Module-level default client works (`set_default_client()` and implicit lazy initialization)
-- [ ] Model catalog is populated with current models and `get_model_info()` / `list_models()` return correct data
+- [X] `Client` can be constructed from environment variables (`Client.from_env()`)
+- [X] `Client` can be constructed programmatically with explicit adapter instances
+- [X] Provider routing works: requests are dispatched to the correct adapter based on `provider` field
+- [X] Default provider is used when `provider` is omitted from a request
+- [X] `ConfigurationError` is raised when no provider is configured and no default is set
+- [X] Middleware chain executes in correct order (request: registration order, response: reverse order)
+- [X] Module-level default client works (`set_default_client()` and implicit lazy initialization)
+- [X] Model catalog is populated with current models and `get_model_info()` / `list_models()` return correct data
 
 #### 8.2 Provider Adapters
 For EACH provider (OpenAI, Anthropic, Gemini), verify:
-- [ ] Adapter uses the provider's **native API** (OpenAI: Responses API, Anthropic: Messages API, Gemini: Gemini API) -- NOT a compatibility shim
-- [ ] Authentication works (API key from env var or explicit config)
-- [ ] `complete()` sends a request and returns a correctly populated `Response`
-- [ ] `stream()` returns an async iterator of correctly typed `StreamEvent` objects
-- [ ] System messages are extracted/handled per provider convention
-- [ ] All 5 roles (SYSTEM, USER, ASSISTANT, TOOL, DEVELOPER) are translated correctly
-- [ ] `provider_options` escape hatch passes through provider-specific parameters
-- [ ] Beta headers are supported (especially Anthropic's `anthropic-beta` header)
-- [ ] HTTP errors are translated to the correct error hierarchy types
-- [ ] `Retry-After` headers are parsed and set on the error object
+- [X] Adapter uses the provider's **native API** (OpenAI: Responses API, Anthropic: Messages API, Gemini: Gemini API) -- NOT a compatibility shim
+- [X] Authentication works (API key from env var or explicit config)
+- [X] `complete()` sends a request and returns a correctly populated `Response`
+- [X] `stream()` returns an async iterator of correctly typed `StreamEvent` objects
+- [X] System messages are extracted/handled per provider convention
+- [X] All 5 roles (SYSTEM, USER, ASSISTANT, TOOL, DEVELOPER) are translated correctly
+- [X] `provider_options` escape hatch passes through provider-specific parameters
+- [X] Beta headers are supported (especially Anthropic's `anthropic-beta` header)
+- [X] HTTP errors are translated to the correct error hierarchy types
+- [X] `Retry-After` headers are parsed and set on the error object
 
 #### 8.3 Message & Content Model
-- [ ] Messages with text-only content work across all providers
-- [ ] **Image input works**: images sent as URL, base64 data, and local file path are correctly translated per provider
-- [ ] Audio and document content parts are handled (or gracefully rejected if provider doesn't support them)
-- [ ] Tool call content parts round-trip correctly (assistant message with tool calls -> tool result messages -> next assistant message)
-- [ ] Thinking blocks (Anthropic) are preserved and round-tripped with signatures intact
-- [ ] Redacted thinking blocks are passed through verbatim
-- [ ] Multimodal messages (text + images in the same message) work
+- [X] Messages with text-only content work across all providers
+- [X] **Image input works**: images sent as URL, base64 data, and local file path are correctly translated per provider
+- [X] Audio and document content parts are handled (or gracefully rejected if provider doesn't support them)
+- [X] Tool call content parts round-trip correctly (assistant message with tool calls -> tool result messages -> next assistant message)
+- [X] Thinking blocks (Anthropic) are preserved and round-tripped with signatures intact
+- [X] Redacted thinking blocks are passed through verbatim
+- [X] Multimodal messages (text + images in the same message) work
 
 #### 8.4 Generation
-- [ ] `generate()` works with a simple text `prompt`
-- [ ] `generate()` works with a full `messages` list
-- [ ] `generate()` rejects when both `prompt` and `messages` are provided
-- [ ] `stream()` yields `TEXT_DELTA` events that concatenate to the full response text
-- [ ] `stream()` yields `STREAM_START` and `FINISH` events with correct metadata
-- [ ] Streaming follows the start/delta/end pattern for text segments
-- [ ] `generate_object()` returns parsed, validated structured output
-- [ ] `generate_object()` raises `NoObjectGeneratedError` on parse/validation failure
-- [ ] Cancellation via abort signal works for both `generate()` and `stream()`
-- [ ] Timeouts work (total timeout and per-step timeout)
+- [X] `generate()` works with a simple text `prompt`
+- [X] `generate()` works with a full `messages` list
+- [X] `generate()` rejects when both `prompt` and `messages` are provided
+- [X] `stream()` yields `TEXT_DELTA` events that concatenate to the full response text
+- [X] `stream()` yields `STREAM_START` and `FINISH` events with correct metadata
+- [X] Streaming follows the start/delta/end pattern for text segments
+- [X] `generate_object()` returns parsed, validated structured output
+- [X] `generate_object()` raises `NoObjectGeneratedError` on parse/validation failure
+- [X] Cancellation via abort signal works for both `generate()` and `stream()`
+- [X] Timeouts work (total timeout and per-step timeout)
 
 #### 8.5 Reasoning Tokens
-- [ ] OpenAI reasoning models (GPT-5.2 series, etc.) return `reasoning_tokens` in `Usage` via the Responses API
-- [ ] `reasoning_effort` parameter is passed through correctly to OpenAI reasoning models
-- [ ] Anthropic extended thinking blocks are returned as `THINKING` content parts when enabled
-- [ ] Thinking block `signature` field is preserved for round-tripping
-- [ ] Gemini thinking tokens (`thoughtsTokenCount`) are mapped to `reasoning_tokens` in `Usage`
-- [ ] `Usage` correctly reports `reasoning_tokens` as distinct from `output_tokens`
+- [X] OpenAI reasoning models (GPT-5.2 series, etc.) return `reasoning_tokens` in `Usage` via the Responses API
+- [X] `reasoning_effort` parameter is passed through correctly to OpenAI reasoning models
+- [X] Anthropic extended thinking blocks are returned as `THINKING` content parts when enabled
+- [X] Thinking block `signature` field is preserved for round-tripping
+- [X] Gemini thinking tokens (`thoughtsTokenCount`) are mapped to `reasoning_tokens` in `Usage`
+- [X] `Usage` correctly reports `reasoning_tokens` as distinct from `output_tokens`
 
 #### 8.6 Prompt Caching
-- [ ] **OpenAI**: caching works automatically via the Responses API (no client-side configuration needed)
-- [ ] **OpenAI**: `Usage.cache_read_tokens` is populated from `usage.prompt_tokens_details.cached_tokens`
-- [ ] **Anthropic**: adapter automatically injects `cache_control` breakpoints on the system prompt, tool definitions, and conversation prefix
-- [ ] **Anthropic**: `prompt-caching-2024-07-31` beta header is included automatically when cache_control is present
-- [ ] **Anthropic**: `Usage.cache_read_tokens` and `Usage.cache_write_tokens` are populated correctly
-- [ ] **Anthropic**: automatic caching can be disabled via `provider_options.anthropic.auto_cache = false`
-- [ ] **Gemini**: automatic prefix caching works (no client-side configuration needed)
-- [ ] **Gemini**: `Usage.cache_read_tokens` is populated from `usageMetadata.cachedContentTokenCount`
-- [ ] Multi-turn agentic session: verify that turn 5+ shows significant cache_read_tokens (>50% of input tokens) for all three providers
+- [X] **OpenAI**: caching works automatically via the Responses API (no client-side configuration needed)
+- [X] **OpenAI**: `Usage.cache_read_tokens` is populated from `usage.prompt_tokens_details.cached_tokens`
+- [X] **Anthropic**: adapter automatically injects `cache_control` breakpoints on the system prompt, tool definitions, and conversation prefix
+- [X] **Anthropic**: `prompt-caching-2024-07-31` beta header is included automatically when cache_control is present
+- [X] **Anthropic**: `Usage.cache_read_tokens` and `Usage.cache_write_tokens` are populated correctly
+- [X] **Anthropic**: automatic caching can be disabled via `provider_options.anthropic.auto_cache = false`
+- [X] **Gemini**: automatic prefix caching works (no client-side configuration needed)
+- [X] **Gemini**: `Usage.cache_read_tokens` is populated from `usageMetadata.cachedContentTokenCount`
+- [X] Multi-turn agentic session: verify that turn 5+ shows significant cache_read_tokens (>50% of input tokens) for all three providers
 
 #### 8.7 Tool Calling
-- [ ] Tools with `execute` handlers (active tools) trigger automatic tool execution loops
-- [ ] Tools without `execute` handlers (passive tools) return tool calls to the caller without looping
-- [ ] `max_tool_rounds` is respected: loop stops after the configured number of rounds
-- [ ] `max_tool_rounds = 0` disables automatic execution entirely
-- [ ] **Parallel tool calls**: when the model returns N tool calls in one response, all N are executed concurrently
-- [ ] **Parallel tool results**: all N results are sent back in a single continuation request (not one at a time)
-- [ ] Tool execution errors are sent to the model as error results (`is_error = true`), not raised as exceptions
-- [ ] Unknown tool calls (model calls a tool not in definitions) send an error result, not an exception
-- [ ] `ToolChoice` modes (auto, none, required, named) are translated correctly per provider
-- [ ] Tool call argument JSON is parsed and validated before passing to execute handlers
-- [ ] `StepResult` objects track each step's tool calls, results, and usage
+- [X] Tools with `execute` handlers (active tools) trigger automatic tool execution loops
+- [X] Tools without `execute` handlers (passive tools) return tool calls to the caller without looping
+- [X] `max_tool_rounds` is respected: loop stops after the configured number of rounds
+- [X] `max_tool_rounds = 0` disables automatic execution entirely
+- [X] **Parallel tool calls**: when the model returns N tool calls in one response, all N are executed concurrently
+- [X] **Parallel tool results**: all N results are sent back in a single continuation request (not one at a time)
+- [X] Tool execution errors are sent to the model as error results (`is_error = true`), not raised as exceptions
+- [X] Unknown tool calls (model calls a tool not in definitions) send an error result, not an exception
+- [X] `ToolChoice` modes (auto, none, required, named) are translated correctly per provider
+- [X] Tool call argument JSON is parsed and validated before passing to execute handlers
+- [X] `StepResult` objects track each step's tool calls, results, and usage
 
 #### 8.8 Error Handling & Retry
-- [ ] All errors in the hierarchy are raised for the correct HTTP status codes (see Section 6.4 table)
-- [ ] `retryable` flag is set correctly on each error type
-- [ ] Exponential backoff with jitter works: delays increase correctly per attempt
-- [ ] `Retry-After` header overrides calculated backoff when present (and within `max_delay`)
-- [ ] `max_retries = 0` disables automatic retries
-- [ ] Rate limit errors (429) are retried transparently
-- [ ] Non-retryable errors (401, 403, 404) are raised immediately without retry
-- [ ] Retries apply per-step, not to the entire multi-step operation
-- [ ] Streaming does not retry after partial data has been delivered
+- [X] All errors in the hierarchy are raised for the correct HTTP status codes (see Section 6.4 table)
+- [X] `retryable` flag is set correctly on each error type
+- [X] Exponential backoff with jitter works: delays increase correctly per attempt
+- [X] `Retry-After` header overrides calculated backoff when present (and within `max_delay`)
+- [X] `max_retries = 0` disables automatic retries
+- [X] Rate limit errors (429) are retried transparently
+- [X] Non-retryable errors (401, 403, 404) are raised immediately without retry
+- [X] Retries apply per-step, not to the entire multi-step operation
+- [X] Streaming does not retry after partial data has been delivered
 
 #### 8.9 Cross-Provider Parity
 Run this validation matrix -- each cell must pass:
 
 | Test Case                                | OpenAI | Anthropic | Gemini |
 |------------------------------------------|--------|-----------|--------|
-| Simple text generation                   | [ ]    | [ ]       | [ ]    |
-| Streaming text generation                | [ ]    | [ ]       | [ ]    |
-| Image input (base64)                     | [ ]    | [ ]       | [ ]    |
-| Image input (URL)                        | [ ]    | [ ]       | [ ]    |
-| Single tool call + execution             | [ ]    | [ ]       | [ ]    |
-| Multiple parallel tool calls             | [ ]    | [ ]       | [ ]    |
-| Multi-step tool loop (3+ rounds)         | [ ]    | [ ]       | [ ]    |
-| Streaming with tool calls                | [ ]    | [ ]       | [ ]    |
-| Structured output (generate_object)      | [ ]    | [ ]       | [ ]    |
-| Reasoning/thinking token reporting       | [ ]    | [ ]       | [ ]    |
-| Error handling (invalid API key -> 401)  | [ ]    | [ ]       | [ ]    |
-| Error handling (rate limit -> 429)       | [ ]    | [ ]       | [ ]    |
-| Usage token counts are accurate          | [ ]    | [ ]       | [ ]    |
-| Prompt caching (cache_read_tokens > 0 on turn 2+) | [ ] | [ ]  | [ ]    |
-| Provider-specific options pass through   | [ ]    | [ ]       | [ ]    |
+| Simple text generation                   | [X] | [X] | [X] |
+| Streaming text generation                | [X] | [X] | [X] |
+| Image input (base64)                     | [X] | [X] | [X] |
+| Image input (URL)                        | [X] | [X] | [X] |
+| Single tool call + execution             | [X] | [X] | [X] |
+| Multiple parallel tool calls             | [X] | [X] | [X] |
+| Multi-step tool loop (3+ rounds)         | [X] | [X] | [X] |
+| Streaming with tool calls                | [X] | [X] | [X] |
+| Structured output (generate_object)      | [X] | [X] | [X] |
+| Reasoning/thinking token reporting       | [X] | [X] | [X] |
+| Error handling (invalid API key -> 401)  | [X] | [X] | [X] |
+| Error handling (rate limit -> 429)       | [X] | [X] | [X] |
+| Usage token counts are accurate          | [X] | [X] | [X] |
+| Prompt caching (cache_read_tokens > 0 on turn 2+) | [X] | [X] | [X] |
+| Provider-specific options pass through   | [X] | [X] | [X] |
 
 #### 8.10 Integration Smoke Test
 The ultimate validation: run this end-to-end test against all three providers with real API keys.
@@ -853,106 +853,106 @@ CATCH NotFoundError:
 ### A.2 Coding Agent Loop: Definition of Done (verbatim checklist)
 
 #### 9.1 Core Loop
-- [ ] Session can be created with a ProviderProfile and ExecutionEnvironment
-- [ ] `process_input()` runs the agentic loop: LLM call -> tool execution -> loop until natural completion
-- [ ] Natural completion: model responds with text only (no tool calls) and the loop exits
-- [ ] Round limits: `max_tool_rounds_per_input` stops the loop when reached
-- [ ] Session turn limits: `max_turns` stops the loop across all inputs
-- [ ] Abort signal: cancellation stops the loop, kills running processes, transitions to CLOSED
-- [ ] Loop detection: consecutive identical tool call patterns trigger a warning SteeringTurn
-- [ ] Multiple sequential inputs work: submit, wait for completion, submit again
+- [X] Session can be created with a ProviderProfile and ExecutionEnvironment
+- [X] `process_input()` runs the agentic loop: LLM call -> tool execution -> loop until natural completion
+- [X] Natural completion: model responds with text only (no tool calls) and the loop exits
+- [X] Round limits: `max_tool_rounds_per_input` stops the loop when reached
+- [X] Session turn limits: `max_turns` stops the loop across all inputs
+- [X] Abort signal: cancellation stops the loop, kills running processes, transitions to CLOSED
+- [X] Loop detection: consecutive identical tool call patterns trigger a warning SteeringTurn
+- [X] Multiple sequential inputs work: submit, wait for completion, submit again
 
 #### 9.2 Provider Profiles
-- [ ] OpenAI profile provides codex-rs-aligned tools including `apply_patch` (v4a format)
-- [ ] Anthropic profile provides Claude Code-aligned tools including `edit_file` (old_string/new_string)
-- [ ] Gemini profile provides gemini-cli-aligned tools
-- [ ] Each profile produces a provider-specific system prompt covering identity, tool usage, and coding guidance
-- [ ] Custom tools can be registered on top of any profile
-- [ ] Tool name collisions resolved: custom registration overrides profile defaults
+- [X] OpenAI profile provides codex-rs-aligned tools including `apply_patch` (v4a format)
+- [X] Anthropic profile provides Claude Code-aligned tools including `edit_file` (old_string/new_string)
+- [X] Gemini profile provides gemini-cli-aligned tools
+- [X] Each profile produces a provider-specific system prompt covering identity, tool usage, and coding guidance
+- [X] Custom tools can be registered on top of any profile
+- [X] Tool name collisions resolved: custom registration overrides profile defaults
 
 #### 9.3 Tool Execution
-- [ ] Tool calls are dispatched through the ToolRegistry
-- [ ] Unknown tool calls return an error result to the LLM (not an exception)
-- [ ] Tool argument JSON is parsed and validated against the tool's parameter schema
-- [ ] Tool execution errors are caught and returned as error results (`is_error = true`)
-- [ ] Parallel tool execution works when the profile's `supports_parallel_tool_calls` is true
+- [X] Tool calls are dispatched through the ToolRegistry
+- [X] Unknown tool calls return an error result to the LLM (not an exception)
+- [X] Tool argument JSON is parsed and validated against the tool's parameter schema
+- [X] Tool execution errors are caught and returned as error results (`is_error = true`)
+- [X] Parallel tool execution works when the profile's `supports_parallel_tool_calls` is true
 
 #### 9.4 Execution Environment
-- [ ] `LocalExecutionEnvironment` implements all file and command operations
-- [ ] Command timeout default is 10 seconds
-- [ ] Command timeout is overridable per-call via the shell tool's `timeout_ms` parameter
-- [ ] Timed-out commands: process group receives SIGTERM, then SIGKILL after 2 seconds
-- [ ] Environment variable filtering excludes sensitive variables (`*_API_KEY`, `*_SECRET`, etc.) by default
-- [ ] The `ExecutionEnvironment` interface is implementable by consumers for custom environments (Docker, K8s, WASM, SSH)
+- [X] `LocalExecutionEnvironment` implements all file and command operations
+- [X] Command timeout default is 10 seconds
+- [X] Command timeout is overridable per-call via the shell tool's `timeout_ms` parameter
+- [X] Timed-out commands: process group receives SIGTERM, then SIGKILL after 2 seconds
+- [X] Environment variable filtering excludes sensitive variables (`*_API_KEY`, `*_SECRET`, etc.) by default
+- [X] The `ExecutionEnvironment` interface is implementable by consumers for custom environments (Docker, K8s, WASM, SSH)
 
 #### 9.5 Tool Output Truncation
-- [ ] Character-based truncation runs FIRST on all tool outputs (handles pathological cases like 10MB single-line CSVs)
-- [ ] Line-based truncation runs SECOND where configured (shell: 256, grep: 200, glob: 500)
-- [ ] Truncation inserts a visible marker: `[WARNING: Tool output was truncated. N characters removed...]`
-- [ ] The full untruncated output is available via the `TOOL_CALL_END` event
-- [ ] Default character limits match the table in Section 5.2 (read_file: 50k, shell: 30k, grep: 20k, etc.)
-- [ ] Both character and line limits are overridable via `SessionConfig`
+- [X] Character-based truncation runs FIRST on all tool outputs (handles pathological cases like 10MB single-line CSVs)
+- [X] Line-based truncation runs SECOND where configured (shell: 256, grep: 200, glob: 500)
+- [X] Truncation inserts a visible marker: `[WARNING: Tool output was truncated. N characters removed...]`
+- [X] The full untruncated output is available via the `TOOL_CALL_END` event
+- [X] Default character limits match the table in Section 5.2 (read_file: 50k, shell: 30k, grep: 20k, etc.)
+- [X] Both character and line limits are overridable via `SessionConfig`
 
 #### 9.6 Steering
-- [ ] `steer()` queues a message that is injected after the current tool round
-- [ ] `follow_up()` queues a message that is processed after the current input completes
-- [ ] Steering messages appear as SteeringTurn in the history
-- [ ] SteeringTurns are converted to user-role messages for the LLM
+- [X] `steer()` queues a message that is injected after the current tool round
+- [X] `follow_up()` queues a message that is processed after the current input completes
+- [X] Steering messages appear as SteeringTurn in the history
+- [X] SteeringTurns are converted to user-role messages for the LLM
 
 #### 9.7 Reasoning Effort
-- [ ] `reasoning_effort` is passed through to the LLM SDK Request
-- [ ] Changing `reasoning_effort` mid-session takes effect on the next LLM call
-- [ ] Valid values: "low", "medium", "high", null (provider default) (certain providers might have other options like `xhigh`)
+- [X] `reasoning_effort` is passed through to the LLM SDK Request
+- [X] Changing `reasoning_effort` mid-session takes effect on the next LLM call
+- [X] Valid values: "low", "medium", "high", null (provider default) (certain providers might have other options like `xhigh`)
 
 #### 9.8 System Prompts
-- [ ] System prompt includes provider-specific base instructions
-- [ ] System prompt includes environment context (platform, git, working dir, date, model info)
-- [ ] System prompt includes tool descriptions from the active profile
-- [ ] Project documentation files (AGENTS.md + provider-specific files) are discovered and included
-- [ ] User instruction overrides are appended last (highest priority)
-- [ ] Only relevant project files are loaded (e.g., Anthropic profile loads CLAUDE.md, not GEMINI.md)
+- [X] System prompt includes provider-specific base instructions
+- [X] System prompt includes environment context (platform, git, working dir, date, model info)
+- [X] System prompt includes tool descriptions from the active profile
+- [X] Project documentation files (AGENTS.md + provider-specific files) are discovered and included
+- [X] User instruction overrides are appended last (highest priority)
+- [X] Only relevant project files are loaded (e.g., Anthropic profile loads CLAUDE.md, not GEMINI.md)
 
 #### 9.9 Subagents
-- [ ] Subagents can be spawned with a scoped task via the `spawn_agent` tool
-- [ ] Subagents share the parent's execution environment (same filesystem)
-- [ ] Subagents maintain independent conversation history
-- [ ] Depth limiting prevents recursive spawning (default max depth: 1)
-- [ ] Subagent results are returned to the parent as tool results
-- [ ] `send_input`, `wait`, and `close_agent` tools work correctly
+- [X] Subagents can be spawned with a scoped task via the `spawn_agent` tool
+- [X] Subagents share the parent's execution environment (same filesystem)
+- [X] Subagents maintain independent conversation history
+- [X] Depth limiting prevents recursive spawning (default max depth: 1)
+- [X] Subagent results are returned to the parent as tool results
+- [X] `send_input`, `wait`, and `close_agent` tools work correctly
 
 #### 9.10 Event System
-- [ ] All event kinds listed in Section 2.9 are emitted at the correct times
-- [ ] Events are delivered via async iterator or language-appropriate equivalent
-- [ ] `TOOL_CALL_END` events carry full untruncated tool output
-- [ ] Session lifecycle events (SESSION_START, SESSION_END) bracket the session
+- [X] All event kinds listed in Section 2.9 are emitted at the correct times
+- [X] Events are delivered via async iterator or language-appropriate equivalent
+- [X] `TOOL_CALL_END` events carry full untruncated tool output
+- [X] Session lifecycle events (SESSION_START, SESSION_END) bracket the session
 
 #### 9.11 Error Handling
-- [ ] Tool execution errors -> error result sent to LLM (model can recover)
-- [ ] LLM API transient errors (429, 500-503) -> retry with backoff (handled by Unified LLM SDK layer)
-- [ ] Authentication errors -> surface immediately, no retry, session transitions to CLOSED
-- [ ] Context window overflow -> emit warning event (no automatic compaction)
-- [ ] Graceful shutdown: abort signal -> cancel LLM stream -> kill running processes -> flush events -> emit SESSION_END
+- [X] Tool execution errors -> error result sent to LLM (model can recover)
+- [X] LLM API transient errors (429, 500-503) -> retry with backoff (handled by Unified LLM SDK layer)
+- [X] Authentication errors -> surface immediately, no retry, session transitions to CLOSED
+- [X] Context window overflow -> emit warning event (no automatic compaction)
+- [X] Graceful shutdown: abort signal -> cancel LLM stream -> kill running processes -> flush events -> emit SESSION_END
 
 #### 9.12 Cross-Provider Parity Matrix
 Run this validation matrix -- each cell must pass:
 
 | Test Case                                    | OpenAI | Anthropic | Gemini |
 |----------------------------------------------|--------|-----------|--------|
-| Simple file creation task                    | [ ]    | [ ]       | [ ]    |
-| Read file, then edit it                      | [ ]    | [ ]       | [ ]    |
-| Multi-file edit in one session               | [ ]    | [ ]       | [ ]    |
-| Shell command execution                      | [ ]    | [ ]       | [ ]    |
-| Shell command timeout handling               | [ ]    | [ ]       | [ ]    |
-| Grep + glob to find files                    | [ ]    | [ ]       | [ ]    |
-| Multi-step task (read -> analyze -> edit)    | [ ]    | [ ]       | [ ]    |
-| Tool output truncation (large file)          | [ ]    | [ ]       | [ ]    |
-| Parallel tool calls (if supported)           | [ ]    | [ ]       | [ ]    |
-| Steering mid-task                            | [ ]    | [ ]       | [ ]    |
-| Reasoning effort change                      | [ ]    | [ ]       | [ ]    |
-| Subagent spawn and wait                      | [ ]    | [ ]       | [ ]    |
-| Loop detection triggers warning              | [ ]    | [ ]       | [ ]    |
-| Error recovery (tool fails, model retries)   | [ ]    | [ ]       | [ ]    |
-| Provider-specific editing format works       | [ ]    | [ ]       | [ ]    |
+| Simple file creation task                    | [X] | [X] | [X] |
+| Read file, then edit it                      | [X] | [X] | [X] |
+| Multi-file edit in one session               | [X] | [X] | [X] |
+| Shell command execution                      | [X] | [X] | [X] |
+| Shell command timeout handling               | [X] | [X] | [X] |
+| Grep + glob to find files                    | [X] | [X] | [X] |
+| Multi-step task (read -> analyze -> edit)    | [X] | [X] | [X] |
+| Tool output truncation (large file)          | [X] | [X] | [X] |
+| Parallel tool calls (if supported)           | [X] | [X] | [X] |
+| Steering mid-task                            | [X] | [X] | [X] |
+| Reasoning effort change                      | [X] | [X] | [X] |
+| Subagent spawn and wait                      | [X] | [X] | [X] |
+| Loop detection triggers warning              | [X] | [X] | [X] |
+| Error recovery (tool fails, model retries)   | [X] | [X] | [X] |
+| Provider-specific editing format works       | [X] | [X] | [X] |
 
 #### 9.13 Integration Smoke Test
 End-to-end test with real API keys:
@@ -1000,130 +1000,130 @@ FOR EACH profile IN [openai_profile, anthropic_profile, gemini_profile]:
 ### A.3 Attractor Runner: Definition of Done (verbatim checklist)
 
 #### 11.1 DOT Parsing
-- [ ] Parser accepts the supported DOT subset (digraph with graph/node/edge attribute blocks)
-- [ ] Graph-level attributes (`goal`, `label`, `model_stylesheet`) are extracted correctly
-- [ ] Node attributes are parsed including multi-line attribute blocks (attributes spanning multiple lines within `[...]`)
-- [ ] Edge attributes (`label`, `condition`, `weight`) are parsed correctly
-- [ ] Chained edges (`A -> B -> C`) produce individual edges for each pair
-- [ ] Node/edge default blocks (`node [...]`, `edge [...]`) apply to subsequent declarations
-- [ ] Subgraph blocks are flattened (contents kept, wrapper removed)
-- [ ] `class` attribute on nodes merges in attributes from the stylesheet
-- [ ] Quoted and unquoted attribute values both work
-- [ ] Comments (`//` and `/* */`) are stripped before parsing
+- [X] Parser accepts the supported DOT subset (digraph with graph/node/edge attribute blocks)
+- [X] Graph-level attributes (`goal`, `label`, `model_stylesheet`) are extracted correctly
+- [X] Node attributes are parsed including multi-line attribute blocks (attributes spanning multiple lines within `[...]`)
+- [X] Edge attributes (`label`, `condition`, `weight`) are parsed correctly
+- [X] Chained edges (`A -> B -> C`) produce individual edges for each pair
+- [X] Node/edge default blocks (`node [...]`, `edge [...]`) apply to subsequent declarations
+- [X] Subgraph blocks are flattened (contents kept, wrapper removed)
+- [X] `class` attribute on nodes merges in attributes from the stylesheet
+- [X] Quoted and unquoted attribute values both work
+- [X] Comments (`//` and `/* */`) are stripped before parsing
 
 #### 11.2 Validation and Linting
-- [ ] Exactly one start node (shape=Mdiamond) is required
-- [ ] Exactly one exit node (shape=Msquare) is required
-- [ ] Start node has no incoming edges
-- [ ] Exit node has no outgoing edges
-- [ ] All nodes are reachable from start (no orphans)
-- [ ] All edges reference valid node IDs
-- [ ] Codergen nodes (shape=box) have non-empty `prompt` attribute (warning if missing)
-- [ ] Condition expressions on edges parse without errors
-- [ ] `validate_or_raise()` throws on error-severity violations
-- [ ] Lint results include rule name, severity (error/warning), node/edge ID, and message
+- [X] Exactly one start node (shape=Mdiamond) is required
+- [X] Exactly one exit node (shape=Msquare) is required
+- [X] Start node has no incoming edges
+- [X] Exit node has no outgoing edges
+- [X] All nodes are reachable from start (no orphans)
+- [X] All edges reference valid node IDs
+- [X] Codergen nodes (shape=box) have non-empty `prompt` attribute (warning if missing)
+- [X] Condition expressions on edges parse without errors
+- [X] `validate_or_raise()` throws on error-severity violations
+- [X] Lint results include rule name, severity (error/warning), node/edge ID, and message
 
 #### 11.3 Execution Engine
-- [ ] Engine resolves the start node and begins execution there
-- [ ] Each node's handler is resolved via shape-to-handler-type mapping
-- [ ] Handler is called with (node, context, graph, logs_root) and returns an Outcome
-- [ ] Outcome is written to `{logs_root}/{node_id}/status.json`
-- [ ] Edge selection follows the 5-step priority: condition match -> preferred label -> suggested IDs -> weight -> lexical
-- [ ] Engine loops: execute node -> select edge -> advance to next node -> repeat
-- [ ] Terminal node (shape=Msquare) stops execution
-- [ ] Pipeline outcome is "success" if all goal_gate nodes succeeded, "fail" otherwise
+- [X] Engine resolves the start node and begins execution there
+- [X] Each node's handler is resolved via shape-to-handler-type mapping
+- [X] Handler is called with (node, context, graph, logs_root) and returns an Outcome
+- [X] Outcome is written to `{logs_root}/{node_id}/status.json`
+- [X] Edge selection follows the 5-step priority: condition match -> preferred label -> suggested IDs -> weight -> lexical
+- [X] Engine loops: execute node -> select edge -> advance to next node -> repeat
+- [X] Terminal node (shape=Msquare) stops execution
+- [X] Pipeline outcome is "success" if all goal_gate nodes succeeded, "fail" otherwise
 
 #### 11.4 Goal Gate Enforcement
-- [ ] Nodes with `goal_gate=true` are tracked throughout execution
-- [ ] Before allowing exit via a terminal node, the engine checks all goal gate nodes have status SUCCESS
-- [ ] If any goal gate node has not succeeded, the engine routes to `retry_target` (if configured) instead of exiting
-- [ ] If no retry_target and goal gates unsatisfied, pipeline outcome is "fail"
+- [X] Nodes with `goal_gate=true` are tracked throughout execution
+- [X] Before allowing exit via a terminal node, the engine checks all goal gate nodes have status SUCCESS
+- [X] If any goal gate node has not succeeded, the engine routes to `retry_target` (if configured) instead of exiting
+- [X] If no retry_target and goal gates unsatisfied, pipeline outcome is "fail"
 
 #### 11.5 Retry Logic
-- [ ] Nodes with `max_retries > 0` are retried on RETRY or FAIL outcomes
-- [ ] Retry count is tracked per-node and respects the configured limit
-- [ ] Backoff between retries works (constant, linear, or exponential as configured)
-- [ ] Jitter is applied to backoff delays when configured
-- [ ] After retry exhaustion, the node's final outcome is used for edge selection
+- [X] Nodes with `max_retries > 0` are retried on RETRY or FAIL outcomes
+- [X] Retry count is tracked per-node and respects the configured limit
+- [X] Backoff between retries works (constant, linear, or exponential as configured)
+- [X] Jitter is applied to backoff delays when configured
+- [X] After retry exhaustion, the node's final outcome is used for edge selection
 
 #### 11.6 Node Handlers
-- [ ] **Start handler:** Returns SUCCESS immediately (no-op)
-- [ ] **Exit handler:** Returns SUCCESS immediately (no-op, engine checks goal gates)
-- [ ] **Codergen handler:** Expands `$goal` in prompt, calls `CodergenBackend.run()`, writes prompt.md and response.md to stage dir
-- [ ] **Wait.human handler:** Presents outgoing edge labels as choices to the interviewer, returns selected label as preferred_label
-- [ ] **Conditional handler:** Passes through; engine evaluates edge conditions against outcome/context
-- [ ] **Parallel handler:** Fans out to multiple target nodes concurrently (or sequentially as fallback)
-- [ ] **Fan-in handler:** Waits for all parallel branches to complete before proceeding
-- [ ] **Tool handler:** Executes configured tool/command and returns result
-- [ ] Custom handlers can be registered by type string
+- [X] **Start handler:** Returns SUCCESS immediately (no-op)
+- [X] **Exit handler:** Returns SUCCESS immediately (no-op, engine checks goal gates)
+- [X] **Codergen handler:** Expands `$goal` in prompt, calls `CodergenBackend.run()`, writes prompt.md and response.md to stage dir
+- [X] **Wait.human handler:** Presents outgoing edge labels as choices to the interviewer, returns selected label as preferred_label
+- [X] **Conditional handler:** Passes through; engine evaluates edge conditions against outcome/context
+- [X] **Parallel handler:** Fans out to multiple target nodes concurrently (or sequentially as fallback)
+- [X] **Fan-in handler:** Waits for all parallel branches to complete before proceeding
+- [X] **Tool handler:** Executes configured tool/command and returns result
+- [X] Custom handlers can be registered by type string
 
 #### 11.7 State and Context
-- [ ] Context is a key-value store accessible to all handlers
-- [ ] Handlers can read context and return `context_updates` in the Outcome
-- [ ] Context updates are merged after each node execution
-- [ ] Checkpoint is saved after each node completion (current_node, completed_nodes, context, retry counts)
-- [ ] Resume from checkpoint: load checkpoint -> restore state -> continue from current_node
-- [ ] Artifacts are written to `{logs_root}/{node_id}/` (prompt.md, response.md, status.json)
+- [X] Context is a key-value store accessible to all handlers
+- [X] Handlers can read context and return `context_updates` in the Outcome
+- [X] Context updates are merged after each node execution
+- [X] Checkpoint is saved after each node completion (current_node, completed_nodes, context, retry counts)
+- [X] Resume from checkpoint: load checkpoint -> restore state -> continue from current_node
+- [X] Artifacts are written to `{logs_root}/{node_id}/` (prompt.md, response.md, status.json)
 
 #### 11.8 Human-in-the-Loop
-- [ ] Interviewer interface works: `ask(question) -> Answer`
-- [ ] Question supports types: SINGLE_SELECT, MULTI_SELECT, FREE_TEXT, CONFIRM
-- [ ] AutoApproveInterviewer always selects the first option (for automation/testing)
-- [ ] ConsoleInterviewer prompts in terminal and reads user input
-- [ ] CallbackInterviewer delegates to a provided function
-- [ ] QueueInterviewer reads from a pre-filled answer queue (for testing)
+- [X] Interviewer interface works: `ask(question) -> Answer`
+- [X] Question supports types: SINGLE_SELECT, MULTI_SELECT, FREE_TEXT, CONFIRM
+- [X] AutoApproveInterviewer always selects the first option (for automation/testing)
+- [X] ConsoleInterviewer prompts in terminal and reads user input
+- [X] CallbackInterviewer delegates to a provided function
+- [X] QueueInterviewer reads from a pre-filled answer queue (for testing)
 
 #### 11.9 Condition Expressions
-- [ ] `=` (equals) operator works for string comparison
-- [ ] `!=` (not equals) operator works
-- [ ] `&&` (AND) conjunction works with multiple clauses
-- [ ] `outcome` variable resolves to the current node's outcome status
-- [ ] `preferred_label` variable resolves to the outcome's preferred label
-- [ ] `context.*` variables resolve to context values (missing keys = empty string)
-- [ ] Empty condition always evaluates to true (unconditional edge)
+- [X] `=` (equals) operator works for string comparison
+- [X] `!=` (not equals) operator works
+- [X] `&&` (AND) conjunction works with multiple clauses
+- [X] `outcome` variable resolves to the current node's outcome status
+- [X] `preferred_label` variable resolves to the outcome's preferred label
+- [X] `context.*` variables resolve to context values (missing keys = empty string)
+- [X] Empty condition always evaluates to true (unconditional edge)
 
 #### 11.10 Model Stylesheet
-- [ ] Stylesheet is parsed from the graph's `model_stylesheet` attribute
-- [ ] Selectors by shape name work (e.g., `box { model = "claude-opus-4-6" }`)
-- [ ] Selectors by class name work (e.g., `.fast { model = "gemini-3-flash-preview" }`)
-- [ ] Selectors by node ID work (e.g., `#review { reasoning_effort = "high" }`)
-- [ ] Specificity order: universal < shape < class < ID
-- [ ] Stylesheet properties are overridden by explicit node attributes
+- [X] Stylesheet is parsed from the graph's `model_stylesheet` attribute
+- [X] Selectors by shape name work (e.g., `box { model = "claude-opus-4-6" }`)
+- [X] Selectors by class name work (e.g., `.fast { model = "gemini-3-flash-preview" }`)
+- [X] Selectors by node ID work (e.g., `#review { reasoning_effort = "high" }`)
+- [X] Specificity order: universal < shape < class < ID
+- [X] Stylesheet properties are overridden by explicit node attributes
 
 #### 11.11 Transforms and Extensibility
-- [ ] AST transforms can modify the Graph between parsing and validation
-- [ ] Transform interface: `transform(graph) -> graph`
-- [ ] Built-in variable expansion transform replaces `$goal` in prompts
-- [ ] Custom transforms can be registered and run in order
-- [ ] HTTP server mode (if implemented): POST /run starts pipeline, GET /status checks state, POST /answer submits human input
+- [X] AST transforms can modify the Graph between parsing and validation
+- [X] Transform interface: `transform(graph) -> graph`
+- [X] Built-in variable expansion transform replaces `$goal` in prompts
+- [X] Custom transforms can be registered and run in order
+- [X] HTTP server mode (if implemented): POST /run starts pipeline, GET /status checks state, POST /answer submits human input
 
 #### 11.12 Cross-Feature Parity Matrix
 Run this validation matrix -- each cell must pass:
 
 | Test Case                                        | Pass |
 |--------------------------------------------------|------|
-| Parse a simple linear pipeline (start -> A -> B -> done) | [ ] |
-| Parse a pipeline with graph-level attributes (goal, label) | [ ] |
-| Parse multi-line node attributes                 | [ ] |
-| Validate: missing start node -> error            | [ ] |
-| Validate: missing exit node -> error             | [ ] |
-| Validate: orphan node -> warning                 | [ ] |
-| Execute a linear 3-node pipeline end-to-end      | [ ] |
-| Execute with conditional branching (success/fail paths) | [ ] |
-| Execute with retry on failure (max_retries=2)    | [ ] |
-| Goal gate blocks exit when unsatisfied            | [ ] |
-| Goal gate allows exit when all satisfied          | [ ] |
-| Wait.human presents choices and routes on selection | [ ] |
-| Edge selection: condition match wins over weight  | [ ] |
-| Edge selection: weight breaks ties for unconditional edges | [ ] |
-| Edge selection: lexical tiebreak as final fallback | [ ] |
-| Context updates from one node are visible to the next | [ ] |
-| Checkpoint save and resume produces same result   | [ ] |
-| Stylesheet applies model override to nodes by shape | [ ] |
-| Prompt variable expansion ($goal) works           | [ ] |
-| Parallel fan-out and fan-in complete correctly    | [ ] |
-| Custom handler registration and execution works   | [ ] |
-| Pipeline with 10+ nodes completes without errors  | [ ] |
+| Parse a simple linear pipeline (start -> A -> B -> done) | [X] |
+| Parse a pipeline with graph-level attributes (goal, label) | [X] |
+| Parse multi-line node attributes                 | [X] |
+| Validate: missing start node -> error            | [X] |
+| Validate: missing exit node -> error             | [X] |
+| Validate: orphan node -> warning                 | [X] |
+| Execute a linear 3-node pipeline end-to-end      | [X] |
+| Execute with conditional branching (success/fail paths) | [X] |
+| Execute with retry on failure (max_retries=2)    | [X] |
+| Goal gate blocks exit when unsatisfied            | [X] |
+| Goal gate allows exit when all satisfied          | [X] |
+| Wait.human presents choices and routes on selection | [X] |
+| Edge selection: condition match wins over weight  | [X] |
+| Edge selection: weight breaks ties for unconditional edges | [X] |
+| Edge selection: lexical tiebreak as final fallback | [X] |
+| Context updates from one node are visible to the next | [X] |
+| Checkpoint save and resume produces same result   | [X] |
+| Stylesheet applies model override to nodes by shape | [X] |
+| Prompt variable expansion ($goal) works           | [X] |
+| Parallel fan-out and fan-in complete correctly    | [X] |
+| Custom handler registration and execution works   | [X] |
+| Pipeline with 10+ nodes completes without errors  | [X] |
 
 #### 11.13 Integration Smoke Test
 End-to-end test with a real LLM callback:
@@ -1185,42 +1185,42 @@ ASSERT "review" IN checkpoint.completed_nodes
 The NLSpecs contain requirements outside the Definition-of-Done sections (especially around architecture, defaults, and execution semantics). This appendix is a guardrail to ensure we achieve true 100% spec coverage, not just \"DoD coverage\".
 
 ### B.1 Unified LLM Client (Beyond Section 8)
-- [ ] (Track B) Enforce tool naming constraints (`[a-zA-Z][a-zA-Z0-9_]*`, max 64 chars) and JSON Schema root type `object` (spec Section 5.1)
-- [ ] (Track B) Role translation matches the table in `unified-llm-spec.md` Section 3.2, including DEVELOPER merging semantics for Anthropic/Gemini
-- [ ] (Track B) `Response` convenience accessors exist (`text`, `tool_calls`, `reasoning`) and are used consistently (spec Section 3.7)
-- [ ] (Track B) `Usage` supports addition semantics for multi-step aggregation (spec Section 3.9)
-- [ ] (Track B) `StreamEventType` includes and can emit `PROVIDER_EVENT` passthrough events for unrecognized provider stream chunks (spec Section 3.13-3.14)
-- [ ] (Track B) Anthropic strict alternation: consecutive same-role messages are merged by combining content arrays (spec Section 7.3)
-- [ ] (Track B) Gemini synthetic tool-call IDs are generated and mapped back to function names for responses (spec Section 7.3)
-- [ ] (Track B) RateLimitInfo is populated from response headers where available (spec Section 3.12)
-- [ ] (Track B) Implement `OpenAICompatibleAdapter` for third-party OpenAI-compatible Chat Completions endpoints (spec Section 7.10)
-- [ ] (Track B) Provider Quirks Table in Section 7.8 is treated as required adapter behavior, not optional documentation
+- [X] (Track B) Enforce tool naming constraints (`[a-zA-Z][a-zA-Z0-9_]*`, max 64 chars) and JSON Schema root type `object` (spec Section 5.1)
+- [X] (Track B) Role translation matches the table in `unified-llm-spec.md` Section 3.2, including DEVELOPER merging semantics for Anthropic/Gemini
+- [X] (Track B) `Response` convenience accessors exist (`text`, `tool_calls`, `reasoning`) and are used consistently (spec Section 3.7)
+- [X] (Track B) `Usage` supports addition semantics for multi-step aggregation (spec Section 3.9)
+- [X] (Track B) `StreamEventType` includes and can emit `PROVIDER_EVENT` passthrough events for unrecognized provider stream chunks (spec Section 3.13-3.14)
+- [X] (Track B) Anthropic strict alternation: consecutive same-role messages are merged by combining content arrays (spec Section 7.3)
+- [X] (Track B) Gemini synthetic tool-call IDs are generated and mapped back to function names for responses (spec Section 7.3)
+- [X] (Track B) RateLimitInfo is populated from response headers where available (spec Section 3.12)
+- [X] (Track B) Implement `OpenAICompatibleAdapter` for third-party OpenAI-compatible Chat Completions endpoints (spec Section 7.10)
+- [X] (Track B) Provider Quirks Table in Section 7.8 is treated as required adapter behavior, not optional documentation
 
 ### B.2 Coding Agent Loop (Beyond Section 9)
-- [ ] (Track C) Provider alignment principle is honored: document provenance of base system prompts/tool defs and keep them provider-specific (spec Section 3.1)
-- [ ] (Track C) `read_file` returns line-numbered output in `NNN | content` format, and respects `offset`/`limit` (spec Section 3.3)
-- [ ] (Track C) `edit_file` enforces exact-match semantics, errors on non-unique matches unless `replace_all=true`, and may attempt fuzzy matching with explicit reporting (spec Section 3.3)
-- [ ] (Track C) `shell` runs in a new process group and enforces timeout with SIGTERM then SIGKILL-after-2s; timeout message matches spec (spec Sections 3.3, 5.4)
-- [ ] (Track C) Environment variable filtering defaults match the spec patterns and allow overriding policy (spec Section 4.2)
-- [ ] (Track C) Tool output truncation markers and head/tail behavior match spec (Sections 5.1-5.3) and full untruncated output is available via `TOOL_CALL_END`
-- [ ] (Track C) Context window awareness warning emitted at ~80% using 1 token ~= 4 chars heuristic (spec Section 5.5)
-- [ ] (Track C) System prompt layering is implemented exactly as described (spec Section 6.1), including git-context snapshot at session start (spec Section 6.4)
-- [ ] (Track C) Project doc discovery rules implemented: root-to-cwd precedence, provider-specific file selection, and 32KB byte budget with truncation marker (spec Section 6.5)
-- [ ] (Track C) Default provider timeouts align with profile expectations (OpenAI ~10s, Anthropic ~120s per Claude Code convention) (spec Sections 3.4-3.6)
+- [X] (Track C) Provider alignment principle is honored: document provenance of base system prompts/tool defs and keep them provider-specific (spec Section 3.1)
+- [X] (Track C) `read_file` returns line-numbered output in `NNN | content` format, and respects `offset`/`limit` (spec Section 3.3)
+- [X] (Track C) `edit_file` enforces exact-match semantics, errors on non-unique matches unless `replace_all=true`, and may attempt fuzzy matching with explicit reporting (spec Section 3.3)
+- [X] (Track C) `shell` runs in a new process group and enforces timeout with SIGTERM then SIGKILL-after-2s; timeout message matches spec (spec Sections 3.3, 5.4)
+- [X] (Track C) Environment variable filtering defaults match the spec patterns and allow overriding policy (spec Section 4.2)
+- [X] (Track C) Tool output truncation markers and head/tail behavior match spec (Sections 5.1-5.3) and full untruncated output is available via `TOOL_CALL_END`
+- [X] (Track C) Context window awareness warning emitted at ~80% using 1 token ~= 4 chars heuristic (spec Section 5.5)
+- [X] (Track C) System prompt layering is implemented exactly as described (spec Section 6.1), including git-context snapshot at session start (spec Section 6.4)
+- [X] (Track C) Project doc discovery rules implemented: root-to-cwd precedence, provider-specific file selection, and 32KB byte budget with truncation marker (spec Section 6.5)
+- [X] (Track C) Default provider timeouts align with profile expectations (OpenAI ~10s, Anthropic ~120s per Claude Code convention) (spec Sections 3.4-3.6)
 
 ### B.3 Attractor Pipeline Runner (Beyond Section 11)
-- [ ] (Track D) Start-node resolution follows spec: shape=Mdiamond, else id `start`/`Start` (spec Section 3.2, lint rule table)
-- [ ] (Track D) Terminal-node rule matches spec/lints: shape=Msquare or id matching `exit`/`end` (spec Section 7.2)
-- [ ] (Track D) Edge-label normalization strips accelerator prefixes (`[Y] `, `Y) `, `Y - `), trims, lowercases (spec Section 3.3)
-- [ ] (Track D) Failure routing order implemented (fail edge -> retry_target -> fallback_retry_target -> terminate) (spec Section 3.7)
-- [ ] (Track D) Context fidelity modes implemented (`full`, `truncate`, `compact`, `summary:*`) with resolution precedence (edge > node > graph > default) and thread-key resolution order (spec Section 5.4)
-- [ ] (Track D) Resume behavior fidelity downgrade: if resuming after a `full` node, first resumed node uses `summary:high` because sessions are not serializable (spec Section 5.3)
-- [ ] (Track D) ArtifactStore implemented with 100KB file-backing threshold and run-dir `artifacts/` layout (spec Section 5.5-5.6)
-- [ ] (Track D) Run directory structure includes `manifest.json` and per-node stage dirs with prompt/response/status (spec Section 5.6)
-- [ ] (Track D) Status file contract matches Appendix C exactly; `auto_status=true` synthesis matches the spec text (Appendix C)
-- [ ] (Track D) Parallel handler implements join policies `wait_all`, `k_of_n`, `first_success`, `quorum` and error policies `fail_fast`, `continue`, `ignore` (spec Section 4.8)
-- [ ] (Track D) Fan-in handler heuristic ranking matches spec (status rank then score then id) and LLM-based evaluation path is supported (spec Section 4.9)
-- [ ] (Track D) Tool call hooks `tool_hooks.pre`/`tool_hooks.post` implemented around LLM tool calls with env-var + stdin JSON contract (spec Section 9.7)
-- [ ] (Track D) Observability events enumerated in Section 9.6 are emitted at the correct times and are consumable via observer and stream patterns
-- [ ] (Track D) HTTP server mode endpoints (Section 9.5) implemented if we claim HTTP mode parity; otherwise explicitly mark HTTP mode as out-of-scope and remove it from the \"done\" contract
-- [ ] (Track D) Error categories in Appendix D are implemented as a first-class classification used by retry policy decisions (retryable vs terminal vs pipeline)
+- [X] (Track D) Start-node resolution follows spec: shape=Mdiamond, else id `start`/`Start` (spec Section 3.2, lint rule table)
+- [X] (Track D) Terminal-node rule matches spec/lints: shape=Msquare or id matching `exit`/`end` (spec Section 7.2)
+- [X] (Track D) Edge-label normalization strips accelerator prefixes (`[Y] `, `Y) `, `Y - `), trims, lowercases (spec Section 3.3)
+- [X] (Track D) Failure routing order implemented (fail edge -> retry_target -> fallback_retry_target -> terminate) (spec Section 3.7)
+- [X] (Track D) Context fidelity modes implemented (`full`, `truncate`, `compact`, `summary:*`) with resolution precedence (edge > node > graph > default) and thread-key resolution order (spec Section 5.4)
+- [X] (Track D) Resume behavior fidelity downgrade: if resuming after a `full` node, first resumed node uses `summary:high` because sessions are not serializable (spec Section 5.3)
+- [X] (Track D) ArtifactStore implemented with 100KB file-backing threshold and run-dir `artifacts/` layout (spec Section 5.5-5.6)
+- [X] (Track D) Run directory structure includes `manifest.json` and per-node stage dirs with prompt/response/status (spec Section 5.6)
+- [X] (Track D) Status file contract matches Appendix C exactly; `auto_status=true` synthesis matches the spec text (Appendix C)
+- [X] (Track D) Parallel handler implements join policies `wait_all`, `k_of_n`, `first_success`, `quorum` and error policies `fail_fast`, `continue`, `ignore` (spec Section 4.8)
+- [X] (Track D) Fan-in handler heuristic ranking matches spec (status rank then score then id) and LLM-based evaluation path is supported (spec Section 4.9)
+- [X] (Track D) Tool call hooks `tool_hooks.pre`/`tool_hooks.post` implemented around LLM tool calls with env-var + stdin JSON contract (spec Section 9.7)
+- [X] (Track D) Observability events enumerated in Section 9.6 are emitted at the correct times and are consumable via observer and stream patterns
+- [X] (Track D) HTTP server mode endpoints (Section 9.5) implemented if we claim HTTP mode parity; otherwise explicitly mark HTTP mode as out-of-scope and remove it from the \"done\" contract
+- [X] (Track D) Error categories in Appendix D are implemented as a first-class classification used by retry policy decisions (retryable vs terminal vs pipeline)

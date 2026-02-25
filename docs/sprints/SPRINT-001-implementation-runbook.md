@@ -258,7 +258,7 @@ Work executes in strict dependency order:
 ```
 - [X] P3-9 Implement observability stream and optional HTTP mode interfaces if claimed in sprint closure.
 ```text
-{verification: complete; commands: `timeout 180 make test`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/make-test.log`; notes: observer/event stream support implemented in `Runner` with coverage in `RunnerTest::testRunEmitsObserverEventsInOrder`; HTTP mode remains explicitly optional and is not claimed as part of closure.}
+{verification: complete; commands: `timeout 180 make build` and `timeout 180 make test`; exit_codes: 0,0; artifacts: `.scratch/verification/SPRINT-001/phase3/build-http-mode.log`, `.scratch/verification/SPRINT-001/phase3/test-http-mode.log`; notes: observer/event stream support implemented in `Runner`; HTTP mode endpoints `/run`, `/status`, and `/answer` with SSE status streaming are implemented and validated in `tests/integration/Pipeline/HttpServerTest.php` and `tests/unit/Pipeline/RunnerTest.php`.}
 ```
 
 ### Acceptance Criteria

@@ -73,17 +73,48 @@ Provider smoke tests run in an explicit group:
 
 ## ADR-004: HTTP Server Mode Is Deferred for Sprint 001 Closure
 - Date: 2026-02-25
-- Status: Accepted
+- Status: Superseded by ADR-005
 
 ### Context
 Attractor HTTP mode is optional in Sprint 001 and not required for deterministic parity closure. The sprint still requires observability coverage for the runner core.
 
 ### Decision
-Implement runner observability event emission in core execution paths and defer optional HTTP server mode to a follow-on sprint.
+Implement runner observability event emission in core execution paths and defer HTTP server mode to a follow-on sprint.
 
 ### Consequences
 - Positive:
   - Closure focuses on deterministic parity and auditable evidence.
   - Event stream semantics are test-covered and ready for future HTTP/SSE surfacing.
 - Tradeoff:
-  - Remote run/status/answer endpoints are not part of Sprint 001 deliverables.
+  - Deferred functionality increased sprint-document drift once parity closure expanded.
+
+## ADR-005: Implement Minimal HTTP Mode for Sprint 001
+- Date: 2026-02-25
+- Status: Accepted
+
+### Context
+Sprint planning and runbook state required Track D11 closure with verifiable HTTP mode behavior:
+- `POST /run`
+- `GET /status`
+- `POST /answer`
+- SSE event delivery for pipeline lifecycle/status events
+
+Runner resume semantics also needed to continue from checkpoint state for answer-driven human gates.
+
+### Decision
+Implement `Attractor\Pipeline\Http\Server` with:
+- JSON run/status/answer endpoints
+- SSE event stream output via `GET /status?run_id=<id>&stream=1`
+- run record persistence in `.scratch/http-runs`
+
+Add `bin/attractor-http` as a PHP built-in server router and extend pipeline runtime:
+- `WAITING` outcome for unanswered `wait.human` gates
+- checkpoint-aware `Runner::resume()` continuation from saved node/context/retry state
+
+### Consequences
+- Positive:
+  - Sprint D11 is functionally closed and test-covered.
+  - Human-gated runs can pause and resume via HTTP answer submission.
+  - Event stream verification is available without custom infrastructure.
+- Tradeoff:
+  - HTTP mode is intentionally minimal and file-backed for Sprint 001 scope.
