@@ -1,0 +1,47 @@
+{
+  "name": "strongdm/attractor-php",
+  "description": "Attractor PHP implementation for NLSpec parity",
+  "type": "library",
+  "license": "MIT",
+  "require": {
+    "php": "^8.3",
+    "ext-json": "*"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^11.5"
+  },
+  "autoload": {
+    "psr-4": {
+      "Attractor\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "classmap": [
+      "tests/"
+    ]
+  },
+  "scripts": {
+    "doctor": [
+      "php -v",
+      "@php -r \"echo 'json_ext=' . (extension_loaded('json') ? 'ok' : 'missing') . PHP_EOL;\""
+    ],
+    "lint": "php bin/lint.php",
+    "fmt": "@lint",
+    "precommit": [
+      "@doctor",
+      "@lint"
+    ],
+    "test": "phpunit --testsuite unit,integration,e2e",
+    "test:unit": "phpunit --testsuite unit",
+    "test:integration": "phpunit --testsuite integration",
+    "test:e2e": "phpunit --testsuite e2e",
+    "build": [
+      "@precommit",
+      "composer dump-autoload -o"
+    ],
+    "ci": [
+      "@precommit",
+      "@test"
+    ]
+  }
+}
