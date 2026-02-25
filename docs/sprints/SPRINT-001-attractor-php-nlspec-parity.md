@@ -85,6 +85,156 @@ Recommended runtime/deps (decisions can be revisited during Track A):
 - CLI host app: `symfony/console`
 - Tests: `phpunit/phpunit`
 
+## Proposed Public API Contracts (Draft)
+This section makes the planned public surface area explicit so implementation can proceed top-down with testable contracts.
+
+### Unified LLM Client (`Attractor\LLM`)
+Core entry points:
+```php
+namespace Attractor\LLM;
+
+interface ProviderAdapter {
+    public function name(): string;
+    public function complete(Request $request): Response;
+
+    /** @return \Traversable<StreamEvent> */
+    public function stream(Request $request): \Traversable;
+}
+
+final class Client {
+    public static function fromEnv(): self;
+    public function __construct(?string $defaultProvider = null);
+    public function registerAdapter(ProviderAdapter $adapter): void;
+    public function complete(Request $request): Response;
+
+    /** @return \Traversable<StreamEvent> */
+    public function stream(Request $request): \Traversable;
+}
+```
+
+High-level functions (Layer 4) (exact names TBD, but must implement spec semantics):
+```php
+namespace Attractor\LLM;
+
+final class HighLevel {
+    public static function generate(GenerateParams $params): GenerateResult;
+
+    /** @return \Traversable<StreamEvent> */
+    public static function stream(StreamParams $params): \Traversable;
+
+    /** @return GenerateObjectResult<T> */
+    public static function generateObject(GenerateObjectParams $params): GenerateObjectResult;
+}
+```
+
+Environment variable contract (from `unified-llm-spec.md` Section 2.2):
+- OpenAI: `OPENAI_API_KEY` (+ `OPENAI_BASE_URL`, `OPENAI_ORG_ID`, `OPENAI_PROJECT_ID`)
+- Anthropic: `ANTHROPIC_API_KEY` (+ `ANTHROPIC_BASE_URL`)
+- Gemini: `GEMINI_API_KEY` (+ `GEMINI_BASE_URL`)
+- Optional fallback: `GOOGLE_API_KEY` may be accepted as a fallback for `GEMINI_API_KEY`
+
+### Coding Agent Loop (`Attractor\Agent`)
+```php
+namespace Attractor\Agent;
+
+interface ProviderProfile {
+    public function id(): string;       // openai|anthropic|gemini
+    public function model(): string;
+    public function tools(): array;     // list<ToolDefinition>
+    public function buildSystemPrompt(ExecutionEnvironment $env, ProjectDocs $docs): string;
+    public function providerOptions(): ?array;
+    public function toolRegistry(): ToolRegistry;
+
+    public function supportsParallelToolCalls(): bool;
+    public function contextWindowSize(): int;
+}
+
+interface ExecutionEnvironment {
+    public function workingDirectory(): string;
+    public function readFile(string $path, ?int $offset = null, ?int $limit = null): string;
+    public function writeFile(string $path, string $content): void;
+    public function fileExists(string $path): bool;
+    public function execCommand(string $command, int $timeoutMs, ?string $workingDir = null, ?array $envVars = null): ExecResult;
+    public function grep(string $pattern, string $path, GrepOptions $options): string;
+    public function glob(string $pattern, string $path): array;
+}
+
+final class Session {
+    public function __construct(
+        ProviderProfile $profile,
+        ExecutionEnvironment $env,
+        \Attractor\LLM\Client $llm,
+        ?SessionConfig $config = null,
+        ?EventEmitter $events = null
+    );
+
+    public function submit(string $input): SessionResult;
+    public function steer(string $message): void;
+    public function followUp(string $message): void;
+    public function close(): void;
+}
+```
+
+### Attractor Runner (`Attractor\Pipeline`)
+```php
+namespace Attractor\Pipeline;
+
+interface Handler {
+    public function execute(Node $node, Context $context, Graph $graph, string $logsRoot): Outcome;
+}
+
+interface CodergenBackend {
+    /** @return string|Outcome */
+    public function run(Node $node, string $prompt, Context $context);
+}
+
+interface Interviewer {
+    public function ask(Question $question): Answer;
+    public function askMultiple(array $questions): array; // list<Answer>
+    public function inform(string $message, string $stage): void;
+}
+
+final class Runner {
+    public function __construct(
+        HandlerRegistry $handlers,
+        TransformRegistry $transforms,
+        Validator $validator,
+        Interviewer $interviewer
+    );
+
+    public function parseDot(string $dotSource): Graph;
+    public function validate(Graph $graph): array; // list<Diagnostic>
+    public function run(Graph $graph, RunnerConfig $config): PipelineOutcome;
+    public function resume(string $logsRoot, RunnerConfig $config): PipelineOutcome;
+}
+```
+
+## Planned File/Namespace Map (Concrete Targets)
+This is the suggested initial skeleton; exact filenames can change, but the boundaries should hold.
+
+- `src/LLM/Client.php`, `src/LLM/ProviderAdapter.php`, `src/LLM/HighLevel.php`
+- `src/LLM/Adapters/OpenAIResponsesAdapter.php`, `src/LLM/Adapters/AnthropicMessagesAdapter.php`, `src/LLM/Adapters/GeminiAdapter.php`, `src/LLM/Adapters/OpenAICompatibleAdapter.php`
+- `src/LLM/Types/*` (`Message`, `ContentPart`, `Request`, `Response`, `Usage`, `StreamEvent`, etc.)
+- `src/LLM/Tools/*` (`Tool`, `ToolCall`, `ToolResult`, `ToolChoice`, etc.)
+- `src/LLM/Errors/*` (error taxonomy per spec Section 6)
+- `src/LLM/Streaming/*` (SSE/NDJSON parsing and normalization)
+
+- `src/Agent/Session.php`, `src/Agent/SessionConfig.php`, `src/Agent/SessionEvent.php`
+- `src/Agent/Profiles/*` (OpenAI/Anthropic/Gemini profiles)
+- `src/Agent/Tools/*` (ToolRegistry + core tools + apply_patch/edit_file)
+- `src/Agent/Exec/*` (ExecutionEnvironment, LocalExecutionEnvironment, wrappers)
+- `src/Agent/Subagents/*` (Subagent manager + tools)
+
+- `src/Pipeline/Dot/*` (tokenizer/parser for DOT subset)
+- `src/Pipeline/Model/*` (Graph/Node/Edge)
+- `src/Pipeline/Stylesheet/*` (parser + transform)
+- `src/Pipeline/Validation/*` (lint rules + diagnostics)
+- `src/Pipeline/Runtime/*` (Context, Outcome, Checkpoint, ArtifactStore)
+- `src/Pipeline/Engine/*` (runner loop, edge selection, retry policy)
+- `src/Pipeline/Handlers/*` (built-ins)
+- `src/Pipeline/Human/*` (interviewers)
+- `src/Pipeline/Http/*` (optional HTTP server mode)
+
 ## Repository Layout (Planned)
 - `src/LLM/...` unified LLM SDK
 - `src/Agent/...` coding agent loop
