@@ -96,6 +96,26 @@ Recommended runtime/deps (decisions can be revisited during Track A):
 - `examples/pipelines/*.dot` reference pipelines for parity matrix
 - `.scratch/verification/SPRINT-001/...` evidence artifacts
 
+## Evidence and Verification Conventions
+Evidence is an explicit deliverable. During implementation, every completed checklist item should be updated with its evidence:
+- Command(s) executed, wrapped in backticks
+- Exit code(s)
+- Artifact path(s) under `.scratch/verification/SPRINT-001/...`
+
+Proposed evidence layout (by track):
+- `.scratch/verification/SPRINT-001/track-a/...` scaffolding/tooling
+- `.scratch/verification/SPRINT-001/track-b/...` unified LLM SDK
+- `.scratch/verification/SPRINT-001/track-c/...` coding agent loop
+- `.scratch/verification/SPRINT-001/track-d/...` Attractor runner
+- `.scratch/verification/SPRINT-001/track-e/...` end-to-end integration
+
+Proposed canonical commands (to be created in Track A):
+- `composer test` (runs all non-e2e tests)
+- `composer test:unit`, `composer test:integration`, `composer test:e2e`
+- `composer lint` (static analysis + style checks)
+- `composer fmt` (format code)
+- `composer run doctor` (toolchain/version checks)
+
 ## Mermaid Diagrams (Verified Syntax)
 
 ### Domain Model (Attractor Graph)
@@ -926,3 +946,47 @@ ASSERT "plan" IN checkpoint.completed_nodes
 ASSERT "implement" IN checkpoint.completed_nodes
 ASSERT "review" IN checkpoint.completed_nodes
 ```
+
+## Appendix B - Full Spec Coverage (Beyond DoD)
+The NLSpecs contain requirements outside the Definition-of-Done sections (especially around architecture, defaults, and execution semantics). This appendix is a guardrail to ensure we achieve true 100% spec coverage, not just \"DoD coverage\".
+
+### B.1 Unified LLM Client (Beyond Section 8)
+- [ ] (Track B) Enforce tool naming constraints (`[a-zA-Z][a-zA-Z0-9_]*`, max 64 chars) and JSON Schema root type `object` (spec Section 5.1)
+- [ ] (Track B) Role translation matches the table in `unified-llm-spec.md` Section 3.2, including DEVELOPER merging semantics for Anthropic/Gemini
+- [ ] (Track B) `Response` convenience accessors exist (`text`, `tool_calls`, `reasoning`) and are used consistently (spec Section 3.7)
+- [ ] (Track B) `Usage` supports addition semantics for multi-step aggregation (spec Section 3.9)
+- [ ] (Track B) `StreamEventType` includes and can emit `PROVIDER_EVENT` passthrough events for unrecognized provider stream chunks (spec Section 3.13-3.14)
+- [ ] (Track B) Anthropic strict alternation: consecutive same-role messages are merged by combining content arrays (spec Section 7.3)
+- [ ] (Track B) Gemini synthetic tool-call IDs are generated and mapped back to function names for responses (spec Section 7.3)
+- [ ] (Track B) RateLimitInfo is populated from response headers where available (spec Section 3.12)
+- [ ] (Track B) Implement `OpenAICompatibleAdapter` for third-party OpenAI-compatible Chat Completions endpoints (spec Section 7.10)
+- [ ] (Track B) Provider Quirks Table in Section 7.8 is treated as required adapter behavior, not optional documentation
+
+### B.2 Coding Agent Loop (Beyond Section 9)
+- [ ] (Track C) Provider alignment principle is honored: document provenance of base system prompts/tool defs and keep them provider-specific (spec Section 3.1)
+- [ ] (Track C) `read_file` returns line-numbered output in `NNN | content` format, and respects `offset`/`limit` (spec Section 3.3)
+- [ ] (Track C) `edit_file` enforces exact-match semantics, errors on non-unique matches unless `replace_all=true`, and may attempt fuzzy matching with explicit reporting (spec Section 3.3)
+- [ ] (Track C) `shell` runs in a new process group and enforces timeout with SIGTERM then SIGKILL-after-2s; timeout message matches spec (spec Sections 3.3, 5.4)
+- [ ] (Track C) Environment variable filtering defaults match the spec patterns and allow overriding policy (spec Section 4.2)
+- [ ] (Track C) Tool output truncation markers and head/tail behavior match spec (Sections 5.1-5.3) and full untruncated output is available via `TOOL_CALL_END`
+- [ ] (Track C) Context window awareness warning emitted at ~80% using 1 token ~= 4 chars heuristic (spec Section 5.5)
+- [ ] (Track C) System prompt layering is implemented exactly as described (spec Section 6.1), including git-context snapshot at session start (spec Section 6.4)
+- [ ] (Track C) Project doc discovery rules implemented: root-to-cwd precedence, provider-specific file selection, and 32KB byte budget with truncation marker (spec Section 6.5)
+- [ ] (Track C) Default provider timeouts align with profile expectations (OpenAI ~10s, Anthropic ~120s per Claude Code convention) (spec Sections 3.4-3.6)
+
+### B.3 Attractor Pipeline Runner (Beyond Section 11)
+- [ ] (Track D) Start-node resolution follows spec: shape=Mdiamond, else id `start`/`Start` (spec Section 3.2, lint rule table)
+- [ ] (Track D) Terminal-node rule matches spec/lints: shape=Msquare or id matching `exit`/`end` (spec Section 7.2)
+- [ ] (Track D) Edge-label normalization strips accelerator prefixes (`[Y] `, `Y) `, `Y - `), trims, lowercases (spec Section 3.3)
+- [ ] (Track D) Failure routing order implemented (fail edge -> retry_target -> fallback_retry_target -> terminate) (spec Section 3.7)
+- [ ] (Track D) Context fidelity modes implemented (`full`, `truncate`, `compact`, `summary:*`) with resolution precedence (edge > node > graph > default) and thread-key resolution order (spec Section 5.4)
+- [ ] (Track D) Resume behavior fidelity downgrade: if resuming after a `full` node, first resumed node uses `summary:high` because sessions are not serializable (spec Section 5.3)
+- [ ] (Track D) ArtifactStore implemented with 100KB file-backing threshold and run-dir `artifacts/` layout (spec Section 5.5-5.6)
+- [ ] (Track D) Run directory structure includes `manifest.json` and per-node stage dirs with prompt/response/status (spec Section 5.6)
+- [ ] (Track D) Status file contract matches Appendix C exactly; `auto_status=true` synthesis matches the spec text (Appendix C)
+- [ ] (Track D) Parallel handler implements join policies `wait_all`, `k_of_n`, `first_success`, `quorum` and error policies `fail_fast`, `continue`, `ignore` (spec Section 4.8)
+- [ ] (Track D) Fan-in handler heuristic ranking matches spec (status rank then score then id) and LLM-based evaluation path is supported (spec Section 4.9)
+- [ ] (Track D) Tool call hooks `tool_hooks.pre`/`tool_hooks.post` implemented around LLM tool calls with env-var + stdin JSON contract (spec Section 9.7)
+- [ ] (Track D) Observability events enumerated in Section 9.6 are emitted at the correct times and are consumable via observer and stream patterns
+- [ ] (Track D) HTTP server mode endpoints (Section 9.5) implemented if we claim HTTP mode parity; otherwise explicitly mark HTTP mode as out-of-scope and remove it from the \"done\" contract
+- [ ] (Track D) Error categories in Appendix D are implemented as a first-class classification used by retry policy decisions (retryable vs terminal vs pipeline)
