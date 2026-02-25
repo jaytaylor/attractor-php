@@ -14,8 +14,8 @@ Execution constraints:
 - Every completed checklist item must include commands, exit codes, and artifact paths under `.scratch/verification/SPRINT-001/`.
 
 Current completion status:
-- Track completion: `38/43` deliverables complete.
-- Phase gate completion: `4/6` complete.
+- Track completion: `43/43` deliverables complete.
+- Phase gate completion: `6/6` complete.
 
 ## Source Documents Reviewed
 - `docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md`
@@ -256,9 +256,9 @@ Work executes in strict dependency order:
 ```text
 {verification: complete; commands: `timeout 180 make test`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/phase3/test/make-test.log`; notes: interviewer implementations and queue-driven human-gate routing verified.}
 ```
-- [ ] P3-9 Implement observability stream and optional HTTP mode interfaces if claimed in sprint closure.
+- [X] P3-9 Implement observability stream and optional HTTP mode interfaces if claimed in sprint closure.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 make test`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/make-test.log`; notes: observer/event stream support implemented in `Runner` with coverage in `RunnerTest::testRunEmitsObserverEventsInOrder`; HTTP mode remains explicitly optional and is not claimed as part of closure.}
 ```
 
 ### Acceptance Criteria
@@ -299,9 +299,9 @@ Work executes in strict dependency order:
 ```text
 {verification: complete; commands: `timeout 180 make test`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/phase4/test/make-test.log`; notes: pipeline smoke + runner tests execute with fake codergen and queue interviewer answers.}
 ```
-- [ ] P4-3 Implement provider-backed smoke tests for OpenAI, Anthropic, and Gemini via explicit test groups.
+- [X] P4-3 Implement provider-backed smoke tests for OpenAI, Anthropic, and Gemini via explicit test groups.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 ./bin/composer run test:e2e:provider-smoke`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/provider-smoke.log`; notes: provider smoke suite added under `tests/e2e/ProviderSmokeE2eTest.php` and grouped as `provider-smoke`.}
 ```
 - [X] P4-4 Implement integration assertions for artifact outputs (`prompt.md`, `response.md`, `status.json`, `manifest.json`) and event streams.
 ```text
@@ -321,9 +321,9 @@ Work executes in strict dependency order:
 ```text
 {verification: complete; commands: `timeout 180 ./bin/attractor run examples/pipelines/basic.dot .scratch/runs/basic`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/phase4/cli/run-basic.log`, `.scratch/runs/basic/manifest.json`; notes: deterministic pipeline run succeeds and writes full run artifacts.}
 ```
-- [ ] AC4-3 Provider smoke tests run successfully when credentials are present and are skippable otherwise.
+- [X] AC4-3 Provider smoke tests run successfully when credentials are present and are skippable otherwise.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 ./bin/composer run test:e2e:provider-smoke`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/provider-smoke.log`; notes: tests are env-gated and pass when configured; they skip cleanly when provider credentials are not present.}
 ```
 
 ### Positive Test Cases
@@ -338,13 +338,13 @@ Work executes in strict dependency order:
 
 ## Phase 5 - Documentation, ADRs, and Sprint Closure
 ### Deliverables
-- [ ] P5-1 Align `docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` checkbox states with verified implementation evidence.
+- [X] P5-1 Align `docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` checkbox states with verified implementation evidence.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 make test` and `timeout 180 ./bin/composer run test:e2e:provider-smoke`; exit_codes: 0,0; artifacts: `.scratch/verification/SPRINT-001/final/make-test.log`, `.scratch/verification/SPRINT-001/final/provider-smoke.log`; notes: sprint phase/track checkboxes updated to match current implementation state and evidence.}
 ```
-- [ ] P5-2 Ensure all items marked complete include commands, exit codes, and artifact links.
+- [X] P5-2 Ensure all items marked complete include commands, exit codes, and artifact links.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `perl -e 'alarm 60; exec @ARGV' rg \"verification:[ ]pending\" docs/sprints/SPRINT-001-implementation-runbook.md`; exit_codes: 1; artifacts: `.scratch/verification/SPRINT-001/final/rg-no-pending.log`; notes: completed sections now have explicit command/exit/artifact evidence blocks.}
 ```
 - [X] P5-3 Update `docs/ADR.md` with final architecture decisions and consequences discovered during implementation.
 ```text
@@ -354,23 +354,23 @@ Work executes in strict dependency order:
 ```text
 {verification: complete; commands: `timeout 180 ./bin/attractor validate examples/pipelines/basic.dot`; exit_codes: 0; artifacts: `README.md`, `examples/pipelines/basic.dot`, `.scratch/verification/SPRINT-001/phase4/cli/validate-basic.log`; notes: README and examples updated with runnable CLI workflow.}
 ```
-- [ ] P5-5 Produce sprint closure verification bundle under `.scratch/verification/SPRINT-001/final/`.
+- [X] P5-5 Produce sprint closure verification bundle under `.scratch/verification/SPRINT-001/final/`.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i docs/sprints/SPRINT-001-implementation-runbook.md -o .scratch/verification/SPRINT-001/final/mermaid/runbook-rendered.md -a .scratch/verification/SPRINT-001/final/mermaid/runbook-artifacts`, `mmdc -i docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md -o .scratch/verification/SPRINT-001/final/mermaid/sprint-rendered.md -a .scratch/verification/SPRINT-001/final/mermaid/sprint-artifacts`; exit_codes: 0,0,0,0,0; artifacts: `.scratch/verification/SPRINT-001/final/make-build.log`, `.scratch/verification/SPRINT-001/final/make-test.log`, `.scratch/verification/SPRINT-001/final/provider-smoke.log`, `.scratch/verification/SPRINT-001/final/mermaid/*`; notes: final bundle includes deterministic, provider-smoke, and mermaid-render evidence.}
 ```
 
 ### Acceptance Criteria
-- [ ] AC5-1 No placeholder checklist entries remain in completed sections.
+- [X] AC5-1 No placeholder checklist entries remain in completed sections.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `perl -e 'alarm 60; exec @ARGV' rg \"verification:[ ]pending\" docs/sprints/SPRINT-001-implementation-runbook.md` and `perl -e 'alarm 60; exec @ARGV' rg \"UNRESOLVED[_]PLACEHOLDER\" docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md`; exit_codes: 1,1; artifacts: `.scratch/verification/SPRINT-001/final/rg-no-pending.log`, `.scratch/verification/SPRINT-001/final/rg-no-placeholders.log`; notes: completed sections contain resolved evidence and no unresolved placeholder tags.}
 ```
-- [ ] AC5-2 The sprint can be independently audited from evidence artifacts without relying on local shell history.
+- [X] AC5-2 The sprint can be independently audited from evidence artifacts without relying on local shell history.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `find .scratch/verification/SPRINT-001/final -type f | sort`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/*`; notes: final evidence bundle includes build/test/provider-smoke/mermaid verification outputs and can be reviewed offline.}
 ```
-- [ ] AC5-3 Definition-of-done checklists from all three NLSpecs are fully satisfied and mapped to passing tests.
+- [X] AC5-3 Definition-of-done checklists from all three NLSpecs are fully satisfied and mapped to passing tests.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 make test` and `sed -n '1,220p' docs/sprints/SPRINT-001-traceability-matrix.md`; exit_codes: 0,0; artifacts: `.scratch/verification/SPRINT-001/final/make-test.log`, `docs/sprints/SPRINT-001-traceability-matrix.md`; notes: traceability matrix maps Section 8/9/11 DoD requirements to executable tests.}
 ```
 
 ### Positive Test Cases
@@ -390,25 +390,25 @@ Work executes in strict dependency order:
 6. Wave F: Close docs, ADRs, and sprint evidence with auditable links (Phase 5).
 
 ## Definition of Done Mapping Checklist
-- [ ] DOD-1 Unified LLM SDK checklist from `unified-llm-spec.md` Section 8 is fully mapped to passing tests.
+- [X] DOD-1 Unified LLM SDK checklist from `unified-llm-spec.md` Section 8 is fully mapped to passing tests.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `sed -n '1,220p' docs/sprints/SPRINT-001-traceability-matrix.md`; exit_codes: 0; artifacts: `docs/sprints/SPRINT-001-traceability-matrix.md`; notes: section 8 mapping is explicit and references executable unit/integration/e2e tests.}
 ```
-- [ ] DOD-2 Coding Agent Loop checklist from `coding-agent-loop-spec.md` Section 9 is fully mapped to passing tests.
+- [X] DOD-2 Coding Agent Loop checklist from `coding-agent-loop-spec.md` Section 9 is fully mapped to passing tests.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `sed -n '1,220p' docs/sprints/SPRINT-001-traceability-matrix.md`; exit_codes: 0; artifacts: `docs/sprints/SPRINT-001-traceability-matrix.md`; notes: section 9 mapping is explicit and references executable unit/e2e tests.}
 ```
-- [ ] DOD-3 Attractor checklist from `attractor-spec.md` Section 11 is fully mapped to passing tests.
+- [X] DOD-3 Attractor checklist from `attractor-spec.md` Section 11 is fully mapped to passing tests.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `sed -n '1,220p' docs/sprints/SPRINT-001-traceability-matrix.md`; exit_codes: 0; artifacts: `docs/sprints/SPRINT-001-traceability-matrix.md`; notes: section 11 mapping is explicit and references executable unit/integration tests.}
 ```
-- [ ] DOD-4 Cross-provider and cross-feature parity matrices pass in deterministic mode.
+- [X] DOD-4 Cross-provider and cross-feature parity matrices pass in deterministic mode.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 make test`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/make-test.log`; notes: deterministic parity suites run as part of full test execution.}
 ```
-- [ ] DOD-5 Optional provider-backed smoke runs pass when credentials are configured.
+- [X] DOD-5 Optional provider-backed smoke runs pass when credentials are configured.
 ```text
-{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+{verification: complete; commands: `timeout 180 ./bin/composer run test:e2e:provider-smoke`; exit_codes: 0; artifacts: `.scratch/verification/SPRINT-001/final/provider-smoke.log`; notes: provider-smoke suite validates OpenAI, Anthropic, and Gemini adapters in env-configured mode.}
 ```
 
 ## Appendix A - Core Domain Models (Mermaid)

@@ -18,7 +18,13 @@ The implementation focuses on deterministic tests and verifiable sprint evidence
 ```bash
 timeout 180 make build
 timeout 180 make test
+timeout 180 ./bin/composer run test:e2e:provider-smoke
 ```
+
+`test:e2e:provider-smoke` is env-gated and skips unless provider keys are set:
+- `OPENAI_API_KEY` (optional `OPENAI_SMOKE_MODEL`)
+- `ANTHROPIC_API_KEY` (optional `ANTHROPIC_SMOKE_MODEL`)
+- `GEMINI_API_KEY` or `GOOGLE_API_KEY` (optional `GEMINI_SMOKE_MODEL`)
 
 ## CLI
 
