@@ -34,4 +34,9 @@ final class Outcome
     {
         return new self('RETRY', $message, $preferredLabel, $updates);
     }
+
+    public static function waiting(string $message = '', ?string $preferredLabel = null, array $updates = []): self
+    {
+        return new self('WAITING', $message, $preferredLabel, $updates);
+    }
 }
