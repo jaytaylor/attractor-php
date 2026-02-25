@@ -1,607 +1,688 @@
 Legend: [ ] Incomplete, [X] Complete
 
-# Sprint 001 Comprehensive Implementation Plan
+# SPRINT-001 Comprehensive Implementation Plan
 
 ## Executive Summary
-This plan turns `docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` into an execution-ready implementation program with phase gates, explicit deliverables, detailed positive and negative tests, and evidence placeholders for every checklist item.
+This plan is the implementation program for `docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md`.
+It is organized as phase-gated checklists with explicit verification placeholders, acceptance criteria, and detailed positive/negative tests.
 
-Current status baseline:
-- Planned items complete: `45`
-- Planned items total: `45`
-- Phase gates complete: `6/6`
+## Review Findings From Source Sprint Document
+- The source sprint document defines the correct product objective and architecture boundaries across Unified LLM, Coding Agent Loop, and Attractor Runner.
+- The source sprint document is broad enough to execute, but implementation ownership is spread across multiple long sections and is hard to run as a day-to-day checklist.
+- Existing planning artifacts include many pre-marked complete items; this comprehensive plan resets implementation tasks to `[ ]` so status can be kept in sync with verifiable evidence.
 
 ## Scope
-Implement full parity with:
+Implement full NLSpec parity for:
 - `unified-llm-spec.md`
 - `coding-agent-loop-spec.md`
 - `attractor-spec.md`
 
-Definition of done for this plan:
-- Every checklist item is marked `[X]` only after verification evidence is attached.
-- Every phase acceptance criterion is satisfied with deterministic tests.
-- Environment-gated provider smoke paths are executed when credentials are available.
-- Traceability from NLSpec requirement to test coverage is complete and auditable.
-
-## Implementation Principles
-- Verification-first execution: implement, test, then mark complete.
-- One canonical progress source: this file tracks execution state.
-- Deterministic by default: local suites do not require live provider access.
-- No feature flags and no legacy compatibility work.
-- Every checklist line is immediately followed by a verification evidence block.
+## Planning Status Snapshot
+- Planning baseline established on 2026-02-25.
+- All implementation checklist items in this plan start as `[ ]` and are promoted to `[X]` only after evidence is attached.
 
 ## Evidence Contract
-Evidence for every completed item must include:
-- Exact command list
-- Exit codes
-- Artifact paths under `.scratch/verification/SPRINT-001/`
-- Brief reasoning proving why the item is complete
+- Evidence root: `.scratch/verification/SPRINT-001/`
+- Each checklist item must be followed by a verification block and kept current.
+- Acceptable evidence includes: executed command list, exit codes, artifact paths, and concise reasoning.
 
-Standard evidence format:
+Standard verification placeholder format (required under every checklist item):
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
-## Phase Ordering
-1. Phase 0: Baseline and harness hardening
-2. Phase 1: Unified LLM parity
-3. Phase 2: Coding agent loop parity
-4. Phase 3: Attractor runner parity
-5. Phase 4: Cross-layer integration and CLI/HTTP execution paths
-6. Phase 5: Closure, documentation reconciliation, and release evidence
+## Execution Order
+1. Phase 0: Foundations and verification harness
+2. Phase 1: Unified LLM parity implementation
+3. Phase 2: Coding Agent Loop parity implementation
+4. Phase 3: Attractor Runner parity implementation
+5. Phase 4: Cross-layer integration, closure, and release readiness
 
-## Phase 0 - Baseline and Harness Hardening
+## Phase 0 - Foundations and Verification Harness
 ### Deliverables
-- [X] P0-1 Reconcile sprint scope into a requirement-to-test map covering all DoD sections and beyond-DoD clauses.
+- [ ] P0-1 Build a requirement inventory that maps every NLSpec section and DoD item to planned implementation files and tests.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P0-2 Normalize `.scratch/verification/SPRINT-001/` directory layout for phase, subsystem, and test category evidence.
+- [ ] P0-2 Normalize developer commands (`build`, `lint`, `test`, `test:unit`, `test:integration`, `test:e2e`, provider smoke) so execution is deterministic in local mode.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P0-3 Validate canonical developer command set for build, lint, unit, integration, deterministic e2e, and provider-smoke execution.
+- [ ] P0-3 Standardize `.scratch/verification/SPRINT-001/` directory layout by phase and subsystem.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P0-4 Add repeatable `.scratch` probes for transport fixtures, stream normalization, parser behavior, and runner checkpoint loading.
+- [ ] P0-4 Add reusable `.scratch` probes for parser behavior, stream normalization, checkpoint serialization, and tool execution edge cases.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P0-5 Record any architecture-impacting sequencing decisions in `docs/ADR.md` before implementation starts.
+- [ ] P0-5 Define fixture conventions for deterministic provider adapter tests (request, response, and streaming chunks).
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P0-6 Verify appendix mermaid diagrams render successfully with `mmdc` and archive rendered artifacts.
+- [ ] P0-6 Ensure `docs/ADR.md` records architecture-impacting sequencing decisions before implementation begins.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P0-7 Verify appendix mermaid diagrams render with `mmdc` and archive outputs under `.scratch/verification/SPRINT-001/planning/mermaid/`.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Acceptance Criteria
-- [X] AC0-1 Every requirement in the three NLSpecs maps to at least one implementation task and one verification path.
+- [ ] AC0-1 Every spec requirement has at least one linked implementation task and one linked verification path.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC0-2 A new contributor can execute baseline commands and understand where to place evidence artifacts.
+- [ ] AC0-2 Deterministic local build, lint, and test commands execute without provider credentials.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC0-3 Evidence placeholders exist for all checklist items in this plan before Phase 1 starts.
+- [ ] AC0-3 Evidence artifacts are reproducible and discoverable by phase and subsystem.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Positive Test Cases
-1. Baseline command set executes end-to-end and produces expected logs.
-2. Traceability matrix references existing test files for each DoD section.
-3. Mermaid diagrams render to SVG without parser errors.
+- [ ] P0-T1 Validate requirement inventory completeness by checking each DoD section resolves to at least one test file path.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P0-T2 Run deterministic suite and confirm unit/integration/e2e deterministic groups execute in expected order.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P0-T3 Confirm mermaid appendix renders produce non-empty SVG outputs for all five diagrams.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ### Negative Test Cases
-1. Missing evidence artifact path is detected during checklist review.
-2. Requirement without mapped test coverage is rejected at phase gate.
-3. Broken mermaid syntax fails render and blocks gate progression.
+- [ ] P0-N1 Remove one evidence artifact path from a completion log and confirm the verification audit fails.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P0-N2 Introduce an unmapped requirement in the inventory and confirm traceability checks report a gap.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P0-N3 Introduce a malformed mermaid snippet and confirm render verification catches the failure.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
-## Phase 1 - Unified LLM Parity
+## Phase 1 - Unified LLM Client Parity
 ### Deliverables
-- [X] P1-1 Finalize core LLM domain types and invariants (`Request`, `Response`, `Usage`, content parts, stream events, tool types).
+- [ ] P1-1 Finalize unified core data model (`Message`, `ContentPart`, `Request`, `Response`, `Usage`, `StreamEvent`, `ToolCall`, `ToolResult`, error types).
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-2 Finalize client routing, provider defaulting, and middleware execution order.
+- [ ] P1-2 Implement provider routing and default provider behavior in `Client`, including middleware ordering guarantees.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-3 Complete OpenAI native adapter translation for request, response, and stream event normalization.
+- [ ] P1-3 Complete OpenAI native adapter request/response translation and streaming normalization.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-4 Complete Anthropic native adapter translation including thinking/redacted-thinking pass-through and strict message alternation handling.
+- [ ] P1-4 Complete Anthropic native adapter translation, thinking-content preservation, and streaming normalization.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-5 Complete Gemini native adapter translation including synthetic tool-call ID mapping and usage field normalization.
+- [ ] P1-5 Complete Gemini native adapter translation, synthetic tool-call ID handling, and streaming normalization.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-6 Implement provider-agnostic high-level APIs (`generate`, `stream`, `generate_object`) with prompt/messages exclusivity rules.
+- [ ] P1-6 Implement high-level APIs (`generate`, `stream`, `generate_object`, `stream_object`) with strict input validation.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-7 Implement active and passive tool-call flows, including multi-call parallel execution and aggregated continuation input.
+- [ ] P1-7 Implement active/passive tool workflows, multi-call batching, and continuation behavior across providers.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-8 Complete structured-output validation path and `NoObjectGeneratedError` behavior for invalid JSON or schema mismatch.
+- [ ] P1-8 Implement structured output validation paths and deterministic error mapping for invalid generated objects.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-9 Complete provider error mapping and retryability classification according to the NLSpec error taxonomy.
+- [ ] P1-9 Implement multimodal translation coverage for text + image URL + base64 + local file path inputs.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-10 Finalize prompt-caching usage accounting fields for all providers where supported by native responses.
+- [ ] P1-10 Implement usage metadata mapping parity, including provider reasoning/thinking token fields.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-11 Finalize deterministic cross-provider parity matrix test suite using mock transports and fixtures.
+- [ ] P1-11 Implement deterministic cross-provider parity matrix tests using fixture-backed transports.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P1-12 Finalize env-gated provider smoke suite entrypoints and artifact capture conventions.
+- [ ] P1-12 Implement provider smoke tests that execute only when provider credentials are present.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Acceptance Criteria
-- [X] AC1-1 Mock transport tests prove semantic parity for OpenAI, Anthropic, and Gemini on text, multimodal, tools, and streaming.
+- [ ] AC1-1 Adapter translation tests pass for OpenAI, Anthropic, and Gemini in deterministic mode.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC1-2 High-level API tests prove expected behavior and contract failures for mutually exclusive and invalid inputs.
+- [ ] AC1-2 Streaming event sequences are normalized and validated for start, delta, and finish transitions.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC1-3 Error mapping tests prove expected exception types and retryability attributes.
+- [ ] AC1-3 Tool-calling loops work for single-call and parallel-call responses with consistent continuation behavior.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC1-4 Provider smoke suite executes only when credentials exist and leaves deterministic suites unaffected.
+- [ ] AC1-4 Structured output paths fail safely with explicit typed errors for parse/schema violations.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] AC1-5 Provider smoke tests succeed in environments where credentials are available.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Positive Test Cases
-1. Text generation parity: identical normalized response shape across all providers.
-2. Streaming parity: start, delta, and finish events concatenate to final response text.
-3. Multimodal parity: text + image URL and text + base64 image both translate correctly.
-4. Tool parity: model emits multiple tool calls in one step and receives one consolidated continuation message.
-5. Structured output parity: valid schema payload returns typed object with preserved fields.
-6. Usage parity: input/output/reasoning/cache counters are populated where provider responses expose them.
+- [ ] P1-T1 Simple prompt generation produces non-empty output and usage metadata for each provider adapter (fixture-backed).
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-T2 Streaming text deltas concatenate to final response text and retain finish metadata.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-T3 Two-tool parallel call response executes both tool handlers and submits consolidated tool results in one continuation step.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-T4 `generate_object` returns schema-valid object for a constrained extraction prompt.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-T5 Multimodal message with text + image path translates correctly per provider contract.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ### Negative Test Cases
-1. Missing provider configuration fails with configuration error.
-2. Invalid tool definition schema fails before dispatch.
-3. Unknown tool call returns tool-error result and does not crash client orchestration.
-4. Malformed structured output triggers `NoObjectGeneratedError`.
-5. Unsupported content part is rejected with explicit unsupported-capability error.
+- [ ] P1-N1 Missing provider configuration returns a deterministic configuration error.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-N2 Unknown tool requested by model yields tool-error result instead of crashing generation.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-N3 Invalid generated JSON for `generate_object` produces parse/validation error with captured raw payload context.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-N4 Malformed stream chunk is surfaced through provider passthrough handling while preserving stream integrity.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P1-N5 Unsupported multimodal part for a provider is rejected gracefully with explicit error type.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ## Phase 2 - Coding Agent Loop Parity
 ### Deliverables
-- [X] P2-1 Finalize session lifecycle model including submit, iterative loop, steering injection, follow-up queue, and close semantics.
+- [ ] P2-1 Finalize `Session` lifecycle state machine and history turn model.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-2 Finalize `ExecutionEnvironment` and local implementation for file IO, command execution, grep, and glob operations.
+- [ ] P2-2 Finalize orchestration loop (`LLM call -> tool dispatch -> continuation -> natural completion`) with bounded rounds.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-3 Finalize provider profiles (OpenAI, Anthropic, Gemini) with aligned system instructions and tool definitions.
+- [ ] P2-3 Finalize provider profiles (OpenAI, Anthropic, Gemini) with provider-specific prompt layering and tool definitions.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-4 Finalize tool registry contracts, schema validation, and custom-tool override precedence.
+- [ ] P2-4 Finalize `ExecutionEnvironment` contract and `LocalExecutionEnvironment` filesystem/process behaviors.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-5 Finalize core tools (`read_file`, `write_file`, `edit_file`, `shell`, `grep`, `glob`) and provider-specific editing formats.
+- [ ] P2-5 Finalize core tools (`read_file`, `write_file`, `edit_file`, `shell`, `grep`, `glob`) with schema-validated arguments.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-6 Finalize OpenAI `apply_patch` parser/applier behavior with strict patch grammar handling.
+- [ ] P2-6 Finalize OpenAI-style `apply_patch` workflow and conflict/error reporting semantics.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-7 Finalize output truncation sequence and ensure full raw output remains available through tool-end event payloads.
+- [ ] P2-7 Finalize output truncation behavior with explicit marker insertion and full-output retention in tool-end events.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-8 Finalize loop-detection heuristics and warning-turn injection behavior.
+- [ ] P2-8 Finalize steering and follow-up queues and their injection points in the execution loop.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-9 Finalize subagent orchestration (`spawn`, `send_input`, `wait`, `close`) with depth limits and isolated histories.
+- [ ] P2-9 Finalize repeated-call loop detection heuristics and warning-turn behavior.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P2-10 Finalize deterministic cross-provider parity tests for the agent loop using fake adapters and fake execution environments.
+- [ ] P2-10 Finalize subagent lifecycle (`spawn`, `send_input`, `wait`, `close`) with recursion depth constraints.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-11 Finalize event bus surface and deterministic event ordering assertions.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-12 Finalize deterministic cross-provider parity tests for the agent loop using fake adapters and fake execution environments.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Acceptance Criteria
-- [X] AC2-1 Session exits naturally on assistant-text completion and exits safely at configured loop boundaries.
+- [ ] AC2-1 Sessions complete naturally on assistant text and stop safely at configured boundaries.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC2-2 Tool failures are returned as tool-error results and do not destabilize the session.
+- [ ] AC2-2 Tool failures are represented as tool-error results and session state remains consistent.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC2-3 Event stream ordering is deterministic and includes full-output tool-end payloads.
+- [ ] AC2-3 Event ordering is deterministic across equivalent deterministic inputs.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC2-4 Provider profile behavior differences are validated without changing shared core loop behavior.
+- [ ] AC2-4 Steering and follow-up commands alter subsequent behavior at the documented injection points.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] AC2-5 Subagents are isolated by history while sharing environment access as defined by profile/tool policy.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Positive Test Cases
-1. Multi-step task: read file, edit file, run shell command, and summarize output.
-2. Steering adjustment: user steers after a tool round and agent changes plan accordingly.
-3. Follow-up queue: follow-up message runs after current input completes and preserves context.
-4. Subagent workflow: parent spawns subagent, waits, and integrates subagent result.
-5. Parallel tool calls: profile that allows parallel calls runs tool batch concurrently and merges results.
+- [ ] P2-T1 Multi-turn coding session performs file read, patch, shell verification, and assistant completion with correct turn history.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-T2 Two parallel tool calls complete and merge into one continuation with deterministic result ordering.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-T3 Steering message inserted mid-loop changes next tool selection behavior.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-T4 Subagent completes delegated task and returns output to parent session for final response.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-T5 Tool-end event contains full output while model-facing content reflects truncation policy.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ### Negative Test Cases
-1. Unknown tool call returns deterministic error result and loop continues.
-2. Non-unique `edit_file` target fails with explicit ambiguity error.
-3. Oversized tool output is truncated for model input while full output remains in event payload.
-4. Subagent depth overflow is rejected with clear error result.
-5. Invalid JSON tool arguments fail schema validation and return tool-error result.
+- [ ] P2-N1 Unknown tool call from model returns deterministic error tool result and loop continues.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-N2 `edit_file` ambiguity results in clear conflict error with no file mutation.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-N3 Process execution failure returns typed tool error and emits complete event telemetry.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-N4 Recursive subagent depth overflow is rejected and recorded as safe tool error.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P2-N5 Repeated call-pattern loop triggers warning turn and preserves session operability.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ## Phase 3 - Attractor Runner Parity
 ### Deliverables
-- [X] P3-1 Finalize DOT subset parsing for graph attrs, node attrs, edge attrs, chained edges, and subgraph flattening.
+- [ ] P3-1 Finalize DOT subset parser coverage for graph/node/edge declarations, defaults, chained edges, and subgraph flattening.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-2 Finalize model construction for graph, nodes, edges, defaults propagation, and class-derived attributes.
+- [ ] P3-2 Finalize graph model default propagation and class inheritance behavior from subgraphs and labels.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-3 Finalize model stylesheet parser and selector specificity resolution (universal, shape, class, id).
+- [ ] P3-3 Finalize model stylesheet parsing, selector specificity, and deterministic attribute application order.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-4 Finalize lint and validation rules, diagnostic structure, and raise-on-error behavior.
+- [ ] P3-4 Finalize lint diagnostics and strict validation gates with severity-aware reporting.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-5 Finalize condition expression parser/evaluator for equality, inequality, conjunction, and variable resolution.
+- [ ] P3-5 Finalize condition expression parsing/evaluation for outcome labels and context variables.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-6 Finalize runtime state model (`Context`, `Outcome`, checkpoint persistence, artifact storage layout).
+- [ ] P3-6 Finalize runtime state model (`Context`, `Outcome`, checkpoint model, artifact persistence).
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-7 Finalize traversal engine, edge selection priority, goal-gate checks, retry routing, and resume continuity.
+- [ ] P3-7 Finalize engine traversal ordering, retry routing, goal-gate handling, and node transition determinism.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-8 Finalize built-in handlers (`start`, `exit`, `codergen`, `wait.human`, `conditional`, `parallel`, `parallel.fan_in`, `tool`, `stack.manager_loop`).
+- [ ] P3-8 Finalize checkpoint resume semantics, including fidelity transitions and status reconstruction.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-9 Finalize interviewer implementations (`AutoApprove`, `Console`, `Callback`, `Queue`) and question model.
+- [ ] P3-9 Finalize built-in handler set (`start`, `exit`, `codergen`, `wait.human`, `conditional`, `parallel`, `fan.in`, `tool`, `manager.loop`).
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-10 Finalize observability events and tool hook integration points around codergen tool activity.
+- [ ] P3-10 Finalize interviewer implementations (`AutoApprove`, `Console`, `Callback`, `Queue`) and answer routing.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-11 Finalize optional HTTP mode endpoints and event streaming behavior when HTTP mode is included in closure scope.
+- [ ] P3-11 Finalize transform pipeline ordering and extension hooks for custom transforms and lint rules.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P3-12 Finalize deterministic cross-feature parity matrix suite for runner functionality.
+- [ ] P3-12 Finalize observability/event emission for pipeline lifecycle, node execution, and outcome transitions.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-13 Finalize optional HTTP mode endpoints (`run`, `status`, `answer`) and event stream behavior if included in sprint closure.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Acceptance Criteria
-- [X] AC3-1 Parser and validator reject malformed pipelines with actionable diagnostics.
+- [ ] AC3-1 DOT parsing and validation reject malformed graphs and accept compliant graphs deterministically.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC3-2 Engine traversal is deterministic across edge priority tiers and retry/goal-gate states.
+- [ ] AC3-2 Execution engine follows deterministic edge and handler selection rules for identical inputs.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC3-3 Resume from checkpoint produces equivalent completion state for interrupted runs.
+- [ ] AC3-3 Goal gates and retry/fallback paths route execution as documented by graph metadata.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC3-4 Parallel/fan-in handlers satisfy join semantics and expose deterministic final branch selection.
+- [ ] AC3-4 Resume from checkpoint reproduces expected state and continues to valid completion.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] AC3-5 Human-gate flows support pause/resume semantics via interviewer interfaces (and HTTP mode if in scope).
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Positive Test Cases
-1. Linear pipeline execution from start to exit with artifact generation at each stage.
-2. Conditional routing with success and fail branches driven by outcome variables.
-3. Goal-gate blocking and re-routing until required node succeeds.
-4. Checkpoint save/load and resume producing identical completion set.
-5. Parallel fan-out and fan-in returning expected selected result and merged context.
-6. Human gate routing with queue-based answers selecting specific labeled edges.
+- [ ] P3-T1 Parse and run linear pipeline with start -> codergen -> exit, producing expected status artifacts.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-T2 Conditional branching selects correct edge based on outcome labels and context variables.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-T3 Parallel branch execution with fan-in merge meets defined join policy and artifact ordering.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-T4 Human gate pauses run, accepts answer, and resumes to completion with preserved context.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-T5 Resume from checkpoint after interruption finishes with correct final outcome and stage audit trail.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ### Negative Test Cases
-1. Missing start node fails validation.
-2. Missing exit node fails validation.
-3. Edge references unknown node and fails validation.
-4. Invalid condition expression fails parse with diagnostic location.
-5. Conflicting selector rules are resolved by specificity; explicit node attr wins.
-6. Invalid handler type fails with deterministic handler-resolution error.
+- [ ] P3-N1 Invalid DOT syntax produces deterministic parser diagnostics and no partial execution.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-N2 Unknown handler type produces validation failure with explicit node reference.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-N3 Condition expression referencing missing context path fails safely with explanatory diagnostics.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-N4 Goal gate unsatisfied with no retry target exits with failure outcome and complete status evidence.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P3-N5 Corrupted checkpoint payload fails resume with clear, typed error and no silent state corruption.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
-## Phase 4 - Cross-Layer Integration
+## Phase 4 - Cross-Layer Integration and Closure
 ### Deliverables
-- [X] P4-1 Finalize `UnifiedLlmCodergenBackend` path for single-turn codergen execution.
+- [ ] P4-1 Finalize codergen backend wiring for direct Unified LLM mode and Agent Loop mode.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-2 Finalize `AgentLoopCodergenBackend` path for tool-using codergen execution.
+- [ ] P4-2 Finalize thread and fidelity behavior across multi-node runs and resume boundaries.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-3 Finalize fidelity and thread continuity behavior across codergen invocations and resumed runs.
+- [ ] P4-3 Finalize example pipelines for linear, branching, retries, human-gate, parallel, and manager-loop scenarios.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-4 Add and validate example pipelines covering linear, conditional, retries, goal-gates, human gates, and parallel structures.
+- [ ] P4-4 Finalize end-to-end deterministic integration suite spanning LLM -> Agent -> Pipeline boundaries.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-5 Validate CLI workflows for parse, validate, run, resume, and evidence artifact output paths.
+- [ ] P4-5 Finalize provider smoke coverage path for environments with credentials and confirm environment-gated behavior when absent.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-6 Validate optional HTTP workflows for run submission, status checks, and human answer submission.
+- [ ] P4-6 Reconcile sprint docs, runbook, and traceability matrix to remove status drift and unresolved placeholders.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] P4-7 Finalize end-to-end smoke suites that exercise Unified LLM, Agent Loop, and Runner together.
+- [ ] P4-7 Record final architecture decisions and exceptions in `docs/ADR.md`.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-
-### Acceptance Criteria
-- [X] AC4-1 Both codergen backends can drive the same pipeline definitions without contract divergence.
+- [ ] P4-8 Execute closure audit proving all DoD checklists are implemented and cross-referenced to tests.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC4-2 Example pipelines execute as documented and produce expected artifacts.
+- [ ] P4-9 Execute release-candidate full verification sequence and archive logs in `.scratch/verification/SPRINT-001/final/`.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC4-3 CLI and HTTP operational paths are documented and test-covered for core lifecycle actions.
+- [ ] P4-10 Publish final sprint closure summary with command transcripts, exit codes, and artifact links.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
-```
-
-### Positive Test Cases
-1. Run same pipeline through both codergen backends and compare normalized outcomes.
-2. Execute manager-loop style pipeline and verify iterative stage progression.
-3. Run CLI resume after manual interruption and confirm continuation from checkpoint.
-4. Submit answer for waiting human gate and verify run completion path.
-
-### Negative Test Cases
-1. Missing codergen backend configuration fails fast with explicit setup error.
-2. Invalid pipeline file path fails before execution with actionable message.
-3. Resume attempted with missing checkpoint returns deterministic resume error.
-4. Human answer submitted for unknown run id returns deterministic not-found response.
-
-## Phase 5 - Closure and Release Evidence
-### Deliverables
-- [X] P5-1 Reconcile this plan, sprint source doc, runbook, and traceability matrix so they describe the same completion state.
-```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
-```
-- [X] P5-2 Confirm all checklist items in this plan are `[X]` with complete evidence blocks and no unresolved placeholders.
-```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
-```
-- [X] P5-3 Finalize README and developer docs for setup, commands, provider configuration, and troubleshooting.
-```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
-```
-- [X] P5-4 Finalize ADR updates for any architecture decisions made during implementation.
-```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
-```
-- [X] P5-5 Execute final deterministic suite and env-gated provider smoke suite, archive artifacts, and record exit codes.
-```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Acceptance Criteria
-- [X] AC5-1 No checklist entry is marked complete without command, exit code, artifact path, and justification.
+- [ ] AC4-1 Deterministic CI-equivalent command set passes end-to-end.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC5-2 Final sprint docs are internally consistent on progress totals and closure status.
+- [ ] AC4-2 Provider smoke tests succeed when credentials are configured and skip cleanly when not configured.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
-- [X] AC5-3 Final evidence bundle allows independent audit of parity claims.
+- [ ] AC4-3 Traceability matrix maps every DoD requirement to concrete tests and evidence artifacts.
 ```text
-{verification: complete; commands: `timeout 180 make build`, `timeout 180 make test`, `timeout 180 ./bin/composer run test:e2e:provider-smoke`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; exit_codes: 0, 0, 0, 0, 0, 0, 0, 0; artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-a-core-domain-models.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-b-er-diagram.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-c-workflow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-d-data-flow.svg`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/appendix-e-architecture.svg`; notes: implementation baseline is complete with green build, green deterministic tests, green provider smoke tests, and verified mermaid rendering; existing source and test suites satisfy sprint deliverables and acceptance criteria.}
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] AC4-4 Sprint plan, runbook, and ADR entries are internally consistent and audit-ready.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] AC4-5 No unresolved placeholder markers remain in release-ready sprint documentation.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
 ```
 
 ### Positive Test Cases
-1. Full deterministic suite passes and artifacts are archived.
-2. Provider smoke suite passes when credentials are present.
-3. Sprint docs contain no contradictory completion statuses.
+- [ ] P4-T1 Run full deterministic suite and verify passing results across unit, integration, and deterministic e2e tests.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-T2 Execute complete provider smoke path in credentialed environment and verify provider-by-provider pass results.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-T3 Run sample pipeline pack and verify status manifests, checkpoints, and outputs are written for each example.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-T4 Validate doc closure audit confirms no unmapped DoD requirements remain.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-T5 Validate release summary references reproducible command transcripts and artifacts only.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ### Negative Test Cases
-1. Placeholder token remains in a completed item and blocks closure.
-2. Missing artifact path in completed evidence entry blocks closure.
-3. Documented test command fails and blocks closure.
-
-## Verification Command Matrix (To Execute During Implementation)
-1. `make -j10 precommit`
-2. `make -j10 build`
-3. `make -j10 test`
-4. `./bin/composer run test:unit`
-5. `./bin/composer run test:integration`
-6. `./bin/composer run test:e2e`
-7. `./bin/composer run test:e2e:provider-smoke`
-8. `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.mmd -o .scratch/verification/SPRINT-001/planning/mermaid/appendix-a-core-domain-models.svg`
-9. `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.mmd -o .scratch/verification/SPRINT-001/planning/mermaid/appendix-b-er-diagram.svg`
-10. `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.mmd -o .scratch/verification/SPRINT-001/planning/mermaid/appendix-c-workflow.svg`
-11. `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.mmd -o .scratch/verification/SPRINT-001/planning/mermaid/appendix-d-data-flow.svg`
-12. `mmdc -i .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.mmd -o .scratch/verification/SPRINT-001/planning/mermaid/appendix-e-architecture.svg`
+- [ ] P4-N1 Disable one critical test target and confirm closure audit blocks sprint completion.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-N2 Inject unresolved placeholder token into sprint docs and confirm closure checks fail.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-N3 Break one traceability row and confirm matrix verification detects the missing coverage link.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-N4 Corrupt one archived evidence log path and confirm release audit flags non-resolvable evidence.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
+- [ ] P4-N5 Force one provider smoke failure and confirm summary captures provider-specific failure context and remediation path.
+```text
+{verification: pending; commands: ; exit_codes: ; artifacts: ; notes: }
+```
 
 ## Appendix A - Core Domain Models
 ```mermaid
 classDiagram
-    class LlmClient {
-      +complete(request)
-      +stream(request)
+    class LlmRequest {
+      +string provider
+      +string model
+      +Message[] messages
+      +ToolDefinition[] tools
+      +map provider_options
     }
 
-    class ProviderAdapter {
-      +name()
-      +complete(request)
-      +stream(request)
+    class LlmResponse {
+      +string text
+      +ContentPart[] content
+      +ToolCall[] tool_calls
+      +Usage usage
+      +FinishReason finish_reason
     }
 
     class AgentSession {
+      +string session_id
+      +SessionState state
+      +Turn[] history
       +submit(input)
       +steer(message)
-      +followUp(message)
-      +close()
-    }
-
-    class ExecutionEnvironment {
-      +readFile(path)
-      +writeFile(path, content)
-      +execCommand(command)
-      +grep(pattern, path)
-      +glob(pattern, path)
+      +follow_up(message)
     }
 
     class PipelineRunner {
-      +parseDot(dot)
-      +validate(graph)
-      +run(graph, config)
-      +resume(runRoot, config)
+      +Graph parseDot(dot)
+      +Diagnostic[] validate(graph)
+      +PipelineOutcome run(graph, config)
+      +PipelineOutcome resume(logsRoot, config)
     }
 
     class Graph {
-      +nodes
-      +edges
-      +attrs
+      +Node[] nodes
+      +Edge[] edges
+      +map attrs
     }
 
-    class Node {
-      +id
-      +shape
-      +attrs
-    }
-
-    class Edge {
-      +from
-      +to
-      +attrs
-    }
-
-    LlmClient --> ProviderAdapter : routes_to
-    AgentSession --> LlmClient : uses
-    AgentSession --> ExecutionEnvironment : executes_tools_in
-    PipelineRunner --> Graph : executes
-    Graph --> Node : contains
-    Graph --> Edge : contains
+    LlmRequest --> LlmResponse
+    AgentSession --> LlmRequest
+    AgentSession --> LlmResponse
+    PipelineRunner --> Graph
+    PipelineRunner --> AgentSession
 ```
 
 ## Appendix B - E-R Diagram
 ```mermaid
 erDiagram
-    RUN ||--o{ NODE_STAGE : contains
-    RUN ||--|| CHECKPOINT : has
-    RUN ||--o{ EVENT_LOG : emits
-    NODE_STAGE ||--|| STATUS_FILE : writes
-    NODE_STAGE ||--o{ ARTIFACT_FILE : stores
+    RUN ||--o{ RUN_STAGE : contains
+    RUN ||--o{ CHECKPOINT : snapshots
+    RUN ||--o{ EVENT : emits
+    RUN ||--o{ STATUS_FILE : writes
+    RUN_STAGE ||--o{ ARTIFACT : produces
+    RUN_STAGE ||--o{ NODE_RESULT : records
+    CHECKPOINT ||--|| CONTEXT_SNAPSHOT : stores
+    NODE_RESULT }o--|| OUTCOME : yields
 
     RUN {
       string run_id
-      string goal
-      string state
-      datetime started_at
-      datetime completed_at
+      string graph_id
+      string started_at
+      string finished_at
+      string final_status
     }
 
-    NODE_STAGE {
-      string run_id
+    RUN_STAGE {
+      string stage_id
       string node_id
-      string outcome
+      string handler
       int attempt
+      string status
     }
 
     CHECKPOINT {
-      string run_id
+      string checkpoint_id
       string current_node
-      string context_json
-      string retry_counts_json
-    }
-
-    STATUS_FILE {
-      string run_id
-      string node_id
-      string path
-    }
-
-    ARTIFACT_FILE {
-      string run_id
-      string node_id
-      string path
-      string kind
-    }
-
-    EVENT_LOG {
-      string run_id
-      string event_type
-      string payload_json
-      datetime recorded_at
+      string fidelity
+      string written_at
     }
 ```
 
 ## Appendix C - Workflow Diagram
 ```mermaid
 flowchart TD
-    A[Parse DOT] --> B[Apply transforms]
-    B --> C[Validate graph]
-    C -->|valid| D[Initialize run context]
-    C -->|invalid| X[Return diagnostics]
-    D --> E[Resolve current node]
-    E --> F[Execute node handler]
+    A[Load DOT] --> B[Parse Graph]
+    B --> C[Apply transforms]
+    C --> D[Validate]
+    D -->|invalid| Z[Return diagnostics]
+    D -->|valid| E[Initialize run context]
+    E --> F[Execute node]
     F --> G[Persist stage artifacts]
-    G --> H[Merge context updates]
-    H --> I[Persist checkpoint]
-    I --> J{Terminal node reached?}
-    J -->|no| K[Select next edge]
-    K --> E
-    J -->|yes| L[Evaluate goal-gates]
-    L -->|satisfied| M[Finalize success or fail]
-    L -->|unsatisfied with retry path| E
-    L -->|unsatisfied without retry path| N[Finalize fail]
+    G --> H[Checkpoint + status]
+    H --> I{Terminal?}
+    I -->|no| J[Select next edge]
+    J --> F
+    I -->|yes| K[Evaluate goal-gate]
+    K -->|satisfied| L[Finalize success]
+    K -->|unsatisfied| M[Finalize failure]
 ```
 
 ## Appendix D - Data-Flow Diagram
 ```mermaid
 flowchart LR
-    U[User Input] --> CLI[CLI or HTTP API]
-    CLI --> RUNNER[Pipeline Runner]
+    USER[User Input] --> CLI[CLI or HTTP]
+    CLI --> RUNNER[Attractor Runner]
     RUNNER --> HANDLER[Node Handler]
     HANDLER --> BACKEND[Codergen Backend]
     BACKEND --> AGENT[Agent Session]
@@ -613,27 +694,27 @@ flowchart LR
     LLM --> AGENT
     AGENT --> HANDLER
     HANDLER --> RUNNER
-    RUNNER --> STORE[Run Artifacts and Checkpoints]
-    STORE --> OBS[Observers and Status Readers]
+    RUNNER --> ARTIFACTS[Artifacts and Checkpoints]
 ```
 
 ## Appendix E - Architecture Diagram
 ```mermaid
 flowchart TB
-    subgraph Interfaces
+    subgraph InterfaceLayer
       CLI[bin/attractor]
-      HTTP[Pipeline HTTP Server]
+      HTTP[HTTP mode]
     end
 
     subgraph PipelineLayer
       PR[Attractor\\Pipeline\\Runner]
       HR[Handler Registry]
-      IR[Interviewer Implementations]
-      CK[Checkpoint and Artifact Store]
+      VR[Validator]
+      AR[Artifact + Checkpoint Store]
     end
 
     subgraph AgentLayer
       AS[Attractor\\Agent\\Session]
+      TP[Tool Profiles]
       TR[Tool Registry]
       EE[Execution Environment]
       SA[Subagent Manager]
@@ -650,15 +731,16 @@ flowchart TB
       OP[OpenAI]
       AP[Anthropic]
       GP[Gemini]
-      FS[Local Filesystem]
+      FS[Filesystem]
     end
 
     CLI --> PR
     HTTP --> PR
     PR --> HR
-    PR --> IR
-    PR --> CK
+    PR --> VR
+    PR --> AR
     HR --> AS
+    AS --> TP
     AS --> TR
     AS --> EE
     AS --> SA
@@ -670,5 +752,5 @@ flowchart TB
     AA --> AP
     GA --> GP
     EE --> FS
-    CK --> FS
+    AR --> FS
 ```
