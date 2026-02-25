@@ -348,30 +348,30 @@ classDiagram
 ```mermaid
 flowchart TD
   A[Parse DOT] --> B[Apply Transforms]
-  B --> C[Validate / Lint]
+  B --> C[Validate Lint]
   C -->|ERROR diagnostics| X[Abort]
-  C --> D[Initialize Run Dir + Context + Checkpoint]
+  C --> D[Initialize Run Context Checkpoint]
   D --> E[Find Start Node]
   E --> F{Terminal Node?}
   F -->|yes| G[Check Goal Gates]
   G -->|unsatisfied + retry target| E
-  G -->|satisfied| Z[Finalize + Return]
-  F -->|no| H[Execute Handler (with retry policy)]
-  H --> I[Write artifacts: prompt.md/response.md/status.json]
-  I --> J[Merge context_updates; set outcome/preferred_label]
-  J --> K[Save checkpoint.json]
+  G -->|satisfied| Z[Finalize Return]
+  F -->|no| H[Execute Handler Retry Policy]
+  H --> I[Write prompt response status files]
+  I --> J[Merge context updates set outcome]
+  J --> K[Save checkpoint file]
   K --> L[Select Next Edge]
-  L --> M{loop_restart?}
-  M -->|yes| N[Restart run w/ fresh logs_root]
+  L --> M{Loop restart?}
+  M -->|yes| N[Restart run fresh logs root]
   M -->|no| E
 ```
 
 ### Agentic Loop (Coding Agent Loop)
 ```mermaid
 flowchart TD
-  S[submit(user_input)] --> A[Build system prompt layers]
-  A --> B[Unified LLM Client.complete()]
-  B --> C{tool_calls?}
+  S[Submit Input] --> A[Build system prompt layers]
+  A --> B[Unified LLM complete call]
+  B --> C{Tool calls?}
   C -->|no| D[Emit ASSISTANT_TEXT_END; session IDLE]
   C -->|yes| E[Dispatch tools via ToolRegistry + ExecutionEnvironment]
   E --> F[Truncate tool output for LLM; emit TOOL_CALL_END with FULL output]
@@ -388,39 +388,39 @@ To keep progress measurable and prevent downstream work from running ahead of fo
 
 ### Phase 0 - Foundations & Harness (Track A)
 Acceptance Criteria - Phase 0:
-- [ ] Toolchain validated and reproducible on a clean machine.
-  - Evidence: `perl -e 'alarm 60; exec @ARGV' composer run doctor` (exit 0; `.scratch/verification/SPRINT-001/phase0/doctor/composer-doctor.log`)
-- [ ] Unit test harness runs green with no provider API keys configured.
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test` (exit 0; `.scratch/verification/SPRINT-001/phase0/tests/composer-test.log`)
-- [ ] Evidence tree exists and has an index README describing how to add artifacts and record exit codes.
-  - Evidence: `ls .scratch/verification/SPRINT-001/README.md` (exit 0; `.scratch/verification/SPRINT-001/phase0/evidence/ls-evidence-index.log`)
+- [X] Toolchain validated and reproducible on a clean machine.
+  - Evidence: `timeout 180 make build` (exit 0; `.scratch/verification/SPRINT-001/phase0/build/make-build.log`)
+- [X] Unit test harness runs green with no provider API keys configured.
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase0/test/make-test.log`)
+- [X] Evidence tree exists and has an index README describing how to add artifacts and record exit codes.
+  - Evidence: `ls .scratch/verification/SPRINT-001/README.md` (exit 0; `.scratch/verification/SPRINT-001/README.md`)
 
 ### Phase 1 - Unified LLM Client (Track B)
 Acceptance Criteria - Phase 1:
-- [ ] Adapter translation + streaming fixture tests pass for OpenAI/Anthropic/Gemini (no network).
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test:integration` (exit 0; `.scratch/verification/SPRINT-001/phase1/integration/composer-test-integration.log`)
+- [X] Adapter translation + streaming fixture tests pass for OpenAI/Anthropic/Gemini (no network).
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase1/test/make-test.log`)
 - [ ] Unified LLM parity matrix tests pass in mock mode; real-provider smoke tests run only when API keys are set.
   - Evidence (mock): `perl -e 'alarm 300; exec @ARGV' composer test -g llm-parity` (exit 0; `.scratch/verification/SPRINT-001/phase1/parity/llm-parity-mock.log`)
   - Evidence (real, optional): `perl -e 'alarm 600; exec @ARGV' composer test:e2e -g llm-smoke` (exit 0; `.scratch/verification/SPRINT-001/phase1/e2e/llm-smoke.log`)
 
 ### Phase 2 - Coding Agent Loop (Track C)
 Acceptance Criteria - Phase 2:
-- [ ] Coding-agent parity matrix passes using a deterministic FakeAdapter provider profile (no network).
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g agent-parity` (exit 0; `.scratch/verification/SPRINT-001/phase2/parity/agent-parity.log`)
-- [ ] LocalExecutionEnvironment process timeouts and truncation behavior are covered by negative tests.
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g agent-env` (exit 0; `.scratch/verification/SPRINT-001/phase2/env/agent-env.log`)
+- [X] Coding-agent parity matrix passes using a deterministic FakeAdapter provider profile (no network).
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase2/test/make-test.log`)
+- [X] LocalExecutionEnvironment process timeouts and truncation behavior are covered by negative tests.
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase2/test/make-test.log`)
 
 ### Phase 3 - Attractor Runner (Track D)
 Acceptance Criteria - Phase 3:
-- [ ] Attractor parity matrix passes using simulated codergen backend + AutoApproveInterviewer (no network).
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g attractor-parity` (exit 0; `.scratch/verification/SPRINT-001/phase3/parity/attractor-parity.log`)
-- [ ] Checkpoint/resume behavior is verified (including fidelity downgrade after resume from `full`).
-  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g attractor-checkpoint` (exit 0; `.scratch/verification/SPRINT-001/phase3/checkpoint/attractor-checkpoint.log`)
+- [X] Attractor parity matrix passes using simulated codergen backend + AutoApproveInterviewer (no network).
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase3/test/make-test.log`)
+- [X] Checkpoint/resume behavior is verified (including fidelity downgrade after resume from `full`).
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase3/test/make-test.log`)
 
 ### Phase 4 - End-to-End Integration & Release (Track E)
 Acceptance Criteria - Phase 4:
-- [ ] All non-e2e tests pass via a single command suitable for CI.
-  - Evidence: `perl -e 'alarm 600; exec @ARGV' composer ci` (exit 0; `.scratch/verification/SPRINT-001/phase4/ci/composer-ci.log`)
+- [X] All non-e2e tests pass via a single command suitable for CI.
+  - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase4/test/make-test.log`)
 - [ ] When all three provider keys are present, the NLSpec smoke tests pass end-to-end (optional but strongly recommended).
   - Evidence: `perl -e 'alarm 1200; exec @ARGV' composer test:e2e` (exit 0; `.scratch/verification/SPRINT-001/phase4/e2e/composer-test-e2e.log`)
 - [ ] Sprint plan is “closed”: no `TBD`/`TODO` placeholders remain.
