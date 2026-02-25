@@ -46,6 +46,7 @@ The remaining sprint focus is parity closure, evidence synchronization, and docu
 - Repo contains a working composer project with source, tests, and CLI.
 - Deterministic local suites pass via `timeout 180 make test`.
 - Provider-smoke tests exist and are env-gated via `composer run test:e2e:provider-smoke`.
+- Latest full verification run (2026-02-25): `timeout 180 make build` -> exit `0`, `timeout 180 make test` -> exit `0` (artifacts: `.scratch/verification/SPRINT-001/phase4/make-build-2026-02-25.log`, `.scratch/verification/SPRINT-001/phase4/make-test-2026-02-25.log`).
 
 ## Prerequisites (Execution Environment)
 This sprint requires a working local PHP toolchain and a few OS-level utilities. Track A will make these explicit and add a `composer`-based developer workflow.
