@@ -3,6 +3,9 @@
   "description": "Attractor PHP implementation for NLSpec parity",
   "type": "library",
   "license": "MIT",
+  "bin": [
+    "bin/attractor"
+  ],
   "require": {
     "php": "^8.3",
     "ext-json": "*"

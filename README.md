@@ -1,8 +1,11 @@
-# Attractor 
+# Attractor PHP
 
-This repository contains [NLSpecs](#terminology) to build your own version of Attractor to create your own software factory.
+This repository contains [NLSpecs](#terminology) plus a PHP reference implementation of:
+- Unified LLM client (`Attractor\LLM`)
+- Coding agent loop (`Attractor\Agent`)
+- Attractor pipeline runner (`Attractor\Pipeline`)
 
-Although bringing your own agentic loop and unified LLM SDK is not required to build your own Attractor, we highly recommend controlling the stack so you have a strong foundation.
+The implementation focuses on deterministic tests and verifiable sprint evidence under `.scratch/verification/SPRINT-001/`.
 
 ## Specs
 
@@ -10,12 +13,20 @@ Although bringing your own agentic loop and unified LLM SDK is not required to b
 - [Coding Agent Loop Specification](./coding-agent-loop-spec.md)
 - [Unified LLM Client Specification](./unified-llm-spec.md)
 
-## Building Attractor
+## Build and Test
 
-Supply the following prompt to a modern coding agent (Claude Code, Codex, OpenCode, Amp, Cursor, etc):
-
+```bash
+timeout 180 make build
+timeout 180 make test
 ```
-codeagent> Implement Attractor as described by https://github.com/strongdm/attractor
+
+## CLI
+
+Use the minimal CLI to validate or run DOT pipelines:
+
+```bash
+bin/attractor validate examples/pipelines/basic.dot
+bin/attractor run examples/pipelines/basic.dot .scratch/runs/basic
 ```
 
 ## Terminology

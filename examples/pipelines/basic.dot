@@ -1,0 +1,14 @@
+digraph G {
+  graph [goal="Generate a release note"];
+  start [shape=Mdiamond];
+  draft [shape=box, prompt="Write a concise release note for: $goal"];
+  review [shape=diamond, type="wait.human", question="Approve release note?"];
+  revise [shape=box, prompt="Revise the release note to satisfy reviewer feedback"];
+  exit [shape=Msquare];
+
+  start -> draft;
+  draft -> review;
+  review -> exit [label="Approve"];
+  review -> revise [label="Revise"];
+  revise -> review;
+}
