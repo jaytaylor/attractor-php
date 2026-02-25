@@ -17,6 +17,10 @@ Implement a PHP library (plus minimal CLI + optional HTTP mode) that fully satis
 
 "Done" means the Definition-of-Done checklists in all three specs are 100% checked, and the cross-provider parity matrices and smoke tests pass.
 
+## Implementation Runbook
+- Execution runbook (this sprint's implementation sequence and verification-first breakdown):
+  - `docs/sprints/SPRINT-001-implementation-runbook.md`
+
 ## Context
 This repository currently contains NLSpecs only (no PHP runtime, no composer project, no tests). The deliverable is therefore a from-scratch implementation and a verification harness that can prove spec parity.
 
