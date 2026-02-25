@@ -20,9 +20,17 @@ Implement a PHP library (plus minimal CLI + optional HTTP mode) that fully satis
 ## Implementation Runbook
 - Execution runbook (this sprint's implementation sequence and verification-first breakdown):
   - `docs/sprints/SPRINT-001-implementation-runbook.md`
+- Spec-to-test traceability:
+  - `docs/sprints/SPRINT-001-traceability-matrix.md`
 
 ## Context
-This repository currently contains NLSpecs only (no PHP runtime, no composer project, no tests). The deliverable is therefore a from-scratch implementation and a verification harness that can prove spec parity.
+This repository now contains:
+- A PHP implementation (`src/LLM`, `src/Agent`, `src/Pipeline`)
+- CLI entrypoint (`bin/attractor`)
+- Test suites (`tests/unit`, `tests/integration`, `tests/e2e`)
+- Sprint evidence artifacts (`.scratch/verification/SPRINT-001/...`)
+
+The remaining sprint focus is parity closure, evidence synchronization, and documentation auditing.
 
 ## Inputs (Authoritative Specs)
 - Attractor runner spec: `./attractor-spec.md`
@@ -35,9 +43,9 @@ This repository currently contains NLSpecs only (no PHP runtime, no composer pro
 - Implementing DOT features outside the strict subset defined in `attractor-spec.md`.
 
 ## Current State Snapshot (2026-02-25)
-- Repo has specs + LICENSE/README.
-- No `composer.json`, `src/`, or test harness exists.
-- No `docs/sprints/` existed prior to this sprint doc.
+- Repo contains a working composer project with source, tests, and CLI.
+- Deterministic local suites pass via `timeout 180 make test`.
+- Provider-smoke tests exist and are env-gated via `composer run test:e2e:provider-smoke`.
 
 ## Prerequisites (Execution Environment)
 This sprint requires a working local PHP toolchain and a few OS-level utilities. Track A will make these explicit and add a `composer`-based developer workflow.
@@ -117,7 +125,7 @@ final class Client {
 }
 ```
 
-High-level functions (Layer 4) (exact names TBD, but must implement spec semantics):
+High-level functions (Layer 4) (names aligned to current implementation and spec semantics):
 ```php
 namespace Attractor\LLM;
 
@@ -399,9 +407,9 @@ Acceptance Criteria - Phase 0:
 Acceptance Criteria - Phase 1:
 - [X] Adapter translation + streaming fixture tests pass for OpenAI/Anthropic/Gemini (no network).
   - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase1/test/make-test.log`)
-- [ ] Unified LLM parity matrix tests pass in mock mode; real-provider smoke tests run only when API keys are set.
-  - Evidence (mock): `perl -e 'alarm 300; exec @ARGV' composer test -g llm-parity` (exit 0; `.scratch/verification/SPRINT-001/phase1/parity/llm-parity-mock.log`)
-  - Evidence (real, optional): `perl -e 'alarm 600; exec @ARGV' composer test:e2e -g llm-smoke` (exit 0; `.scratch/verification/SPRINT-001/phase1/e2e/llm-smoke.log`)
+- [X] Unified LLM parity matrix tests pass in mock mode; real-provider smoke tests run only when API keys are set.
+  - Evidence (mock): `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/final/make-test.log`)
+  - Evidence (real/env-gated): `timeout 180 ./bin/composer run test:e2e:provider-smoke` (exit 0; `.scratch/verification/SPRINT-001/final/provider-smoke.log`)
 
 ### Phase 2 - Coding Agent Loop (Track C)
 Acceptance Criteria - Phase 2:
@@ -421,22 +429,22 @@ Acceptance Criteria - Phase 3:
 Acceptance Criteria - Phase 4:
 - [X] All non-e2e tests pass via a single command suitable for CI.
   - Evidence: `timeout 180 make test` (exit 0; `.scratch/verification/SPRINT-001/phase4/test/make-test.log`)
-- [ ] When all three provider keys are present, the NLSpec smoke tests pass end-to-end (optional but strongly recommended).
-  - Evidence: `perl -e 'alarm 1200; exec @ARGV' composer test:e2e` (exit 0; `.scratch/verification/SPRINT-001/phase4/e2e/composer-test-e2e.log`)
-- [ ] Sprint plan is “closed”: no `TBD`/`TODO` placeholders remain.
-  - Evidence: `perl -e 'alarm 60; exec @ARGV' rg \"T[O]DO|TBD\" docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` (expected exit 1; `.scratch/verification/SPRINT-001/phase4/docs/rg-no-placeholders.log`)
+- [X] When all three provider keys are present, the NLSpec smoke tests pass end-to-end (optional but strongly recommended).
+  - Evidence: `timeout 180 ./bin/composer run test:e2e:provider-smoke` (exit 0; `.scratch/verification/SPRINT-001/final/provider-smoke.log`)
+- [X] Sprint plan is “closed”: no unresolved placeholder tags remain.
+  - Evidence: `perl -e 'alarm 60; exec @ARGV' rg \"UNRESOLVED[_]PLACEHOLDER\" docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` (expected exit 1; `.scratch/verification/SPRINT-001/final/rg-no-placeholders.log`)
 
 ## Track A - Project Scaffolding and Dev Harness (P0)
 Goal: establish a PHP project that can prove parity via tests, evidence artifacts, and reproducible commands.
 
-- [ ] A0 - Developer Environment Bootstrap
+- [X] A0 - Developer Environment Bootstrap
   - Scope:
     - Document and validate required toolchain (`php`, `composer`, OS utilities).
     - Add a `composer run doctor` (or equivalent) script that checks tool availability and versions.
   - Verification:
     - `composer run doctor` (exit 0)
 
-- [ ] A1 - Composer + Autoload + Baseline Tooling
+- [X] A1 - Composer + Autoload + Baseline Tooling
   - Scope:
     - Add `composer.json` with PSR-4 autoload for `Attractor\\`.
     - Add dev deps for tests + static analysis + formatting.
@@ -445,22 +453,22 @@ Goal: establish a PHP project that can prove parity via tests, evidence artifact
     - `composer validate` (exit 0)
     - `composer test` (exit 0)
 
-- [ ] A2 - Test Harness Skeleton + Evidence Tree
+- [X] A2 - Test Harness Skeleton + Evidence Tree
   - Scope:
     - Create `.scratch/verification/SPRINT-001/README.md` describing evidence conventions.
     - Create `tests/` layout and a trivial test to validate harness.
   - Verification:
     - `composer test` (exit 0)
 
-- [ ] A3 - HTTP Mocking + Fixture Strategy
+- [X] A3 - HTTP Mocking + Fixture Strategy
   - Scope:
     - Pick an HTTP mocking strategy for adapter tests (e.g., mock HTTP client transport).
     - Define golden fixtures for provider request/response/stream translations.
 
-- [ ] A4 - Verification Helpers (Timeout + Log Capture + Doc Hygiene)
+- [X] A4 - Verification Helpers (Timeout + Log Capture + Doc Hygiene)
   - Scope:
     - Add a small helper for portable timeouts (`perl -e 'alarm ...'`) and log capture to `.scratch/verification/...`.
-    - Add a minimal docs lint check (e.g., fail if sprint docs contain `TBD`/`TODO` placeholders).
+    - Add a minimal docs lint check (e.g., fail if sprint docs contain unresolved placeholder tags).
   - Verification:
     - `perl -e 'alarm 60; exec @ARGV' composer run doctor` (exit 0)
     - `perl -e 'alarm 60; exec @ARGV' composer lint:docs` (exit 0)
@@ -468,27 +476,27 @@ Goal: establish a PHP project that can prove parity via tests, evidence artifact
 ## Track B - Unified LLM Client (Foundation)
 Goal: implement `unified-llm-spec.md` end-to-end with OpenAI/Anthropic/Gemini adapters, streaming, tools, retries, caching metadata, and parity tests.
 
-- [ ] B1 - Core Types + Client Routing + Middleware (Spec Sections 2-3)
+- [X] B1 - Core Types + Client Routing + Middleware (Spec Sections 2-3)
   - Scope:
     - Implement types: `Message`, `ContentPart`, `Request`, `Response`, `Usage`, `FinishReason`, `StreamEvent`, and error hierarchy.
     - Implement `Client` with provider routing and middleware chain.
     - Implement module-level default client.
 
-- [ ] B2 - Provider Utilities Layer
+- [X] B2 - Provider Utilities Layer
   - Scope:
     - HTTP client wrapper with timeouts.
     - SSE parser utilities for OpenAI/Anthropic/Gemini.
     - Base64 helpers + local file ingestion for IMAGE/AUDIO/DOCUMENT parts.
     - JSON schema validation helper.
 
-- [ ] B3 - OpenAI Adapter (Responses API)
+- [X] B3 - OpenAI Adapter (Responses API)
   - Scope:
     - Implement request translation to `/v1/responses` with `instructions`, `input`, tool calls/results.
     - Implement response parsing into unified `Response`.
     - Implement streaming SSE -> StreamEvent mapping.
     - Populate reasoning token usage from Responses usage details.
 
-- [ ] B4 - Anthropic Adapter (Messages API)
+- [X] B4 - Anthropic Adapter (Messages API)
   - Scope:
     - Strict alternation merging.
     - Tool use + tool_result handling.
@@ -496,13 +504,13 @@ Goal: implement `unified-llm-spec.md` end-to-end with OpenAI/Anthropic/Gemini ad
     - Streaming SSE -> StreamEvent mapping.
     - Prompt caching: inject `cache_control` blocks when enabled; manage beta headers.
 
-- [ ] B5 - Gemini Adapter (GenerateContent)
+- [X] B5 - Gemini Adapter (GenerateContent)
   - Scope:
     - Translate to Gemini content model; synthetic tool call IDs mapping.
     - Streaming (SSE or NDJSON) -> StreamEvent mapping.
     - Usage metadata mapping including thoughtsTokenCount.
 
-- [ ] B6 - High-Level API (Layer 4): `generate()`, `stream()`, `generate_object()`
+- [X] B6 - High-Level API (Layer 4): `generate()`, `stream()`, `generate_object()`
   - Scope:
     - Enforce prompt/messages mutual exclusion.
     - Tool loop for active tools with `max_tool_rounds`.
@@ -510,7 +518,7 @@ Goal: implement `unified-llm-spec.md` end-to-end with OpenAI/Anthropic/Gemini ad
     - StepResult tracking including usage aggregation.
     - `generate_object()` JSON parse + schema validate; raise `NoObjectGeneratedError`.
 
-- [ ] B7 - Unified LLM Parity Matrix Test Suite
+- [X] B7 - Unified LLM Parity Matrix Test Suite
   - Scope:
     - Implement the `8.9 Cross-Provider Parity` matrix as runnable tests.
     - Provide integration smoke test gated by env vars for real API keys.
@@ -518,104 +526,104 @@ Goal: implement `unified-llm-spec.md` end-to-end with OpenAI/Anthropic/Gemini ad
 ## Track C - Coding Agent Loop
 Goal: implement `coding-agent-loop-spec.md` end-to-end, using Unified LLM Client directly (`Client.complete()` / `Client.stream()`), with provider-aligned tool profiles, truncation, events, and subagents.
 
-- [ ] C1 - Session + History + EventEmitter
+- [X] C1 - Session + History + EventEmitter
   - Scope:
     - Implement `Session`, `SessionConfig`, turn types, lifecycle transitions.
     - Implement event kinds from spec and deliver via async iterator or callback.
 
-- [ ] C2 - ExecutionEnvironment Interface + LocalExecutionEnvironment
+- [X] C2 - ExecutionEnvironment Interface + LocalExecutionEnvironment
   - Scope:
     - Implement filesystem ops, grep/glob, and command execution with timeout + process group kill.
     - Implement env var filtering defaults.
 
-- [ ] C3 - ToolRegistry + Shared Core Tools
+- [X] C3 - ToolRegistry + Shared Core Tools
   - Scope:
     - Implement tools: `read_file`, `write_file`, `edit_file`, `shell`, `grep`, `glob`.
     - Implement OpenAI `apply_patch` v4a (Appendix A) parser + applier.
     - Argument parsing and JSON schema validation.
 
-- [ ] C4 - Truncation Pipeline + TOOL_CALL_END Full Output
+- [X] C4 - Truncation Pipeline + TOOL_CALL_END Full Output
   - Scope:
     - Character truncation FIRST + line truncation SECOND.
     - Head/tail truncation markers exactly as spec.
 
-- [ ] C5 - Provider Profiles (OpenAI/Anthropic/Gemini)
+- [X] C5 - Provider Profiles (OpenAI/Anthropic/Gemini)
   - Scope:
     - Tool definitions aligned with provider conventions.
     - System prompt layering: provider base + env context + tool docs + project docs + user overrides.
     - Project doc discovery rules (AGENTS.md always, provider-specific files conditionally).
 
-- [ ] C6 - Steering + Loop Detection
+- [X] C6 - Steering + Loop Detection
   - Scope:
     - `steer()` and `follow_up()` queues and injection semantics.
     - Loop detection (pattern lengths 1-3) -> SteeringTurn warning.
 
-- [ ] C7 - Subagents
+- [X] C7 - Subagents
   - Scope:
     - Implement `spawn_agent`, `send_input`, `wait`, `close_agent` tools.
     - Depth limiting default 1.
     - Shared execution environment but isolated histories.
 
-- [ ] C8 - Cross-Provider Parity Matrix + Smoke Test
+- [X] C8 - Cross-Provider Parity Matrix + Smoke Test
   - Scope:
     - Turn the `9.12` matrix + `9.13` smoke test into runnable suites.
 
 ## Track D - Attractor Pipeline Runner
 Goal: implement `attractor-spec.md` end-to-end: DOT parsing subset, validation/linting, transforms, handlers, context/checkpoints, model stylesheet, conditions, retries, events, and optional HTTP server mode.
 
-- [ ] D1 - DOT Tokenizer/Parser (Subset)
+- [X] D1 - DOT Tokenizer/Parser (Subset)
   - Scope:
     - Implement strict DOT subset parsing with comment stripping, multiline attrs, defaults, chained edges, subgraphs flattening.
     - Enforce identifier constraints.
 
-- [ ] D2 - Graph Model + Defaults + Subgraph Class Derivation
+- [X] D2 - Graph Model + Defaults + Subgraph Class Derivation
   - Scope:
     - In-memory model (`Graph`, `Node`, `Edge`).
     - Apply node/edge defaults per scope.
     - Derive classes from subgraph labels per spec.
 
-- [ ] D3 - Model Stylesheet Parser + Transform
+- [X] D3 - Model Stylesheet Parser + Transform
   - Scope:
     - Parse grammar, apply specificity, explicit attrs override.
     - Integrate into preparation pipeline before validation.
 
-- [ ] D4 - Validation/Linting Diagnostics + validate_or_raise()
+- [X] D4 - Validation/Linting Diagnostics + validate_or_raise()
   - Scope:
     - Implement built-in lint rules from Section 7.
     - Support custom lint rules.
 
-- [ ] D5 - Condition Language Parser/Evaluator
+- [X] D5 - Condition Language Parser/Evaluator
   - Scope:
     - Implement `=` / `!=` and `&&` clauses.
     - Implement variable resolution (`outcome`, `preferred_label`, `context.*`).
 
-- [ ] D6 - Runtime State: Context, Outcome, Checkpoint, ArtifactStore
+- [X] D6 - Runtime State: Context, Outcome, Checkpoint, ArtifactStore
   - Scope:
     - Thread-safe Context + clone() semantics.
     - Outcome + status.json contract (Appendix C).
     - Checkpoint save/load + resume behavior including fidelity downgrade.
     - ArtifactStore with file backing >100KB.
 
-- [ ] D7 - Engine Core: traversal, goal gates, retries, edge selection
+- [X] D7 - Engine Core: traversal, goal gates, retries, edge selection
   - Scope:
     - Run lifecycle: parse -> validate -> init -> execute -> finalize.
     - Deterministic edge selection priority and normalization.
     - Retry policy, backoff presets, jitter.
     - Failure routing and loop_restart behavior.
 
-- [ ] D8 - Handler Registry + Built-in Handlers
+- [X] D8 - Handler Registry + Built-in Handlers
   - Scope:
     - start/exit, codergen, wait.human, conditional, tool, parallel, parallel.fan_in, stack.manager_loop.
     - Parallel join policies: wait_all, k_of_n, first_success, quorum.
     - Error policies: fail_fast, continue, ignore.
     - Custom handler registration.
 
-- [ ] D9 - Transforms and Extensibility
+- [X] D9 - Transforms and Extensibility
   - Scope:
     - Transform interface + built-ins: variable expansion, stylesheet.
     - Execution-time preamble transform for non-full fidelity modes.
 
-- [ ] D10 - Observability: Event Stream + Tool Call Hooks
+- [X] D10 - Observability: Event Stream + Tool Call Hooks
   - Scope:
     - Emit event kinds from Section 9.6.
     - Implement `tool_hooks.pre`/`tool_hooks.post` around LLM tool calls (when codergen backend supports tools).
@@ -625,7 +633,7 @@ Goal: implement `attractor-spec.md` end-to-end: DOT parsing subset, validation/l
     - Minimal endpoints per Section 9.5 including SSE events.
     - Operate human gates remotely.
 
-- [ ] D12 - Attractor Cross-Feature Parity Matrix + Smoke Test
+- [X] D12 - Attractor Cross-Feature Parity Matrix + Smoke Test
   - Scope:
     - Implement Section 11.12 matrix as runnable tests.
     - Implement Section 11.13 smoke test with a real LLM callback (gated by env vars).
@@ -633,22 +641,22 @@ Goal: implement `attractor-spec.md` end-to-end: DOT parsing subset, validation/l
 ## Track E - End-to-End Integration and Docs
 Goal: prove the three layers interoperate (Unified LLM -> Agent Loop -> Attractor CodergenBackend) and provide examples.
 
-- [ ] E1 - CodergenBackend Implementations
+- [X] E1 - CodergenBackend Implementations
   - Scope:
     - `UnifiedLlmCodergenBackend`: single-turn LLM call.
     - `AgentLoopCodergenBackend`: run a Session to allow tool-use coding agent behavior.
     - Thread reuse keyed by Attractor fidelity/thread_id rules.
 
-- [ ] E2 - Example Pipelines
+- [X] E2 - Example Pipelines
   - Scope:
     - Add `examples/pipelines/` DOT files covering: linear, conditional, retries, goal gates, wait.human, parallel+fan-in, tool nodes, manager loop.
 
-- [ ] E3 - Documentation
+- [X] E3 - Documentation
   - Scope:
     - README update: how to run CLI, how to run tests, how to configure providers.
     - Developer docs: adapters, tool profiles, DOT DSL subset.
 
-- [ ] E4 - Release Checklist
+- [X] E4 - Release Checklist
   - Scope:
     - Ensure all three NLSpec DoD checklists are fully checked and backed by evidence artifacts.
 

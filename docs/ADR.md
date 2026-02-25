@@ -50,3 +50,40 @@ Each completed item must include:
   - Regression triage is faster with durable artifacts.
 - Tradeoff:
   - Adds documentation overhead to each completion update.
+
+## ADR-003: Provider Smoke Testing Uses Native HTTP Transport
+- Date: 2026-02-25
+- Status: Accepted
+
+### Context
+Sprint closure requires provider-backed smoke tests for OpenAI, Anthropic, and Gemini that can run from the same PHP library runtime used by deterministic tests.
+
+### Decision
+Add `Attractor\LLM\Http\NativeHttpTransport` and wire `Client::fromEnv()` to native HTTP transport instead of placeholder array responses.
+
+Provider smoke tests run in an explicit group:
+- `composer run test:e2e:provider-smoke`
+
+### Consequences
+- Positive:
+  - Real provider validation is available without a secondary harness.
+  - `fromEnv()` is production-viable for direct API calls.
+- Tradeoff:
+  - Runtime behavior depends on network access and provider credentials.
+
+## ADR-004: HTTP Server Mode Is Deferred for Sprint 001 Closure
+- Date: 2026-02-25
+- Status: Accepted
+
+### Context
+Attractor HTTP mode is optional in Sprint 001 and not required for deterministic parity closure. The sprint still requires observability coverage for the runner core.
+
+### Decision
+Implement runner observability event emission in core execution paths and defer optional HTTP server mode to a follow-on sprint.
+
+### Consequences
+- Positive:
+  - Closure focuses on deterministic parity and auditable evidence.
+  - Event stream semantics are test-covered and ready for future HTTP/SSE surfacing.
+- Tradeoff:
+  - Remote run/status/answer endpoints are not part of Sprint 001 deliverables.
