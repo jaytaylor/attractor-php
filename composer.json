@@ -38,6 +38,7 @@
     "test:unit": "phpunit --testsuite unit",
     "test:integration": "phpunit --testsuite integration",
     "test:e2e": "phpunit --testsuite e2e",
+    "test:e2e:provider-smoke": "phpunit --testsuite e2e --group provider-smoke",
     "build": [
       "@precommit",
       "composer dump-autoload -o"

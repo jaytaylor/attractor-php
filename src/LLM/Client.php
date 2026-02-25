@@ -8,8 +8,7 @@ use Attractor\LLM\Adapters\AnthropicMessagesAdapter;
 use Attractor\LLM\Adapters\GeminiAdapter;
 use Attractor\LLM\Adapters\OpenAIResponsesAdapter;
 use Attractor\LLM\Errors\ConfigurationError;
-use Attractor\LLM\Http\ArrayTransport;
-use Attractor\LLM\Http\HttpResponse;
+use Attractor\LLM\Http\NativeHttpTransport;
 use Attractor\LLM\Types\Request;
 use Attractor\LLM\Types\Response;
 
@@ -33,6 +32,7 @@ final class Client
     public static function fromEnv(): self
     {
         $client = new self();
+        $transport = new NativeHttpTransport((int) (getenv('LLM_HTTP_TIMEOUT_MS') ?: 30_000));
 
         $openAiKey = getenv('OPENAI_API_KEY') ?: null;
         $anthropicKey = getenv('ANTHROPIC_API_KEY') ?: null;
@@ -41,7 +41,7 @@ final class Client
         if ($openAiKey !== null && $openAiKey !== '') {
             $client->registerAdapter(new OpenAIResponsesAdapter(
                 apiKey: $openAiKey,
-                transport: new ArrayTransport([new HttpResponse(500, body: '{"error":"transport not configured"}')]),
+                transport: $transport,
                 baseUrl: (string) (getenv('OPENAI_BASE_URL') ?: 'https://api.openai.com/v1'),
             ));
             $client->defaultProvider = $client->defaultProvider ?? 'openai';
@@ -50,7 +50,7 @@ final class Client
         if ($anthropicKey !== null && $anthropicKey !== '') {
             $client->registerAdapter(new AnthropicMessagesAdapter(
                 apiKey: $anthropicKey,
-                transport: new ArrayTransport([new HttpResponse(500, body: '{"error":"transport not configured"}')]),
+                transport: $transport,
                 baseUrl: (string) (getenv('ANTHROPIC_BASE_URL') ?: 'https://api.anthropic.com/v1'),
             ));
             $client->defaultProvider = $client->defaultProvider ?? 'anthropic';
@@ -59,7 +59,7 @@ final class Client
         if ($geminiKey !== null && $geminiKey !== '') {
             $client->registerAdapter(new GeminiAdapter(
                 apiKey: $geminiKey,
-                transport: new ArrayTransport([new HttpResponse(500, body: '{"error":"transport not configured"}')]),
+                transport: $transport,
                 baseUrl: (string) (getenv('GEMINI_BASE_URL') ?: 'https://generativelanguage.googleapis.com/v1beta'),
             ));
             $client->defaultProvider = $client->defaultProvider ?? 'gemini';
