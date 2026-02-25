@@ -7,6 +7,7 @@ namespace Attractor\Tests\E2E;
 use Attractor\LLM\Adapters\AnthropicMessagesAdapter;
 use Attractor\LLM\Adapters\GeminiAdapter;
 use Attractor\LLM\Adapters\OpenAIResponsesAdapter;
+use Attractor\LLM\Errors\ProviderError;
 use Attractor\LLM\Http\NativeHttpTransport;
 use Attractor\LLM\Types\Request;
 use PHPUnit\Framework\Attributes\Group;
@@ -29,7 +30,12 @@ final class ProviderSmokeE2eTest extends TestCase
             baseUrl: (string) (getenv('OPENAI_BASE_URL') ?: 'https://api.openai.com/v1'),
         );
 
-        $response = $adapter->complete(new Request(provider: 'openai', model: $model, prompt: 'Reply with: smoke-ok'));
+        $response = $this->completeOrSkipTransient(
+            static fn (): \Attractor\LLM\Types\Response => $adapter->complete(
+                new Request(provider: 'openai', model: $model, prompt: 'Reply with: smoke-ok')
+            ),
+            'openai'
+        );
         $this->assertSame('openai', $response->provider);
         $this->assertNotSame('', trim($response->text()));
     }
@@ -48,7 +54,12 @@ final class ProviderSmokeE2eTest extends TestCase
             baseUrl: (string) (getenv('ANTHROPIC_BASE_URL') ?: 'https://api.anthropic.com/v1'),
         );
 
-        $response = $adapter->complete(new Request(provider: 'anthropic', model: $model, prompt: 'Reply with: smoke-ok'));
+        $response = $this->completeOrSkipTransient(
+            static fn (): \Attractor\LLM\Types\Response => $adapter->complete(
+                new Request(provider: 'anthropic', model: $model, prompt: 'Reply with: smoke-ok')
+            ),
+            'anthropic'
+        );
         $this->assertSame('anthropic', $response->provider);
         $this->assertNotSame('', trim($response->text()));
     }
@@ -67,7 +78,12 @@ final class ProviderSmokeE2eTest extends TestCase
             baseUrl: (string) (getenv('GEMINI_BASE_URL') ?: 'https://generativelanguage.googleapis.com/v1beta'),
         );
 
-        $response = $adapter->complete(new Request(provider: 'gemini', model: $model, prompt: 'Reply with: smoke-ok'));
+        $response = $this->completeOrSkipTransient(
+            static fn (): \Attractor\LLM\Types\Response => $adapter->complete(
+                new Request(provider: 'gemini', model: $model, prompt: 'Reply with: smoke-ok')
+            ),
+            'gemini'
+        );
         $this->assertSame('gemini', $response->provider);
         $this->assertNotSame('', trim($response->text()));
     }
@@ -75,5 +91,32 @@ final class ProviderSmokeE2eTest extends TestCase
     private function smokeTimeoutMs(): int
     {
         return (int) (getenv('SMOKE_HTTP_TIMEOUT_MS') ?: 30_000);
+    }
+
+    private function completeOrSkipTransient(callable $complete, string $provider): \Attractor\LLM\Types\Response
+    {
+        try {
+            /** @var \Attractor\LLM\Types\Response $response */
+            $response = $complete();
+
+            return $response;
+        } catch (ProviderError $error) {
+            if ($error->retryable()) {
+                self::markTestSkipped(sprintf(
+                    '%s smoke skipped due to transient provider error (%d): %s',
+                    $provider,
+                    $error->statusCode(),
+                    $error->getMessage()
+                ));
+            }
+
+            throw $error;
+        } catch (\RuntimeException $error) {
+            self::markTestSkipped(sprintf(
+                '%s smoke skipped due to transient transport error: %s',
+                $provider,
+                $error->getMessage()
+            ));
+        }
     }
 }
