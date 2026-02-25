@@ -49,6 +49,7 @@ The remaining sprint focus is parity closure, evidence synchronization, and docu
 - Deterministic local suites pass via `timeout 180 make test`.
 - Provider-smoke tests exist and are env-gated via `composer run test:e2e:provider-smoke`.
 - Latest full verification run (2026-02-25): `timeout 180 make build` -> exit `0`, `timeout 180 make test` -> exit `0` (artifacts: `.scratch/verification/SPRINT-001/phase4/make-build-2026-02-25.log`, `.scratch/verification/SPRINT-001/phase4/make-test-2026-02-25.log`).
+- Implementation-cycle verification run (2026-02-25): `timeout 180 make build` -> exit `0`, `timeout 180 make test` -> exit `0`, `timeout 180 ./bin/composer run test:e2e:provider-smoke` -> exit `0`, plus `mmdc` renders for all appendix diagrams -> exit `0` (artifacts: `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-build.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/make-test.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/provider-smoke.log`, `.scratch/verification/SPRINT-001/implementation-2026-02-25/baseline/mmdc-render.log`).
 
 ## Prerequisites (Execution Environment)
 This sprint requires a working local PHP toolchain and a few OS-level utilities. Track A will make these explicit and add a `composer`-based developer workflow.
