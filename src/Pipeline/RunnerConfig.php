@@ -10,6 +10,7 @@ final class RunnerConfig
         public readonly string $logsRoot,
         public readonly ?string $preferredLabel = null,
         public readonly bool $autoStatus = true,
+        public readonly ?Observer $observer = null,
     ) {
     }
 }

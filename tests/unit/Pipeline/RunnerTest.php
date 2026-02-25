@@ -18,6 +18,7 @@ use Attractor\Pipeline\Handlers\WaitHumanHandler;
 use Attractor\Pipeline\Human\AutoApproveInterviewer;
 use Attractor\Pipeline\Human\QueueInterviewer;
 use Attractor\Pipeline\Answer;
+use Attractor\Pipeline\BufferedObserver;
 use Attractor\Pipeline\Runner;
 use Attractor\Pipeline\RunnerConfig;
 use Attractor\Pipeline\Runtime\Outcome;
@@ -162,6 +163,34 @@ final class RunnerTest extends TestCase
         $resumed = $runner->resume($this->tmpDir, new RunnerConfig($this->tmpDir . '-resume'), $graph);
         $this->assertSame('success', $resumed->status);
         $this->assertSame('summary:high', $graph->nodes['exit']->attrs['fidelity']);
+    }
+
+    public function testRunEmitsObserverEventsInOrder(): void
+    {
+        $backend = new FakeCodergenBackend();
+        $runner = $this->newRunner($backend, new AutoApproveInterviewer());
+        $observer = new BufferedObserver();
+
+        $dot = <<<'DOT'
+        digraph G {
+          start [shape=Mdiamond];
+          plan [shape=box, prompt="x"];
+          exit [shape=Msquare];
+          start -> plan;
+          plan -> exit;
+        }
+        DOT;
+
+        $graph = $runner->parseDot($dot);
+        $runner->run($graph, new RunnerConfig($this->tmpDir, observer: $observer));
+
+        $types = array_map(static fn ($event): string => $event->type, $observer->all());
+        $this->assertSame('RUN_START', $types[0] ?? null);
+        $this->assertContains('NODE_START', $types);
+        $this->assertContains('NODE_END', $types);
+        $this->assertContains('EDGE_SELECTED', $types);
+        $this->assertContains('CHECKPOINT_SAVED', $types);
+        $this->assertSame('RUN_END', $types[count($types) - 1] ?? null);
     }
 
     private function newRunner(FakeCodergenBackend $backend, $interviewer): Runner
