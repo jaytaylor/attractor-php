@@ -41,6 +41,7 @@ final class Runner
 
     public function run(Graph $graph, RunnerConfig $config): PipelineOutcome
     {
+        $this->emit($config, 'RUN_START', ['logs_root' => $config->logsRoot]);
         $this->validator->validateOrRaise($graph);
 
         $store = new ArtifactStore($config->logsRoot);
@@ -67,8 +68,14 @@ final class Runner
         }
 
         while (true) {
+            $this->emit($config, 'NODE_START', ['node_id' => $current->id]);
             $handler = $resolver->resolve($current);
             $outcome = $handler->execute($current, $ctx, $graph, $config->logsRoot);
+            $this->emit($config, 'NODE_END', [
+                'node_id' => $current->id,
+                'status' => $outcome->status,
+                'preferred_label' => $outcome->preferredLabel,
+            ]);
 
             $ctx->merge($outcome->contextUpdates);
             $completed[] = $current->id;
@@ -91,6 +98,7 @@ final class Runner
                 context: $ctx->all(),
                 retryCounts: $retryCounts,
             ));
+            $this->emit($config, 'CHECKPOINT_SAVED', ['node_id' => $current->id]);
 
             if ($current->shape() === 'Msquare' || preg_match('/^(exit|end)$/i', $current->id) === 1) {
                 $allGoalSatisfied = array_reduce($goalStatuses, static fn (bool $carry, bool $ok): bool => $carry && $ok, true);
@@ -99,6 +107,7 @@ final class Runner
                         'status' => 'success',
                         'completed_nodes' => $completed,
                     ]);
+                    $this->emit($config, 'RUN_END', ['status' => 'success']);
 
                     return new PipelineOutcome('success', $completed, $config->logsRoot);
                 }
@@ -114,6 +123,7 @@ final class Runner
                     'completed_nodes' => $completed,
                     'reason' => 'goal gates unsatisfied',
                 ]);
+                $this->emit($config, 'RUN_END', ['status' => 'fail', 'reason' => 'goal gates unsatisfied']);
 
                 return new PipelineOutcome('fail', $completed, $config->logsRoot, 'goal gates unsatisfied');
             }
@@ -148,6 +158,7 @@ final class Runner
                     'completed_nodes' => $completed,
                     'reason' => 'failure routing exhausted',
                 ]);
+                $this->emit($config, 'RUN_END', ['status' => 'fail', 'reason' => 'failure routing exhausted']);
 
                 return new PipelineOutcome('fail', $completed, $config->logsRoot, 'failure routing exhausted');
             }
@@ -159,15 +170,23 @@ final class Runner
                     'completed_nodes' => $completed,
                     'reason' => 'no next edge',
                 ]);
+                $this->emit($config, 'RUN_END', ['status' => 'fail', 'reason' => 'no next edge']);
 
                 return new PipelineOutcome('fail', $completed, $config->logsRoot, 'no next edge');
             }
 
             if (($next->attrs['loop_restart'] ?? 'false') === 'true') {
                 $freshRoot = rtrim(dirname($config->logsRoot), '/') . '/restart-' . basename($config->logsRoot);
-                return $this->run($graph, new RunnerConfig($freshRoot, $config->preferredLabel, $config->autoStatus));
+                $this->emit($config, 'LOOP_RESTART', ['from_node' => $current->id, 'to_logs_root' => $freshRoot]);
+
+                return $this->run($graph, new RunnerConfig($freshRoot, $config->preferredLabel, $config->autoStatus, $config->observer));
             }
 
+            $this->emit($config, 'EDGE_SELECTED', [
+                'from_node' => $current->id,
+                'to_node' => $next->to,
+                'label' => $next->label(),
+            ]);
             $current = $graph->nodes[$next->to] ?? throw new \RuntimeException('next node missing: ' . $next->to);
         }
     }
@@ -179,6 +198,7 @@ final class Runner
         if ($checkpoint === null) {
             throw new \RuntimeException('checkpoint not found');
         }
+        $this->emit($config, 'RUN_RESUME', ['logs_root' => $logsRoot, 'current_node' => $checkpoint->currentNode]);
 
         if (!isset($graph->nodes[$checkpoint->currentNode])) {
             throw new \RuntimeException('checkpoint node missing from graph');
@@ -188,6 +208,14 @@ final class Runner
         $graph->nodes[$checkpoint->currentNode]->attrs['fidelity'] = 'summary:high';
 
         return $this->run($graph, $config);
+    }
+
+    /**
+     * @param array<string, mixed> $payload
+     */
+    private function emit(RunnerConfig $config, string $type, array $payload = []): void
+    {
+        $config->observer?->onEvent(new PipelineEvent($type, $payload));
     }
 
     /** @param list<Edge> $edges */
