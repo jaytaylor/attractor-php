@@ -45,7 +45,8 @@ Minimum (required):
 
 Strongly recommended:
 - `rg` (ripgrep) for grep-backed tools
-- `timeout` (GNU coreutils) or an equivalent timeout wrapper for deterministic CI
+- `perl` (for portable timeouts via `perl -e 'alarm N; exec @ARGV' ...` on macOS/Linux)
+- `timeout` (GNU coreutils) if available (optional; prefer `perl -e 'alarm ...'` for portability)
 - `graphviz` (optional) for rendering `.dot` graphs to SVG/PNG in docs/tests
 
 ## Golden Sample Review (SPRINT-047-google-oauth.md)
@@ -259,6 +260,26 @@ Proposed evidence layout (by track):
 - `.scratch/verification/SPRINT-001/track-d/...` Attractor runner
 - `.scratch/verification/SPRINT-001/track-e/...` end-to-end integration
 
+### Evidence + Verification Logging Plan (Golden-Sample Inspired)
+- Every future `[X]` mark must include:
+  - Command used (wrapped in backticks) and its exact exit code.
+  - A link to the `.scratch/verification/...` artifact(s) created by that command.
+  - A short note listing positive tests and negative tests covered by the item.
+- For commands where timeouts matter, use a portable alarm wrapper (macOS-safe):
+  - `perl -e 'alarm 60; exec @ARGV' <cmd> ...`
+- For piped commands (e.g., `| tee`), explicitly record the exit code of the leftmost command, not `tee`.
+
+Recommended logging snippet (copy/paste shape):
+```bash
+mkdir -p .scratch/verification/SPRINT-001/track-a/doctor
+perl -e 'alarm 60; exec @ARGV' composer run doctor 2>&1 | tee .scratch/verification/SPRINT-001/track-a/doctor/composer-doctor.log
+printf "exit_code=%d\n" ${PIPESTATUS[0]} >> .scratch/verification/SPRINT-001/track-a/doctor/composer-doctor.log
+```
+
+Guideline for verification helpers:
+- Store one-off probes/scripts under `.scratch/tests` or `.scratch/verification` until they are stable.
+- Avoid adding a top-level `scripts/` directory for ad-hoc verification. Promote only stable workflows into `composer` scripts or `bin/` commands.
+
 Proposed canonical commands (to be created in Track A):
 - `composer test` (runs all non-e2e tests)
 - `composer test:unit`, `composer test:integration`, `composer test:e2e`
@@ -358,6 +379,49 @@ flowchart TD
 ## Execution Order
 Track A -> Track B -> Track C -> Track D -> Track E.
 
+## Phases (Execution Gates)
+To keep progress measurable and prevent downstream work from running ahead of foundations, we gate the sprint by phases. A phase is complete only when all its acceptance criteria are satisfied and backed by `.scratch/verification/SPRINT-001/...` artifacts.
+
+### Phase 0 - Foundations & Harness (Track A)
+Acceptance Criteria - Phase 0:
+- [ ] Toolchain validated and reproducible on a clean machine.
+  - Evidence: `perl -e 'alarm 60; exec @ARGV' composer run doctor` (exit 0; `.scratch/verification/SPRINT-001/phase0/doctor/composer-doctor.log`)
+- [ ] Unit test harness runs green with no provider API keys configured.
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test` (exit 0; `.scratch/verification/SPRINT-001/phase0/tests/composer-test.log`)
+- [ ] Evidence tree exists and has an index README describing how to add artifacts and record exit codes.
+  - Evidence: `ls .scratch/verification/SPRINT-001/README.md` (exit 0; `.scratch/verification/SPRINT-001/phase0/evidence/ls-evidence-index.log`)
+
+### Phase 1 - Unified LLM Client (Track B)
+Acceptance Criteria - Phase 1:
+- [ ] Adapter translation + streaming fixture tests pass for OpenAI/Anthropic/Gemini (no network).
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test:integration` (exit 0; `.scratch/verification/SPRINT-001/phase1/integration/composer-test-integration.log`)
+- [ ] Unified LLM parity matrix tests pass in mock mode; real-provider smoke tests run only when API keys are set.
+  - Evidence (mock): `perl -e 'alarm 300; exec @ARGV' composer test -g llm-parity` (exit 0; `.scratch/verification/SPRINT-001/phase1/parity/llm-parity-mock.log`)
+  - Evidence (real, optional): `perl -e 'alarm 600; exec @ARGV' composer test:e2e -g llm-smoke` (exit 0; `.scratch/verification/SPRINT-001/phase1/e2e/llm-smoke.log`)
+
+### Phase 2 - Coding Agent Loop (Track C)
+Acceptance Criteria - Phase 2:
+- [ ] Coding-agent parity matrix passes using a deterministic FakeAdapter provider profile (no network).
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g agent-parity` (exit 0; `.scratch/verification/SPRINT-001/phase2/parity/agent-parity.log`)
+- [ ] LocalExecutionEnvironment process timeouts and truncation behavior are covered by negative tests.
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g agent-env` (exit 0; `.scratch/verification/SPRINT-001/phase2/env/agent-env.log`)
+
+### Phase 3 - Attractor Runner (Track D)
+Acceptance Criteria - Phase 3:
+- [ ] Attractor parity matrix passes using simulated codergen backend + AutoApproveInterviewer (no network).
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g attractor-parity` (exit 0; `.scratch/verification/SPRINT-001/phase3/parity/attractor-parity.log`)
+- [ ] Checkpoint/resume behavior is verified (including fidelity downgrade after resume from `full`).
+  - Evidence: `perl -e 'alarm 300; exec @ARGV' composer test -g attractor-checkpoint` (exit 0; `.scratch/verification/SPRINT-001/phase3/checkpoint/attractor-checkpoint.log`)
+
+### Phase 4 - End-to-End Integration & Release (Track E)
+Acceptance Criteria - Phase 4:
+- [ ] All non-e2e tests pass via a single command suitable for CI.
+  - Evidence: `perl -e 'alarm 600; exec @ARGV' composer ci` (exit 0; `.scratch/verification/SPRINT-001/phase4/ci/composer-ci.log`)
+- [ ] When all three provider keys are present, the NLSpec smoke tests pass end-to-end (optional but strongly recommended).
+  - Evidence: `perl -e 'alarm 1200; exec @ARGV' composer test:e2e` (exit 0; `.scratch/verification/SPRINT-001/phase4/e2e/composer-test-e2e.log`)
+- [ ] Sprint plan is “closed”: no `TBD`/`TODO` placeholders remain.
+  - Evidence: `perl -e 'alarm 60; exec @ARGV' rg \"T[O]DO|TBD\" docs/sprints/SPRINT-001-attractor-php-nlspec-parity.md` (expected exit 1; `.scratch/verification/SPRINT-001/phase4/docs/rg-no-placeholders.log`)
+
 ## Track A - Project Scaffolding and Dev Harness (P0)
 Goal: establish a PHP project that can prove parity via tests, evidence artifacts, and reproducible commands.
 
@@ -388,6 +452,14 @@ Goal: establish a PHP project that can prove parity via tests, evidence artifact
   - Scope:
     - Pick an HTTP mocking strategy for adapter tests (e.g., mock HTTP client transport).
     - Define golden fixtures for provider request/response/stream translations.
+
+- [ ] A4 - Verification Helpers (Timeout + Log Capture + Doc Hygiene)
+  - Scope:
+    - Add a small helper for portable timeouts (`perl -e 'alarm ...'`) and log capture to `.scratch/verification/...`.
+    - Add a minimal docs lint check (e.g., fail if sprint docs contain `TBD`/`TODO` placeholders).
+  - Verification:
+    - `perl -e 'alarm 60; exec @ARGV' composer run doctor` (exit 0)
+    - `perl -e 'alarm 60; exec @ARGV' composer lint:docs` (exit 0)
 
 ## Track B - Unified LLM Client (Foundation)
 Goal: implement `unified-llm-spec.md` end-to-end with OpenAI/Anthropic/Gemini adapters, streaming, tools, retries, caching metadata, and parity tests.
