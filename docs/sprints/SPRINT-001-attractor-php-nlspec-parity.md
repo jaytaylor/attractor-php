@@ -20,6 +20,8 @@ Implement a PHP library (plus minimal CLI + optional HTTP mode) that fully satis
 ## Implementation Runbook
 - Execution runbook (this sprint's implementation sequence and verification-first breakdown):
   - `docs/sprints/SPRINT-001-implementation-runbook.md`
+- Comprehensive implementation plan (phase-by-phase deliverables, acceptance criteria, and explicit test matrix):
+  - `docs/sprints/SPRINT-001-comprehensive-implementation-plan.md`
 - Spec-to-test traceability:
   - `docs/sprints/SPRINT-001-traceability-matrix.md`
 
