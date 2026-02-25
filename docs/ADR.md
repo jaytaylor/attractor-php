@@ -118,3 +118,24 @@ Add `bin/attractor-http` as a PHP built-in server router and extend pipeline run
   - Event stream verification is available without custom infrastructure.
 - Tradeoff:
   - HTTP mode is intentionally minimal and file-backed for Sprint 001 scope.
+
+## ADR-006: Phase-Gated Sprint 001 Execution With Evidence-First Status Updates
+- Date: 2026-02-25
+- Status: Accepted
+
+### Context
+The prior Sprint 001 planning artifact mixed planning and closure states, which made implementation sequencing and real progress tracking difficult to audit.
+
+### Decision
+Use `docs/sprints/SPRINT-001-comprehensive-implementation-plan.md` as the canonical phase-gated execution plan with:
+- Foundation -> Unified LLM -> Agent Loop -> Pipeline Runner -> Cross-spec integration ordering
+- Explicit per-phase deliverables, acceptance criteria, and positive/negative tests
+- Evidence placeholders attached to every checklist item and completed only after command and artifact verification
+
+### Consequences
+- Positive:
+  - Sprint status remains aligned with verifiable implementation state.
+  - Cross-team handoff is clearer because each phase has concrete completion gates.
+  - Regression investigation is faster due to standardized evidence paths.
+- Tradeoff:
+  - Documentation maintenance effort increases during active implementation.
