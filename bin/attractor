@@ -1,0 +1,62 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Attractor\Pipeline\DefaultRunnerFactory;
+use Attractor\Pipeline\RunnerConfig;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+$argv = $_SERVER['argv'] ?? [];
+$cmd = $argv[1] ?? 'help';
+
+if (in_array($cmd, ['-h', '--help', 'help'], true)) {
+    fwrite(STDOUT, "Usage:\n");
+    fwrite(STDOUT, "  bin/attractor validate <pipeline.dot>\n");
+    fwrite(STDOUT, "  bin/attractor run <pipeline.dot> [logs_dir]\n");
+    exit(0);
+}
+
+if ($cmd === 'validate') {
+    $path = $argv[2] ?? null;
+    if ($path === null || !is_file($path)) {
+        fwrite(STDERR, "validate requires an existing .dot file\n");
+        exit(2);
+    }
+
+    $runner = DefaultRunnerFactory::make();
+    $graph = $runner->parseDot((string) file_get_contents($path));
+    $diagnostics = $runner->validate($graph);
+
+    if ($diagnostics === []) {
+        fwrite(STDOUT, "OK: no diagnostics\n");
+        exit(0);
+    }
+
+    foreach ($diagnostics as $diag) {
+        fwrite(STDOUT, sprintf("[%s] %s (%s): %s\n", strtoupper($diag->severity), $diag->rule, $diag->targetId, $diag->message));
+    }
+
+    $hasError = array_filter($diagnostics, static fn ($d): bool => $d->severity === 'error') !== [];
+    exit($hasError ? 1 : 0);
+}
+
+if ($cmd === 'run') {
+    $path = $argv[2] ?? null;
+    if ($path === null || !is_file($path)) {
+        fwrite(STDERR, "run requires an existing .dot file\n");
+        exit(2);
+    }
+
+    $logs = $argv[3] ?? ('.scratch/runs/' . date('Ymd-His'));
+    $runner = DefaultRunnerFactory::make();
+    $graph = $runner->parseDot((string) file_get_contents($path));
+    $outcome = $runner->run($graph, new RunnerConfig($logs));
+
+    fwrite(STDOUT, sprintf("run status=%s logs=%s\n", $outcome->status, $outcome->logsRoot));
+    exit($outcome->status === 'success' ? 0 : 1);
+}
+
+fwrite(STDERR, "unknown command: {$cmd}\n");
+exit(2);
