@@ -35,6 +35,20 @@ bin/attractor validate examples/pipelines/basic.dot
 bin/attractor run examples/pipelines/basic.dot .scratch/runs/basic
 ```
 
+## HTTP Mode
+
+Run the minimal HTTP server mode with PHP's built-in server:
+
+```bash
+php -S 127.0.0.1:8080 bin/attractor-http
+```
+
+Available endpoints:
+- `POST /run` with JSON body containing `dot` (or `dot_path`), optional `run_id`, and optional `logs_root`
+- `GET /status?run_id=<id>` for JSON status
+- `GET /status?run_id=<id>&stream=1` for SSE event stream
+- `POST /answer` with JSON body containing `run_id` and `selected` for paused `wait.human` gates
+
 ## Terminology
 
 - **NLSpec** (Natural Language Spec): a human-readable spec intended to be  directly usable by coding agents to implement/validate behavior.
