@@ -30,6 +30,19 @@ final class WaitHumanHandler implements Handler
         ));
 
         $selected = $answer->selected[0] ?? null;
+        if ($selected === null && $options !== []) {
+            return Outcome::waiting(
+                'human input required',
+                null,
+                [
+                    'pending_human' => [
+                        'node_id' => $node->id,
+                        'question' => (string) $node->attr('question', 'Choose next step'),
+                        'options' => $options,
+                    ],
+                ],
+            );
+        }
 
         return Outcome::success('human decision', $selected);
     }

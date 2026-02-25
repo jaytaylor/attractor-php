@@ -9,6 +9,7 @@ use Attractor\Pipeline\Engine\ConditionEvaluator;
 use Attractor\Pipeline\Engine\HandlerResolver;
 use Attractor\Pipeline\Model\Edge;
 use Attractor\Pipeline\Model\Graph;
+use Attractor\Pipeline\Model\Node;
 use Attractor\Pipeline\Runtime\ArtifactStore;
 use Attractor\Pipeline\Runtime\Checkpoint;
 use Attractor\Pipeline\Runtime\Context;
@@ -47,37 +48,89 @@ final class Runner
         $store = new ArtifactStore($config->logsRoot);
         $store->ensureRunDir();
 
-        $ctx = new Context([
-            'goal' => $graph->goal(),
-        ]);
-
         $current = $graph->startNode();
         if ($current === null) {
             throw new \RuntimeException('no start node');
         }
 
-        $resolver = new HandlerResolver($this->handlers);
-        $completed = [];
-        $retryCounts = [];
-        $goalStatuses = [];
+        return $this->runLoop(
+            graph: $graph,
+            config: $config,
+            store: $store,
+            context: new Context(['goal' => $graph->goal()]),
+            current: $current,
+            completed: [],
+            retryCounts: [],
+            goalStatuses: $this->initializeGoalStatuses($graph, [], $store),
+        );
+    }
 
-        foreach ($graph->nodes as $node) {
-            if (($node->attr('goal_gate') ?? 'false') === 'true') {
-                $goalStatuses[$node->id] = false;
-            }
+    public function resume(string $logsRoot, RunnerConfig $config, Graph $graph): PipelineOutcome
+    {
+        $store = new ArtifactStore($logsRoot);
+        $checkpoint = $store->readCheckpoint();
+        if ($checkpoint === null) {
+            throw new \RuntimeException('checkpoint not found');
         }
+
+        $this->validator->validateOrRaise($graph);
+        $this->emit($config, 'RUN_RESUME', ['logs_root' => $logsRoot, 'current_node' => $checkpoint->currentNode]);
+
+        if (!isset($graph->nodes[$checkpoint->currentNode])) {
+            throw new \RuntimeException('checkpoint node missing from graph');
+        }
+
+        $current = $graph->nodes[$checkpoint->currentNode];
+        // Fidelity downgrade per spec for resumed runs after full context nodes.
+        $current->attrs['fidelity'] = 'summary:high';
+
+        $resumeConfig = new RunnerConfig(
+            logsRoot: $logsRoot,
+            preferredLabel: $config->preferredLabel,
+            autoStatus: $config->autoStatus,
+            observer: $config->observer,
+        );
+
+        return $this->runLoop(
+            graph: $graph,
+            config: $resumeConfig,
+            store: $store,
+            context: new Context($checkpoint->context),
+            current: $current,
+            completed: $checkpoint->completedNodes,
+            retryCounts: $checkpoint->retryCounts,
+            goalStatuses: $this->initializeGoalStatuses($graph, $checkpoint->completedNodes, $store),
+        );
+    }
+
+    /**
+     * @param list<string> $completed
+     * @param array<string, int> $retryCounts
+     * @param array<string, bool> $goalStatuses
+     */
+    private function runLoop(
+        Graph $graph,
+        RunnerConfig $config,
+        ArtifactStore $store,
+        Context $context,
+        Node $current,
+        array $completed,
+        array $retryCounts,
+        array $goalStatuses,
+    ): PipelineOutcome {
+        $resolver = new HandlerResolver($this->handlers);
 
         while (true) {
             $this->emit($config, 'NODE_START', ['node_id' => $current->id]);
             $handler = $resolver->resolve($current);
-            $outcome = $handler->execute($current, $ctx, $graph, $config->logsRoot);
+            $outcome = $handler->execute($current, $context, $graph, $config->logsRoot);
             $this->emit($config, 'NODE_END', [
                 'node_id' => $current->id,
                 'status' => $outcome->status,
                 'preferred_label' => $outcome->preferredLabel,
             ]);
 
-            $ctx->merge($outcome->contextUpdates);
+            $context->merge($outcome->contextUpdates);
             $completed[] = $current->id;
             if (isset($goalStatuses[$current->id]) && $outcome->status === 'SUCCESS') {
                 $goalStatuses[$current->id] = true;
@@ -95,10 +148,30 @@ final class Runner
             $store->writeCheckpoint(new Checkpoint(
                 currentNode: $current->id,
                 completedNodes: $completed,
-                context: $ctx->all(),
+                context: $context->all(),
                 retryCounts: $retryCounts,
             ));
             $this->emit($config, 'CHECKPOINT_SAVED', ['node_id' => $current->id]);
+
+            if ($outcome->status === 'WAITING') {
+                $manifest = [
+                    'status' => 'waiting',
+                    'completed_nodes' => $completed,
+                    'reason' => $outcome->message === '' ? 'human input required' : $outcome->message,
+                ];
+                $pending = $outcome->contextUpdates['pending_human'] ?? null;
+                if (is_array($pending)) {
+                    $manifest['pending_human'] = $pending;
+                }
+                $store->writeManifest($manifest);
+                $this->emit($config, 'RUN_WAITING', [
+                    'node_id' => $current->id,
+                    'reason' => $manifest['reason'],
+                    'pending_human' => $pending,
+                ]);
+
+                return new PipelineOutcome('waiting', $completed, $config->logsRoot, (string) $manifest['reason']);
+            }
 
             if ($current->shape() === 'Msquare' || preg_match('/^(exit|end)$/i', $current->id) === 1) {
                 $allGoalSatisfied = array_reduce($goalStatuses, static fn (bool $carry, bool $ok): bool => $carry && $ok, true);
@@ -163,7 +236,7 @@ final class Runner
                 return new PipelineOutcome('fail', $completed, $config->logsRoot, 'failure routing exhausted');
             }
 
-            $next = $this->selectNextEdge($graph->outgoing($current->id), $outcome, $ctx, $config->preferredLabel);
+            $next = $this->selectNextEdge($graph->outgoing($current->id), $outcome, $context, $config->preferredLabel);
             if ($next === null) {
                 $store->writeManifest([
                     'status' => 'fail',
@@ -189,25 +262,6 @@ final class Runner
             ]);
             $current = $graph->nodes[$next->to] ?? throw new \RuntimeException('next node missing: ' . $next->to);
         }
-    }
-
-    public function resume(string $logsRoot, RunnerConfig $config, Graph $graph): PipelineOutcome
-    {
-        $store = new ArtifactStore($logsRoot);
-        $checkpoint = $store->readCheckpoint();
-        if ($checkpoint === null) {
-            throw new \RuntimeException('checkpoint not found');
-        }
-        $this->emit($config, 'RUN_RESUME', ['logs_root' => $logsRoot, 'current_node' => $checkpoint->currentNode]);
-
-        if (!isset($graph->nodes[$checkpoint->currentNode])) {
-            throw new \RuntimeException('checkpoint node missing from graph');
-        }
-
-        // Fidelity downgrade per spec for resumed runs after full context nodes.
-        $graph->nodes[$checkpoint->currentNode]->attrs['fidelity'] = 'summary:high';
-
-        return $this->run($graph, $config);
     }
 
     /**
@@ -279,5 +333,37 @@ final class Runner
         $trimmed = preg_replace('/^[A-Za-z]\s+-\s+/', '', $trimmed) ?? $trimmed;
 
         return strtolower(trim($trimmed));
+    }
+
+    /**
+     * @param list<string> $completedNodes
+     * @return array<string, bool>
+     */
+    private function initializeGoalStatuses(Graph $graph, array $completedNodes, ArtifactStore $store): array
+    {
+        $goalStatuses = [];
+        foreach ($graph->nodes as $node) {
+            if (($node->attr('goal_gate') ?? 'false') === 'true') {
+                $goalStatuses[$node->id] = false;
+            }
+        }
+
+        foreach ($completedNodes as $nodeId) {
+            if (!isset($goalStatuses[$nodeId])) {
+                continue;
+            }
+
+            $statusPath = $store->runDir() . '/' . $nodeId . '/status.json';
+            if (!is_file($statusPath)) {
+                continue;
+            }
+
+            $data = json_decode((string) file_get_contents($statusPath), true);
+            if (is_array($data) && ($data['status'] ?? null) === 'SUCCESS') {
+                $goalStatuses[$nodeId] = true;
+            }
+        }
+
+        return $goalStatuses;
     }
 }

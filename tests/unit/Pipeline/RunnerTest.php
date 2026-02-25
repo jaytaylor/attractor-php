@@ -193,6 +193,41 @@ final class RunnerTest extends TestCase
         $this->assertSame('RUN_END', $types[count($types) - 1] ?? null);
     }
 
+    public function testWaitHumanCanPauseAndResumeFromCheckpoint(): void
+    {
+        $backend = new FakeCodergenBackend();
+        $pausedRunner = $this->newRunner($backend, new QueueInterviewer([]));
+
+        $dot = <<<'DOT'
+        digraph G {
+          start [shape=Mdiamond];
+          ask [shape=diamond, type="wait.human", question="Choose"];
+          yespath [shape=box, prompt="y"];
+          nopath [shape=box, prompt="n"];
+          exit [shape=Msquare];
+          start -> ask;
+          ask -> yespath [label="Yes"];
+          ask -> nopath [label="No"];
+          yespath -> exit;
+          nopath -> exit;
+        }
+        DOT;
+
+        $graph = $pausedRunner->parseDot($dot);
+        $paused = $pausedRunner->run($graph, new RunnerConfig($this->tmpDir));
+        $this->assertSame('waiting', $paused->status);
+        $this->assertFileExists($this->tmpDir . '/manifest.json');
+        $manifest = json_decode((string) file_get_contents($this->tmpDir . '/manifest.json'), true);
+        $this->assertSame('waiting', $manifest['status'] ?? null);
+        $this->assertSame('ask', $manifest['pending_human']['node_id'] ?? null);
+
+        $resumeRunner = $this->newRunner($backend, new QueueInterviewer([new Answer(selected: ['Yes'])]));
+        $resumed = $resumeRunner->resume($this->tmpDir, new RunnerConfig($this->tmpDir), $graph);
+
+        $this->assertSame('success', $resumed->status);
+        $this->assertFileExists($this->tmpDir . '/yespath/status.json');
+    }
+
     private function newRunner(FakeCodergenBackend $backend, $interviewer): Runner
     {
         $registry = new HandlerRegistry();

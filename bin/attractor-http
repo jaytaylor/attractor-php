@@ -1,0 +1,31 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+use Attractor\Pipeline\Http\Server;
+
+require __DIR__ . '/../vendor/autoload.php';
+
+if (PHP_SAPI !== 'cli-server') {
+    fwrite(STDOUT, "Attractor HTTP router.\n");
+    fwrite(STDOUT, "Run with:\n");
+    fwrite(STDOUT, "  php -S 127.0.0.1:8080 bin/attractor-http\n");
+    fwrite(STDOUT, "Endpoints:\n");
+    fwrite(STDOUT, "  POST /run\n");
+    fwrite(STDOUT, "  GET  /status?run_id=<id>[&stream=1]\n");
+    fwrite(STDOUT, "  POST /answer\n");
+    exit(0);
+}
+
+$server = new Server();
+$method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
+$uri = $_SERVER['REQUEST_URI'] ?? '/';
+$body = (string) file_get_contents('php://input');
+
+$response = $server->handle($method, $uri, $body);
+http_response_code($response->status);
+foreach ($response->headers as $name => $value) {
+    header($name . ': ' . $value);
+}
+echo $response->body;
