@@ -13,20 +13,20 @@ use Attractor\LLM\Types\Request;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\TestCase;
 
-#[Group('provider-smoke')]
-final class ProviderSmokeE2eTest extends TestCase
+#[Group('provider-e2e')]
+final class ProviderE2eTest extends TestCase
 {
-    public function testOpenAiSimpleGenerationSmoke(): void
+    public function testOpenAiSimpleGeneration(): void
     {
         $apiKey = getenv('OPENAI_API_KEY') ?: '';
         if ($apiKey === '') {
             self::markTestSkipped('OPENAI_API_KEY not set');
         }
 
-        $model = (string) (getenv('OPENAI_SMOKE_MODEL') ?: 'gpt-5.2');
+        $model = (string) (getenv('OPENAI_E2E_MODEL') ?: 'gpt-5.2');
         $adapter = new OpenAIResponsesAdapter(
             apiKey: $apiKey,
-            transport: new NativeHttpTransport($this->smokeTimeoutMs()),
+            transport: new NativeHttpTransport($this->timeoutMs()),
             baseUrl: (string) (getenv('OPENAI_BASE_URL') ?: 'https://api.openai.com/v1'),
         );
 
@@ -40,17 +40,17 @@ final class ProviderSmokeE2eTest extends TestCase
         $this->assertNotSame('', trim($response->text()));
     }
 
-    public function testAnthropicSimpleGenerationSmoke(): void
+    public function testAnthropicSimpleGeneration(): void
     {
         $apiKey = getenv('ANTHROPIC_API_KEY') ?: '';
         if ($apiKey === '') {
             self::markTestSkipped('ANTHROPIC_API_KEY not set');
         }
 
-        $model = (string) (getenv('ANTHROPIC_SMOKE_MODEL') ?: 'claude-sonnet-4-5');
+        $model = (string) (getenv('ANTHROPIC_E2E_MODEL') ?: 'claude-sonnet-4-5');
         $adapter = new AnthropicMessagesAdapter(
             apiKey: $apiKey,
-            transport: new NativeHttpTransport($this->smokeTimeoutMs()),
+            transport: new NativeHttpTransport($this->timeoutMs()),
             baseUrl: (string) (getenv('ANTHROPIC_BASE_URL') ?: 'https://api.anthropic.com/v1'),
         );
 
@@ -64,17 +64,17 @@ final class ProviderSmokeE2eTest extends TestCase
         $this->assertNotSame('', trim($response->text()));
     }
 
-    public function testGeminiSimpleGenerationSmoke(): void
+    public function testGeminiSimpleGeneration(): void
     {
         $apiKey = getenv('GEMINI_API_KEY') ?: getenv('GOOGLE_API_KEY') ?: '';
         if ($apiKey === '') {
             self::markTestSkipped('GEMINI_API_KEY or GOOGLE_API_KEY not set');
         }
 
-        $model = (string) (getenv('GEMINI_SMOKE_MODEL') ?: 'gemini-2.0-flash');
+        $model = (string) (getenv('GEMINI_E2E_MODEL') ?: 'gemini-2.0-flash');
         $adapter = new GeminiAdapter(
             apiKey: $apiKey,
-            transport: new NativeHttpTransport($this->smokeTimeoutMs()),
+            transport: new NativeHttpTransport($this->timeoutMs()),
             baseUrl: (string) (getenv('GEMINI_BASE_URL') ?: 'https://generativelanguage.googleapis.com/v1beta'),
         );
 
@@ -88,9 +88,9 @@ final class ProviderSmokeE2eTest extends TestCase
         $this->assertNotSame('', trim($response->text()));
     }
 
-    private function smokeTimeoutMs(): int
+    private function timeoutMs(): int
     {
-        return (int) (getenv('SMOKE_HTTP_TIMEOUT_MS') ?: 30_000);
+        return (int) (getenv('E2E_HTTP_TIMEOUT_MS') ?: 30_000);
     }
 
     private function completeOrSkipTransient(callable $complete, string $provider): \Attractor\LLM\Types\Response
@@ -103,7 +103,7 @@ final class ProviderSmokeE2eTest extends TestCase
         } catch (ProviderError $error) {
             if ($error->retryable()) {
                 self::markTestSkipped(sprintf(
-                    '%s smoke skipped due to transient provider error (%d): %s',
+                    '%s provider E2E skipped due to transient provider error (%d): %s',
                     $provider,
                     $error->statusCode(),
                     $error->getMessage()
@@ -113,7 +113,7 @@ final class ProviderSmokeE2eTest extends TestCase
             throw $error;
         } catch (\RuntimeException $error) {
             self::markTestSkipped(sprintf(
-                '%s smoke skipped due to transient transport error: %s',
+                '%s provider E2E skipped due to transient transport error: %s',
                 $provider,
                 $error->getMessage()
             ));
