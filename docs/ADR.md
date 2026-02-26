@@ -51,18 +51,21 @@ Each completed item must include:
 - Tradeoff:
   - Adds documentation overhead to each completion update.
 
-## ADR-003: Provider Smoke Testing Uses Native HTTP Transport
+## ADR-003: Provider-Backed E2E Testing Uses Native HTTP Transport
 - Date: 2026-02-25
 - Status: Accepted
 
 ### Context
-Sprint closure requires provider-backed smoke tests for OpenAI, Anthropic, and Gemini that can run from the same PHP library runtime used by deterministic tests.
+Sprint closure requires provider-backed end-to-end tests for OpenAI, Anthropic, and Gemini that can run from the same PHP library runtime used by deterministic tests.
 
 ### Decision
 Add `Attractor\LLM\Http\NativeHttpTransport` and wire `Client::fromEnv()` to native HTTP transport instead of placeholder array responses.
 
-Provider smoke tests run in an explicit group:
-- `composer run test:e2e:provider-smoke`
+Provider-backed end-to-end tests run as part of:
+- `make test-e2e`
+
+They are tagged as an explicit group so deterministic suites can exclude them:
+- `composer run test:e2e:provider`
 
 ### Consequences
 - Positive:

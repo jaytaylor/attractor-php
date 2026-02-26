@@ -16,15 +16,15 @@ The implementation focuses on deterministic tests and verifiable sprint evidence
 ## Build and Test
 
 ```bash
-timeout 180 make build
-timeout 180 make test
-timeout 180 ./bin/composer run test:e2e:provider-smoke
+make build
+make test
+make test-e2e
 ```
 
-`test:e2e:provider-smoke` is env-gated and skips unless provider keys are set:
-- `OPENAI_API_KEY` (optional `OPENAI_SMOKE_MODEL`)
-- `ANTHROPIC_API_KEY` (optional `ANTHROPIC_SMOKE_MODEL`)
-- `GEMINI_API_KEY` or `GOOGLE_API_KEY` (optional `GEMINI_SMOKE_MODEL`)
+`make test-e2e` includes provider-backed end-to-end tests. They are env-gated and skip unless provider keys are set:
+- `OPENAI_API_KEY` (optional `OPENAI_E2E_MODEL`)
+- `ANTHROPIC_API_KEY` (optional `ANTHROPIC_E2E_MODEL`)
+- `GEMINI_API_KEY` or `GOOGLE_API_KEY` (optional `GEMINI_E2E_MODEL`)
 
 ## CLI
 

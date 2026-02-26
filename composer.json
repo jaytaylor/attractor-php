@@ -35,11 +35,11 @@
       "@doctor",
       "@lint"
     ],
-    "test": "phpunit --testsuite unit,integration,e2e --exclude-group provider-smoke",
+    "test": "phpunit --testsuite unit,integration,e2e --exclude-group provider-e2e",
     "test:unit": "phpunit --testsuite unit",
     "test:integration": "phpunit --testsuite integration",
-    "test:e2e": "phpunit --testsuite e2e --exclude-group provider-smoke",
-    "test:e2e:provider-smoke": "phpunit --testsuite e2e --group provider-smoke",
+    "test:e2e": "phpunit --testsuite e2e",
+    "test:e2e:provider": "phpunit --testsuite e2e --group provider-e2e",
     "build": [
       "@precommit",
       "composer dump-autoload -o"

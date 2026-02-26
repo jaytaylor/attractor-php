@@ -6,7 +6,7 @@ namespace Attractor\Tests\E2E;
 
 use PHPUnit\Framework\TestCase;
 
-final class SmokeE2eTest extends TestCase
+final class CliE2eTest extends TestCase
 {
     public function testCliValidateAndRunBasicPipeline(): void
     {
