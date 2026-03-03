@@ -53,6 +53,93 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
   - `{logs_root}/{run_id}/{node_id}/...`
   - `{logs_root}/{run_id}/artifacts/...`
 
+## UX Spec (Coreys-Attractor-Inspired)
+This UI intentionally mirrors the flow that makes Corey’s Attractor productive while keeping the implementation dependency-light.
+
+### Views
+- **Monitor** (default): run list + run details (stages, graph, live log, artifacts, human gate controls)
+- **Create**: DOT editor + validate + graph preview + run
+- **Archived**: list archived runs and re-open or unarchive
+- **Docs**: built-in documentation of UI + API + DOT
+
+### Monitor View - Minimum Behaviors
+- Run list shows: name, status, started time, current node, archived flag.
+- Run details shows:
+  - Status badge + elapsed time
+  - Stage list with per-stage status and error detail
+  - Graph panel (SVG) with zoom/pan and per-node status highlighting
+  - Live log panel (append-only)
+  - Human gate panel/modal when a question is pending
+  - Artifacts viewer (list + preview + download)
+- Actions (conditioned on run state):
+  - Cancel (running only)
+  - Archive/unarchive (terminal only)
+  - Delete (terminal only, explicit confirmation)
+
+### Create View - Minimum Behaviors
+- Paste DOT, validate, preview as SVG, then run.
+- Validation diagnostics must be shown inline and block run creation until fixed.
+
+## API Shapes (Selected, Starting Point)
+The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to remove ambiguity for implementers and test authors.
+
+### `PipelineListItem` (response item for `GET /api/v1/pipelines`)
+```json
+{
+  "id": "run-1700000000000-1",
+  "displayName": "Autumn Falcon",
+  "fileName": "pipeline.dot",
+  "status": "running",
+  "archived": false,
+  "simulate": false,
+  "autoApprove": true,
+  "familyId": "run-1700000000000-1",
+  "originalPrompt": "Write and test a REST API",
+  "startedAtMs": 1700000000000,
+  "finishedAtMs": null,
+  "currentNodeId": "plan",
+  "stages": []
+}
+```
+
+### `PipelineDetail` (response for `GET /api/v1/pipelines/{id}`)
+```json
+{
+  "dotSource": "digraph P { ... }",
+  "checkpoint": { "current_node": "plan", "completed_nodes": ["start"] },
+  "contextSummary": { "keys": ["graph.goal", "notes"] }
+}
+```
+
+### `PendingQuestion` (response item for `GET /api/v1/pipelines/{id}/questions`)
+```json
+{
+  "id": "q-1",
+  "stage": "review_gate",
+  "type": "MULTIPLE_CHOICE",
+  "text": "Approve changes?",
+  "options": [
+    { "key": "A", "label": "Approve" },
+    { "key": "F", "label": "Fix" }
+  ]
+}
+```
+
+### SSE Event Envelope (per-run and global streams)
+```json
+{
+  "runId": "run-1700000000000-1",
+  "tsMs": 1700000000123,
+  "type": "StageCompleted",
+  "payload": { "nodeId": "plan", "durationMs": 1200 }
+}
+```
+
+## Security and Robustness Invariants
+- Artifact file routes must prevent path traversal and must not allow reading outside the run directory.
+- The UI must HTML-escape any untrusted strings (LLM outputs, log lines, DOT labels) to prevent injection.
+- Large text artifacts must be rendered with bounded UI (truncation + explicit “download full file” path).
+
 ## Deliverables
 ### Phase 0 - Contracts, IA, and Decision Log
 - [ ] **P0.1 - Capture key architecture decisions in ADR**
@@ -115,6 +202,12 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P1.18 - Robust error envelope + CORS behavior for all endpoints**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.19 - Archive/unarchive endpoints: `POST /api/v1/pipelines/{id}/archive` and `/unarchive`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.20 - Runs listing can include/exclude archived runs (explicit contract, tested)**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.21 - Security invariants enforced for artifacts and UI-served HTML**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 1)
 - [ ] `GET /` returns a functional dashboard shell and loads without external network dependencies
@@ -126,6 +219,8 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 - [ ] Human-gate operations work end-to-end: pending question appears, answer submission is validated and recorded, run resumes
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Artifact file download endpoints prevent path traversal and handle binary vs text safely
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Archive/unarchive updates the run’s `archived` flag and affects listing behavior as specified
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -145,6 +240,8 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P2.7 - Artifact viewer: list files, preview text, download binary**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P2.8 - Archive/unarchive + delete actions wired into the Monitor view with confirmations**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 2)
 - [ ] Monitor view reflects state changes in near-real-time from SSE without manual refresh
@@ -156,6 +253,8 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 - [ ] Human-gate interaction is usable: question is visible, answer submission has immediate feedback, and pipeline continues
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Artifact viewer can preview large text artifacts safely (bounded rendering) and provides download links
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Archive/unarchive and delete are guarded by state and require explicit confirmation in the UI
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -173,6 +272,8 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P3.6 - Built-in documentation page (`/docs`) describing UI + API + DOT**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P3.7 - Archived view: list archived runs and allow unarchive/open**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 3)
 - [ ] Users can paste DOT, validate, preview, and run without leaving the UI
@@ -182,6 +283,8 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 - [ ] Run delete is safe: requires explicit confirmation and refuses to delete a currently running run
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] `/docs` is fully served by the application and remains readable without external network access
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Archived view clearly differentiates archived runs and provides a path to restore visibility
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -222,6 +325,8 @@ This section is a concrete starting point; the authoritative version must live i
 - `GET /api/v1/pipelines/{id}` get run (includes DOT and current checkpoint summary)
 - `POST /api/v1/pipelines/{id}/cancel` cancel a running run
 - `DELETE /api/v1/pipelines/{id}` delete a non-running run
+- `POST /api/v1/pipelines/{id}/archive` archive a terminal run
+- `POST /api/v1/pipelines/{id}/unarchive` unarchive a terminal run
 - `GET /api/v1/pipelines/{id}/events` per-run SSE stream
 - `GET /api/v1/events` global SSE stream (aggregated)
 - `GET /api/v1/pipelines/{id}/graph` rendered SVG for the run’s DOT
@@ -263,6 +368,8 @@ Negative cases:
 6. Cancel on a terminal run is rejected with 409 + error envelope.
 7. Delete on a running run is rejected with 409 + error envelope.
 8. Delete on a nonexistent run id returns 404 + error envelope.
+9. Archive on a running run is rejected with 409 + error envelope.
+10. Unarchive on a running run is rejected with 409 + error envelope.
 
 ### UI E2E (Selected)
 Positive cases:
