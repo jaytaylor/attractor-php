@@ -17,6 +17,13 @@ This sprint explicitly uses the embedded dashboard in [`coreys-attractor`](../..
 ## Context
 Attractor’s NLSpec makes the engine headless and UI-driven by events. It allows an HTTP server mode and requires that human gates be operable via web controls with real-time event streaming (SSE). Corey’s Attractor demonstrates a practical, dependency-light approach: a single-page dashboard served by the runtime, backed by an HTTP JSON API and SSE streams.
 
+## Dependencies
+- This sprint assumes the Attractor engine and core run directory artifacts exist (see Sprint 001’s objective: full NLSpec parity). If that foundation is missing, Phase 1 must include the minimum scaffolding to run pipelines and emit events.
+
+## Current State Snapshot (2026-03-03)
+- This repo is currently NLSpecs + docs only (no PHP runtime implementation, no HTTP server, no UI assets).
+- A local reference implementation of a similar dashboard approach exists in this worktree (`coreys-attractor/`) and is used only as inspiration (not a deliverable).
+
 ## Non-Goals
 - Authentication/authorization, multi-user sessions, or RBAC
 - Multi-tenant isolation
@@ -164,6 +171,23 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 }
 ```
 
+Event types (starting point; align with `attractor-spec.md` Section 9.6):
+- `PipelineStarted`
+- `PipelineCompleted`
+- `PipelineFailed`
+- `StageStarted`
+- `StageCompleted`
+- `StageFailed`
+- `StageRetrying`
+- `InterviewStarted`
+- `InterviewCompleted`
+- `InterviewTimeout`
+- `CheckpointSaved`
+
+SSE snapshot strategy (required):
+- On connect, the server must emit a `Snapshot` event first (per-run stream includes the run detail; global stream includes the run list), then emit incremental events.
+- Clients must be able to reconnect without losing correctness: “snapshot then deltas” must converge UI state.
+
 Error codes (starting point, align with OpenAPI):
 - `BAD_REQUEST` (400): invalid field, invalid DOT, invalid answer payload
 - `NOT_FOUND` (404): run id or artifact path not found
@@ -175,8 +199,46 @@ Error codes (starting point, align with OpenAPI):
 - The UI must HTML-escape any untrusted strings (LLM outputs, log lines, DOT labels) to prevent injection.
 - Large text artifacts must be rendered with bounded UI (truncation + explicit “download full file” path).
 
+## Risks and Mitigations
+| Risk | Impact | Likelihood | Mitigation |
+|---|---|---|---|
+| Graph rendering depends on external Graphviz | UI loses the “graph preview” and “monitor graph” panels | Medium | Decide in ADR: server-side Graphviz, client-side rendering, or a fallback “DOT only” view; ensure Create/Monitor still usable without SVG. |
+| SSE reconnect semantics are underspecified | UI becomes inconsistent after refresh/reconnect | Medium | Require `Snapshot`-first stream behavior and write explicit SSE contract tests (Phase 4). |
+| Large logs/artifacts cause slow UI or crashes | Bad UX, browser hangs | Medium | Enforce bounded preview sizes, paginate lists, and always offer “download full file”. |
+| Artifact path traversal or HTML injection | Security issue (local file read / XSS) | Medium | Centralize sanitization (path normalization + HTML escaping) and add negative tests for both. |
+| `simulate=true` diverges from real execution behavior | Tests give false confidence | Medium | Ensure simulation uses the same event pipeline and artifact writers as real mode; include at least one non-simulated smoke path once LLM backend exists. |
+
+## Evidence Tree (Required)
+Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scratch/verification/SPRINT-002/`:
+```text
+.scratch/verification/SPRINT-002/
+  phase0/
+    adr/
+    openapi/
+    sse-contract/
+    diagrams/
+  phase1/
+    api/
+    sse/
+    artifacts/
+    security/
+  phase2/
+    ui-monitor/
+    screenshots/
+  phase3/
+    ui-create/
+    ui-archived/
+    ui-docs/
+  phase4/
+    backend-tests/
+    e2e/
+    docs/
+```
+
 ## Deliverables
 ### Phase 0 - Contracts, IA, and Decision Log
+- [ ] **P0.0 - Evidence scaffolding: create `.scratch/verification/SPRINT-002/` tree + an index README**
+```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.1 - Capture key architecture decisions in ADR**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.2 - Define the HTTP API contract (OpenAPI + written invariants)**
@@ -185,7 +247,7 @@ Error codes (starting point, align with OpenAPI):
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.4 - Define UI information architecture and view-to-endpoint mapping**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.5 - Mermaid appendix diagrams render via `mmdc`**
+- [ ] **P0.5 - Mermaid appendix diagrams render via `mmdc` (outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 0)
@@ -195,7 +257,7 @@ Error codes (starting point, align with OpenAPI):
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] SSE contract describes ordering expectations, replay/initial snapshot behavior, and disconnect semantics
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] Appendix diagrams exist and `mmdc` can render them without errors
+- [ ] Appendix diagrams exist and `mmdc` can render them without errors (artifacts under `.scratch/verification/SPRINT-002/phase0/diagrams/`)
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -339,13 +401,13 @@ Error codes (starting point, align with OpenAPI):
 ---
 
 ### Phase 4 - Test Strategy, E2E Proof, and Documentation
-- [ ] **P4.1 - Backend unit/integration tests for every API endpoint the UI calls**
+- [ ] **P4.1 - Backend unit/integration tests for every API endpoint the UI calls (logs under `.scratch/verification/SPRINT-002/phase4/backend-tests/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P4.2 - SSE tests: per-run stream and global stream contracts**
+- [ ] **P4.2 - SSE tests: per-run stream and global stream contracts (logs under `.scratch/verification/SPRINT-002/phase4/backend-tests/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P4.3 - Browser E2E tests covering Create, Monitor, human-gate, and artifacts flows**
+- [ ] **P4.3 - Browser E2E tests covering Create, Monitor, human-gate, and artifacts flows (screenshots/logs under `.scratch/verification/SPRINT-002/phase4/e2e/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P4.4 - Manual UX verification checklist (desktop + mobile layouts)**
+- [ ] **P4.4 - Manual UX verification checklist (desktop + mobile layouts) with screenshots + walkthrough notes in `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P4.5 - Operator/developer docs: run server, run tests, troubleshoot**
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -366,6 +428,48 @@ This section is a concrete starting point; the authoritative version must live i
 ### Error Envelope (All non-2xx)
 ```json
 { "error": "human readable message", "code": "MACHINE_CODE" }
+```
+
+### Endpoint Matrix (UI-Facing)
+| Category | Method | Path | Purpose | Used By |
+|---|---|---|---|---|
+| UI | `GET` | `/` | Dashboard SPA shell (static HTML/CSS/JS) | All views |
+| UI | `GET` | `/docs` | Built-in documentation (UI + API + DOT) | Docs view |
+| Runs | `GET` | `/api/v1/pipelines` | List runs (with archived filtering per contract) | Monitor, Archived |
+| Runs | `POST` | `/api/v1/pipelines` | Create + start run from DOT | Create |
+| Runs | `GET` | `/api/v1/pipelines/{id}` | Get run detail (includes `dotSource`) | Monitor |
+| Runs | `POST` | `/api/v1/pipelines/{id}/cancel` | Cancel a running run | Monitor |
+| Runs | `DELETE` | `/api/v1/pipelines/{id}` | Delete a non-running run | Monitor |
+| Runs | `POST` | `/api/v1/pipelines/{id}/archive` | Archive a terminal run | Monitor |
+| Runs | `POST` | `/api/v1/pipelines/{id}/unarchive` | Unarchive a terminal run | Archived, Monitor |
+| Events | `GET` | `/api/v1/events` | Global SSE stream (`Snapshot` then deltas) | Monitor |
+| Events | `GET` | `/api/v1/pipelines/{id}/events` | Per-run SSE stream (`Snapshot` then deltas) | Monitor |
+| Human | `GET` | `/api/v1/pipelines/{id}/questions` | List pending questions | Monitor |
+| Human | `POST` | `/api/v1/pipelines/{id}/questions/{qid}/answer` | Submit answer | Monitor |
+| State | `GET` | `/api/v1/pipelines/{id}/checkpoint` | Checkpoint snapshot | Monitor |
+| State | `GET` | `/api/v1/pipelines/{id}/context` | Context key/value store | Monitor |
+| Graph | `GET` | `/api/v1/pipelines/{id}/graph` | Rendered run graph as SVG | Monitor |
+| Artifacts | `GET` | `/api/v1/pipelines/{id}/artifacts` | List run artifact files | Monitor |
+| Artifacts | `GET` | `/api/v1/pipelines/{id}/artifacts/{path}` | Fetch one artifact file | Monitor |
+| Artifacts | `GET` | `/api/v1/pipelines/{id}/artifacts.zip` | Download all artifacts as ZIP | Monitor |
+| DOT | `POST` | `/api/v1/dot/validate` | Validate DOT and return diagnostics | Create |
+| DOT | `POST` | `/api/v1/dot/render` | Render DOT to SVG | Create |
+
+### Create Run Request (`POST /api/v1/pipelines`)
+Request body:
+
+| Field | Type | Required | Default | Semantics |
+|---|---|---|---|---|
+| `dotSource` | string | yes | n/a | Full DOT source for the pipeline run. |
+| `fileName` | string | no | `""` | Display-only name shown in the UI. |
+| `displayName` | string | no | `""` | Optional friendly name; if empty, UI derives one from fileName/id. |
+| `simulate` | boolean | no | `false` | Run without real LLM calls. Must still emit realistic events and artifacts. |
+| `autoApprove` | boolean | no | `true` | If `true`, human gates are automatically answered (for CI/demo). |
+| `originalPrompt` | string | no | `""` | If DOT was generated from a prompt, store it for later display. |
+
+Response 201:
+```json
+{ "id": "run-1700000000000-1", "status": "running" }
 ```
 
 ### Core Endpoints (Minimum)
