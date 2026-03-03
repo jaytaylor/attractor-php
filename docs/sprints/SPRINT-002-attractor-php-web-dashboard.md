@@ -2,6 +2,10 @@ Legend: [ ] Incomplete, [X] Complete
 
 # Sprint #002 - Attractor PHP: Web Dashboard UI (Coreys-Attractor-Inspired)
 
+Evidence rule:
+- Mark an item `[X]` only once it includes the exact verification command(s) (wrapped in backticks), exit code(s), and paths to produced artifacts (logs, fixtures, screenshots, `.scratch` transcripts) in the placeholder block directly beneath the item.
+- Store evidence under `.scratch/verification/SPRINT-002/...` and link those paths in the placeholder block.
+
 ## Objective
 Deliver a built-in web dashboard for Attractor PHP that enables:
 - Real-time pipeline monitoring (status, stages, logs, rendered graph)
@@ -18,6 +22,9 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
 - Multi-tenant isolation
 - A fully general-purpose “software factory UI” (IDE plugin, editor integrations)
 - Legacy backwards compatibility for any prior API (there is none in this repo)
+
+## Execution Order
+Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 
 ## Product Requirements (User Flows)
 1. **Create a pipeline run**
@@ -74,21 +81,39 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
 ### Phase 1 - Backend HTTP + SSE (UI-Serving API)
 - [ ] **P1.1 - Server serves the dashboard shell at `/` (static HTML/CSS/JS)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.2 - Pipeline run CRUD endpoints**
+- [ ] **P1.2 - List runs: `GET /api/v1/pipelines`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.3 - Per-run event stream (SSE) endpoint**
+- [ ] **P1.3 - Create run: `POST /api/v1/pipelines`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.4 - Global event stream (SSE) endpoint (multi-run)**
+- [ ] **P1.4 - Get run: `GET /api/v1/pipelines/{id}`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.5 - Human-gate endpoints: list pending questions + submit answer**
+- [ ] **P1.5 - Cancel run: `POST /api/v1/pipelines/{id}/cancel`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.6 - Graph render endpoint returning SVG for a run**
+- [ ] **P1.6 - Delete run: `DELETE /api/v1/pipelines/{id}` (refuse if running)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.7 - Artifact endpoints: list files, fetch a file, download ZIP**
+- [ ] **P1.7 - Per-run event stream (SSE): `GET /api/v1/pipelines/{id}/events`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.8 - DOT tooling endpoints: validate and render (create workflow support)**
+- [ ] **P1.8 - Global event stream (SSE): `GET /api/v1/events`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.9 - Robust error envelope + CORS behavior for all endpoints**
+- [ ] **P1.9 - List pending questions: `GET /api/v1/pipelines/{id}/questions`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.10 - Submit answer: `POST /api/v1/pipelines/{id}/questions/{qid}/answer`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.11 - Graph render endpoint returning SVG for a run: `GET /api/v1/pipelines/{id}/graph`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.12 - List artifacts: `GET /api/v1/pipelines/{id}/artifacts`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.13 - Fetch artifact file: `GET /api/v1/pipelines/{id}/artifacts/{path}`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.14 - Download artifacts ZIP: `GET /api/v1/pipelines/{id}/artifacts.zip`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.15 - DOT validate endpoint: `POST /api/v1/dot/validate`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.16 - DOT render endpoint: `POST /api/v1/dot/render`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.17 - Spec-core endpoint aliases (`/pipelines/...`) implemented as thin wrappers to the v1 API**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.18 - Robust error envelope + CORS behavior for all endpoints**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 1)
@@ -195,6 +220,8 @@ This section is a concrete starting point; the authoritative version must live i
 - `GET /api/v1/pipelines` list runs (summary)
 - `POST /api/v1/pipelines` create a run from DOT (and start execution)
 - `GET /api/v1/pipelines/{id}` get run (includes DOT and current checkpoint summary)
+- `POST /api/v1/pipelines/{id}/cancel` cancel a running run
+- `DELETE /api/v1/pipelines/{id}` delete a non-running run
 - `GET /api/v1/pipelines/{id}/events` per-run SSE stream
 - `GET /api/v1/events` global SSE stream (aggregated)
 - `GET /api/v1/pipelines/{id}/graph` rendered SVG for the run’s DOT
@@ -206,6 +233,15 @@ This section is a concrete starting point; the authoritative version must live i
 - `POST /api/v1/dot/validate` validate DOT and return diagnostics
 - `POST /api/v1/dot/render` render DOT to SVG (used by Create preview)
 
+Spec-core aliases (non-versioned, thin wrappers around the v1 implementation):
+- `POST /pipelines`
+- `GET /pipelines/{id}`
+- `GET /pipelines/{id}/events` (SSE)
+- `POST /pipelines/{id}/cancel`
+- `GET /pipelines/{id}/graph`
+- `GET /pipelines/{id}/questions`
+- `POST /pipelines/{id}/questions/{qid}/answer`
+
 ## Test Matrix (Explicit Positive + Negative Coverage)
 The implementation must include tests proving the following scenarios.
 
@@ -216,6 +252,7 @@ Positive cases:
 3. Human gate: pending question appears; answer submission accepts a valid option; pipeline continues.
 4. Artifact list shows per-stage files; fetching a text artifact returns correct content-type and contents.
 5. Graph render returns valid SVG for well-formed DOT.
+6. Cancel run transitions status to `cancelled` and emits a terminal event on SSE.
 
 Negative cases:
 1. Create run rejects missing/empty `dotSource` with 400 + error envelope.
@@ -223,6 +260,9 @@ Negative cases:
 3. Fetching a nonexistent run id returns 404 + error envelope.
 4. Artifact path traversal attempt (e.g. `../`) is rejected with 400/404 (stable code), and no file is read.
 5. Answer submission for unknown `qid` returns 404; submission for invalid option returns 400.
+6. Cancel on a terminal run is rejected with 409 + error envelope.
+7. Delete on a running run is rejected with 409 + error envelope.
+8. Delete on a nonexistent run id returns 404 + error envelope.
 
 ### UI E2E (Selected)
 Positive cases:
@@ -396,4 +436,3 @@ flowchart LR
   ENG --> DISK
   API --> DISK
 ```
-
