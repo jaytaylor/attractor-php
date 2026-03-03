@@ -105,9 +105,21 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 ### `PipelineDetail` (response for `GET /api/v1/pipelines/{id}`)
 ```json
 {
-  "dotSource": "digraph P { ... }",
-  "checkpoint": { "current_node": "plan", "completed_nodes": ["start"] },
-  "contextSummary": { "keys": ["graph.goal", "notes"] }
+  "id": "run-1700000000000-1",
+  "displayName": "Autumn Falcon",
+  "fileName": "pipeline.dot",
+  "status": "running",
+  "archived": false,
+  "simulate": false,
+  "autoApprove": true,
+  "familyId": "run-1700000000000-1",
+  "originalPrompt": "Write and test a REST API",
+  "startedAtMs": 1700000000000,
+  "finishedAtMs": null,
+  "currentNodeId": "plan",
+  "stages": [],
+  "logs": [],
+  "dotSource": "digraph P { ... }"
 }
 ```
 
@@ -125,6 +137,23 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 }
 ```
 
+### `Checkpoint` (response for `GET /api/v1/pipelines/{id}/checkpoint`)
+```json
+{
+  "current_node": "plan",
+  "completed_nodes": ["start"],
+  "timestamp": "2026-03-03T00:00:00Z"
+}
+```
+
+### `Context` (response for `GET /api/v1/pipelines/{id}/context`)
+```json
+{
+  "graph.goal": "Write and test a REST API",
+  "notes": "..."
+}
+```
+
 ### SSE Event Envelope (per-run and global streams)
 ```json
 {
@@ -134,6 +163,12 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
   "payload": { "nodeId": "plan", "durationMs": 1200 }
 }
 ```
+
+Error codes (starting point, align with OpenAPI):
+- `BAD_REQUEST` (400): invalid field, invalid DOT, invalid answer payload
+- `NOT_FOUND` (404): run id or artifact path not found
+- `INVALID_STATE` (409): action not permitted in current run state
+- `INTERNAL_ERROR` (500): unexpected server error
 
 ## Security and Robustness Invariants
 - Artifact file routes must prevent path traversal and must not allow reading outside the run directory.
@@ -198,7 +233,7 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P1.16 - DOT render endpoint: `POST /api/v1/dot/render`**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P1.17 - Spec-core endpoint aliases (`/pipelines/...`) implemented as thin wrappers to the v1 API**
+- [ ] **P1.17 - Spec-core endpoint aliases (`/pipelines/...`) implemented as thin wrappers to the v1 API (including `/checkpoint` and `/context`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P1.18 - Robust error envelope + CORS behavior for all endpoints**
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -207,6 +242,12 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 - [ ] **P1.20 - Runs listing can include/exclude archived runs (explicit contract, tested)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P1.21 - Security invariants enforced for artifacts and UI-served HTML**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.22 - Checkpoint endpoint: `GET /api/v1/pipelines/{id}/checkpoint`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.23 - Context endpoint: `GET /api/v1/pipelines/{id}/context`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.24 - Hermetic simulation mode for UI + tests (`simulate=true` runs without real LLM calls)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 1)
@@ -221,6 +262,10 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 - [ ] Artifact file download endpoints prevent path traversal and handle binary vs text safely
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Archive/unarchive updates the run’s `archived` flag and affects listing behavior as specified
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Checkpoint and context endpoints return a consistent snapshot for a given run id (and 404 for unknown ids)
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] `simulate=true` runs do not require network access or API keys and still emit a realistic event stream and artifacts
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -274,6 +319,8 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P3.7 - Archived view: list archived runs and allow unarchive/open**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P3.8 - Create view options: `simulate` toggle (and `autoApprove` if implemented) are passed to run creation**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 3)
 - [ ] Users can paste DOT, validate, preview, and run without leaving the UI
@@ -285,6 +332,8 @@ The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to 
 - [ ] `/docs` is fully served by the application and remains readable without external network access
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Archived view clearly differentiates archived runs and provides a path to restore visibility
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] A user can run a pipeline in simulation mode from the Create view and observe completion without external dependencies
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -332,6 +381,8 @@ This section is a concrete starting point; the authoritative version must live i
 - `GET /api/v1/pipelines/{id}/graph` rendered SVG for the run’s DOT
 - `GET /api/v1/pipelines/{id}/questions` pending questions
 - `POST /api/v1/pipelines/{id}/questions/{qid}/answer` submit answer
+- `GET /api/v1/pipelines/{id}/checkpoint` fetch current checkpoint snapshot
+- `GET /api/v1/pipelines/{id}/context` fetch current context key-value store
 - `GET /api/v1/pipelines/{id}/artifacts` list artifact files
 - `GET /api/v1/pipelines/{id}/artifacts/{path}` fetch a single artifact file
 - `GET /api/v1/pipelines/{id}/artifacts.zip` download all artifacts as zip
@@ -346,6 +397,8 @@ Spec-core aliases (non-versioned, thin wrappers around the v1 implementation):
 - `GET /pipelines/{id}/graph`
 - `GET /pipelines/{id}/questions`
 - `POST /pipelines/{id}/questions/{qid}/answer`
+- `GET /pipelines/{id}/checkpoint`
+- `GET /pipelines/{id}/context`
 
 ## Test Matrix (Explicit Positive + Negative Coverage)
 The implementation must include tests proving the following scenarios.
@@ -358,6 +411,8 @@ Positive cases:
 4. Artifact list shows per-stage files; fetching a text artifact returns correct content-type and contents.
 5. Graph render returns valid SVG for well-formed DOT.
 6. Cancel run transitions status to `cancelled` and emits a terminal event on SSE.
+7. `GET /api/v1/pipelines/{id}/checkpoint` and `/context` return expected shapes while the run is active.
+8. Create run with `simulate=true` completes deterministically and produces the expected artifact tree.
 
 Negative cases:
 1. Create run rejects missing/empty `dotSource` with 400 + error envelope.
@@ -370,6 +425,7 @@ Negative cases:
 8. Delete on a nonexistent run id returns 404 + error envelope.
 9. Archive on a running run is rejected with 409 + error envelope.
 10. Unarchive on a running run is rejected with 409 + error envelope.
+11. Checkpoint/context endpoints on a nonexistent run id return 404 + error envelope.
 
 ### UI E2E (Selected)
 Positive cases:
