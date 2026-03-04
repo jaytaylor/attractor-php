@@ -76,6 +76,61 @@ function request(string $method, string $url, ?array $json = null): array
     ];
 }
 
+/**
+ * @return array{provider:string,model:string}
+ */
+function providerForDotTests(): array
+{
+    $explicitProvider = strtolower(trim((string) getenv('DOT_TEST_PROVIDER')));
+    if ($explicitProvider !== '') {
+        $explicitModel = trim((string) getenv('DOT_TEST_MODEL'));
+        return ['provider' => $explicitProvider, 'model' => $explicitModel];
+    }
+
+    if (trim((string) getenv('OPENAI_API_KEY')) !== '') {
+        return ['provider' => 'openai', 'model' => trim((string) getenv('DOT_OPENAI_MODEL'))];
+    }
+    if (trim((string) getenv('ANTHROPIC_API_KEY')) !== '') {
+        return ['provider' => 'anthropic', 'model' => trim((string) getenv('DOT_ANTHROPIC_MODEL'))];
+    }
+    if (trim((string) getenv('GEMINI_API_KEY')) !== '' || trim((string) getenv('GOOGLE_API_KEY')) !== '') {
+        return ['provider' => 'gemini', 'model' => trim((string) getenv('DOT_GEMINI_MODEL'))];
+    }
+
+    fwrite(STDERR, "No provider API key configured for DOT endpoint tests\n");
+    exit(1);
+}
+
+function appendProviderPayload(array $payload, array $providerConfig): array
+{
+    $payload['provider'] = $providerConfig['provider'];
+    if (($providerConfig['model'] ?? '') !== '') {
+        $payload['model'] = $providerConfig['model'];
+    }
+    return $payload;
+}
+
+function extractDotFromSse(string $body): string
+{
+    $dot = '';
+    foreach (explode("\n", $body) as $line) {
+        if (!str_starts_with($line, 'data: ')) {
+            continue;
+        }
+        $frame = json_decode(substr($line, 6), true);
+        if (!is_array($frame)) {
+            continue;
+        }
+        if (isset($frame['delta']) && is_string($frame['delta'])) {
+            $dot .= $frame['delta'];
+        }
+        if (isset($frame['done']) && $frame['done'] === true && isset($frame['dotSource']) && is_string($frame['dotSource'])) {
+            $dot = $frame['dotSource'];
+        }
+    }
+    return trim($dot);
+}
+
 $root = dirname(__DIR__);
 $runtimeRoot = $root . '/.scratch/runtime';
 rrmdir($runtimeRoot);
@@ -113,6 +168,8 @@ assertTrue(($res['json']['valid'] ?? false) === true, 'validate should be valid 
 
 $res = request('POST', $base . '/api/v1/pipelines', ['dotSource' => 'bad']);
 assertTrue($res['status'] === 400, 'invalid create should fail');
+
+$providerConfig = providerForDotTests();
 
 $dot = "digraph Pipeline {\n  start -> review;\n  review -> done;\n  done [shape=Msquare];\n}";
 $res = request('POST', $base . '/api/v1/pipelines', [
@@ -165,19 +222,43 @@ $res = request('GET', $base . '/pipelines/' . rawurlencode($runId) . '/context')
 assertTrue($res['status'] === 200, 'alias context should return 200');
 assertTrue(isset($res['json']['run.id']), 'context shape invalid');
 
-$res = request('POST', $base . '/api/v1/dot/generate/stream', ['prompt' => 'Build release pipeline']);
+$res = request('POST', $base . '/api/v1/dot/generate/stream', appendProviderPayload([
+    'prompt' => 'Build release pipeline with plan build test deploy nodes',
+], $providerConfig));
 assertTrue($res['status'] === 200, 'generate stream should return 200');
 assertTrue(str_contains($res['body'], '"delta"'), 'generate stream should include delta');
 assertTrue(str_contains($res['body'], '"done":true'), 'generate stream should include done frame');
+$generatedDot = extractDotFromSse($res['body']);
+assertTrue($generatedDot !== '', 'generate stream should include final dotSource');
 
-$res = request('POST', $base . '/api/v1/dot/fix/stream', ['dotSource' => '```dot\na->b\n```', 'error' => 'parse']);
+$res = request('POST', $base . '/api/v1/dot/validate', ['dotSource' => $generatedDot]);
+assertTrue($res['status'] === 200, 'validate generated dot should return 200');
+assertTrue(($res['json']['valid'] ?? false) === true, 'generated dot should validate');
+
+$res = request('POST', $base . '/api/v1/dot/fix/stream', appendProviderPayload([
+    'dotSource' => '```dot
+a->b
+```',
+    'error' => 'parse',
+], $providerConfig));
 assertTrue($res['status'] === 200, 'fix stream should return 200');
-assertTrue(!str_contains($res['body'], '```'), 'fixed dot stream should strip fences');
+$fixedDot = extractDotFromSse($res['body']);
+assertTrue($fixedDot !== '', 'fix stream should include final dotSource');
+assertTrue(!str_contains($fixedDot, '```'), 'fixed dot should strip markdown fences');
+$res = request('POST', $base . '/api/v1/dot/validate', ['dotSource' => $fixedDot]);
+assertTrue($res['status'] === 200, 'validate fixed dot should return 200');
+assertTrue(($res['json']['valid'] ?? false) === true, 'fixed dot should validate');
 
-$res = request('POST', $base . '/api/v1/dot/iterate', ['baseDot' => $dot, 'changes' => 'Add review loop']);
+$res = request('POST', $base . '/api/v1/dot/iterate', appendProviderPayload([
+    'baseDot' => $generatedDot,
+    'changes' => 'Add approval gate and connect it before done',
+], $providerConfig));
 assertTrue($res['status'] === 200, 'iterate endpoint should return 200');
 $newDot = (string) ($res['json']['dotSource'] ?? '');
-assertTrue(str_contains($newDot, 'iterate_step'), 'iterated dot should include iterate_step node');
+assertTrue($newDot !== '', 'iterated dot should not be empty');
+$res = request('POST', $base . '/api/v1/dot/validate', ['dotSource' => $newDot]);
+assertTrue($res['status'] === 200, 'validate iterated dot should return 200');
+assertTrue(($res['json']['valid'] ?? false) === true, 'iterated dot should validate');
 
 $res = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/iterate', [
     'dotSource' => $newDot,

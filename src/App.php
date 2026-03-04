@@ -7,6 +7,7 @@ namespace App;
 use App\Http\Request;
 use App\Http\Response;
 use App\Services\DotService;
+use App\Services\DotServiceException;
 use App\Services\RunRepository;
 
 final class App
@@ -241,7 +242,13 @@ final class App
             if ($prompt === '') {
                 $this->error(400, 'prompt is required', 'BAD_REQUEST');
             }
-            Response::json(200, ['dotSource' => $this->dotService->generate($prompt)]);
+            $options = $this->dotOptions($request);
+            try {
+                $dot = $this->dotService->generate($prompt, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            Response::json(200, ['dotSource' => $dot]);
         }
 
         if ($method === 'POST' && $path === '/api/v1/dot/fix') {
@@ -249,7 +256,14 @@ final class App
             if ($dot === '') {
                 $this->error(400, 'dotSource is required', 'BAD_REQUEST');
             }
-            Response::json(200, ['dotSource' => $this->dotService->fix($dot)]);
+            $error = trim((string) ($request->jsonBody['error'] ?? ''));
+            $options = $this->dotOptions($request);
+            try {
+                $fixed = $this->dotService->fix($dot, $error, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            Response::json(200, ['dotSource' => $fixed]);
         }
 
         if ($method === 'POST' && $path === '/api/v1/dot/iterate') {
@@ -258,7 +272,13 @@ final class App
             if ($base === '' || $changes === '') {
                 $this->error(400, 'baseDot and changes are required', 'BAD_REQUEST');
             }
-            Response::json(200, ['dotSource' => $this->dotService->iterate($base, $changes)]);
+            $options = $this->dotOptions($request);
+            try {
+                $iterated = $this->dotService->iterate($base, $changes, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            Response::json(200, ['dotSource' => $iterated]);
         }
 
         if ($method === 'POST' && $path === '/api/v1/dot/generate/stream') {
@@ -266,7 +286,12 @@ final class App
             if ($prompt === '') {
                 $this->error(400, 'prompt is required', 'BAD_REQUEST');
             }
-            $dot = $this->dotService->generate($prompt);
+            $options = $this->dotOptions($request);
+            try {
+                $dot = $this->dotService->generate($prompt, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
             $this->streamDot($dot);
         }
 
@@ -275,7 +300,14 @@ final class App
             if ($dot === '') {
                 $this->error(400, 'dotSource is required', 'BAD_REQUEST');
             }
-            $this->streamDot($this->dotService->fix($dot));
+            $error = trim((string) ($request->jsonBody['error'] ?? ''));
+            $options = $this->dotOptions($request);
+            try {
+                $fixed = $this->dotService->fix($dot, $error, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            $this->streamDot($fixed);
         }
 
         if ($method === 'POST' && $path === '/api/v1/dot/iterate/stream') {
@@ -284,7 +316,13 @@ final class App
             if ($base === '' || $changes === '') {
                 $this->error(400, 'baseDot and changes are required', 'BAD_REQUEST');
             }
-            $this->streamDot($this->dotService->iterate($base, $changes));
+            $options = $this->dotOptions($request);
+            try {
+                $iterated = $this->dotService->iterate($base, $changes, $options);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            $this->streamDot($iterated);
         }
 
         // spec-core aliases
@@ -311,6 +349,25 @@ final class App
         }
         $frames[] = ['done' => true, 'dotSource' => $dot];
         Response::sse($frames);
+    }
+
+    /**
+     * @return array{provider?:string,model?:string}
+     */
+    private function dotOptions(Request $request): array
+    {
+        $options = [];
+        $provider = trim((string) ($request->jsonBody['provider'] ?? ''));
+        if ($provider !== '') {
+            $options['provider'] = $provider;
+        }
+
+        $model = trim((string) ($request->jsonBody['model'] ?? ''));
+        if ($model !== '') {
+            $options['model'] = $model;
+        }
+
+        return $options;
     }
 
     private function serveStatic(string $publicPath): void

@@ -51,6 +51,18 @@
         <label>Prompt
           <input id="prompt-input" type="text" placeholder="Describe pipeline goal">
         </label>
+        <div class="row">
+          <label>Provider
+            <select id="provider-select">
+              <option value="openai">openai</option>
+              <option value="anthropic">anthropic</option>
+              <option value="gemini">gemini</option>
+            </select>
+          </label>
+          <label>Model
+            <input id="model-input" type="text" placeholder="Optional model override">
+          </label>
+        </div>
         <div class="buttons">
           <button id="btn-generate">Generate DOT</button>
           <button id="btn-fix">Fix DOT</button>

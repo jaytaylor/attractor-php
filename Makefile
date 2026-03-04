@@ -1,4 +1,4 @@
-.PHONY: precommit build test dev
+.PHONY: precommit build test test-e2e dev
 
 HOST ?= 127.0.0.1
 PORT ?= 7070
@@ -14,6 +14,9 @@ test: precommit
 	@timeout 135 php tests/check_sprint_evidence.php
 	@timeout 135 php tests/prompt_system.php
 	@timeout 135 php tests/run.php
+
+test-e2e: precommit
+	@bash tests/e2e/run_tmux_playwright_e2e.sh
 
 dev: precommit
 	@echo "serving on http://$(HOST):$(PORT)"

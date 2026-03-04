@@ -1,6 +1,11 @@
 const app = document.getElementById('app');
 let selectedRunId = null;
 let latestDot = 'digraph Pipeline {\n  start -> done;\n  done [shape=Msquare];\n}';
+const providerDefaultModels = {
+  openai: 'gpt-5.3-chat-latest',
+  anthropic: 'claude-sonnet-4-6',
+  gemini: 'gemini-2.5-flash',
+};
 
 function esc(s) {
   return String(s).replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
@@ -201,15 +206,33 @@ async function initCreate() {
   const dot = document.getElementById('dot-input');
   const prompt = document.getElementById('prompt-input');
   const changes = document.getElementById('changes-input');
+  const provider = document.getElementById('provider-select');
+  const model = document.getElementById('model-input');
   const validation = document.getElementById('validation-panel');
   const preview = document.getElementById('preview-panel');
   const btnRun = document.getElementById('btn-run');
 
   dot.value = latestDot;
+  if (!model.value.trim()) model.value = providerDefaultModels[provider.value] || '';
+  provider.addEventListener('change', () => {
+    model.value = providerDefaultModels[provider.value] || '';
+  });
+
+  function dotOptionsPayload(basePayload) {
+    return {
+      ...basePayload,
+      provider: provider.value,
+      model: model.value.trim(),
+    };
+  }
 
   document.getElementById('btn-generate').addEventListener('click', async () => {
     try {
-      await streamDot('/api/v1/dot/generate/stream', { prompt: prompt.value || 'Build a pipeline' }, dot);
+      await streamDot(
+        '/api/v1/dot/generate/stream',
+        dotOptionsPayload({ prompt: prompt.value || 'Build a pipeline' }),
+        dot,
+      );
       validation.textContent = 'Generated DOT stream completed.';
       btnRun.disabled = true;
     } catch (e) {
@@ -219,7 +242,11 @@ async function initCreate() {
 
   document.getElementById('btn-fix').addEventListener('click', async () => {
     try {
-      await streamDot('/api/v1/dot/fix/stream', { dotSource: dot.value, error: 'fix it' }, dot);
+      await streamDot(
+        '/api/v1/dot/fix/stream',
+        dotOptionsPayload({ dotSource: dot.value, error: 'fix it' }),
+        dot,
+      );
       validation.textContent = 'Fix stream completed.';
       btnRun.disabled = true;
     } catch (e) {
@@ -229,7 +256,11 @@ async function initCreate() {
 
   document.getElementById('btn-iterate').addEventListener('click', async () => {
     try {
-      await streamDot('/api/v1/dot/iterate/stream', { baseDot: dot.value, changes: changes.value || 'Add iteration node' }, dot);
+      await streamDot(
+        '/api/v1/dot/iterate/stream',
+        dotOptionsPayload({ baseDot: dot.value, changes: changes.value || 'Add iteration node' }),
+        dot,
+      );
       validation.textContent = 'Iterate stream completed.';
       btnRun.disabled = true;
     } catch (e) {
