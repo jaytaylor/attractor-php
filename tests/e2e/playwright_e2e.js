@@ -22,6 +22,13 @@ async function validateDot(page) {
   await waitForText(page, '#validation-panel', '"valid": true');
 }
 
+async function previewDot(page) {
+  await page.click('#btn-preview');
+  await page.waitForSelector('#preview-panel svg', { timeout: 30000 });
+  const svgHtml = await page.locator('#preview-panel').innerHTML();
+  must(svgHtml.includes('graph0'), 'preview should contain graphviz svg content');
+}
+
 async function runGenerateFlow(page, provider, model) {
   await page.selectOption('#provider-select', provider);
   await page.fill('#model-input', model);
@@ -96,6 +103,7 @@ async function main() {
 
     await runFixFlow(page, providerConfigs[0].provider, providerConfigs[0].model);
     await runIterateFlow(page, providerConfigs[0].provider, providerConfigs[0].model);
+    await previewDot(page);
     await runCreateRunFlow(page);
 
     console.log('Playwright e2e passed');

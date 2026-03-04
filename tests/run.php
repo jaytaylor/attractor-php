@@ -166,6 +166,13 @@ $res = request('POST', $base . '/api/v1/dot/validate', ['dotSource' => 'digraph 
 assertTrue($res['status'] === 200, 'validate should return 200');
 assertTrue(($res['json']['valid'] ?? false) === true, 'validate should be valid for correct dot');
 
+$res = request('POST', $base . '/api/v1/dot/render', ['dotSource' => 'digraph A { a -> b; }']);
+assertTrue($res['status'] === 200, 'render should return 200 for valid dot');
+$svg = (string) ($res['json']['svg'] ?? '');
+assertTrue(str_contains($svg, '<svg'), 'rendered svg should include <svg root');
+assertTrue(str_contains($svg, 'graph0'), 'rendered svg should include graphviz graph group');
+assertTrue(!str_contains($svg, 'DOT Preview'), 'render should not use text-only placeholder svg');
+
 $res = request('POST', $base . '/api/v1/pipelines', ['dotSource' => 'bad']);
 assertTrue($res['status'] === 400, 'invalid create should fail');
 

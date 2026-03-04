@@ -146,7 +146,11 @@ final class App
             if ($run === null) {
                 $this->error(404, 'run not found', 'NOT_FOUND');
             }
-            $svg = $this->dotService->renderSvg((string) $run['dotSource']);
+            try {
+                $svg = $this->dotService->renderSvg((string) $run['dotSource']);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
             Response::text(200, $svg, 'image/svg+xml');
         }
 
@@ -234,7 +238,12 @@ final class App
             if (!$validation['valid']) {
                 $this->error(400, 'invalid dot source', 'BAD_REQUEST', ['diagnostics' => $validation['diagnostics']]);
             }
-            Response::json(200, ['svg' => $this->dotService->renderSvg($dot)]);
+            try {
+                $svg = $this->dotService->renderSvg($dot);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+            Response::json(200, ['svg' => $svg]);
         }
 
         if ($method === 'POST' && $path === '/api/v1/dot/generate') {

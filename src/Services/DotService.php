@@ -43,14 +43,41 @@ final class DotService
 
     public function renderSvg(string $dot): string
     {
-        $escaped = htmlspecialchars($dot, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
-        return '<svg xmlns="http://www.w3.org/2000/svg" width="960" height="360">'
-            . '<rect width="100%" height="100%" fill="#f7fafc"/>'
-            . '<text x="20" y="34" font-size="20" font-family="Courier New, monospace" fill="#1f2937">DOT Preview</text>'
-            . '<foreignObject x="20" y="50" width="920" height="290">'
-            . '<div xmlns="http://www.w3.org/1999/xhtml" style="font-family:Courier New,monospace;font-size:13px;white-space:pre-wrap;color:#111827;">'
-            . $escaped
-            . '</div></foreignObject></svg>';
+        $command = 'dot -Tsvg';
+        $descriptorSpec = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+
+        $process = proc_open($command, $descriptorSpec, $pipes);
+        if (!is_resource($process)) {
+            throw new DotServiceException('failed to start graphviz renderer', 'DOT_RENDER_FAILED', 500);
+        }
+
+        fwrite($pipes[0], $dot);
+        fclose($pipes[0]);
+
+        $stdout = stream_get_contents($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]);
+        fclose($pipes[1]);
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+        $svg = is_string($stdout) ? trim($stdout) : '';
+        $errorOutput = is_string($stderr) ? trim($stderr) : '';
+
+        if ($exitCode !== 0 || $svg === '') {
+            $detail = $errorOutput !== '' ? $errorOutput : 'graphviz returned no output';
+            throw new DotServiceException('failed to render dot to svg: ' . $detail, 'DOT_RENDER_FAILED', 400);
+        }
+
+        $svgStart = strpos($svg, '<svg');
+        if ($svgStart === false) {
+            throw new DotServiceException('graphviz output did not contain svg markup', 'DOT_RENDER_FAILED', 400);
+        }
+
+        return substr($svg, $svgStart);
     }
 
     /**
