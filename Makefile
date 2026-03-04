@@ -12,6 +12,7 @@ build: precommit
 
 test: precommit
 	@timeout 135 php tests/check_sprint_evidence.php
+	@timeout 135 php tests/prompt_system.php
 	@timeout 135 php tests/run.php
 
 dev: precommit
