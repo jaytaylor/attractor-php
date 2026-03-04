@@ -109,9 +109,20 @@
             </div>
           </div>
 
+          <section class="subpanel workflow-status-panel" aria-live="polite">
+            <h3>Workflow Status</h3>
+            <div class="status-grid">
+              <div class="status-item"><span class="status-label">Prompt</span><span id="status-prompt" class="status-pill idle">Not started</span></div>
+              <div class="status-item"><span class="status-label">DOT Validity</span><span id="status-dot" class="status-pill idle">Unknown</span></div>
+              <div class="status-item"><span class="status-label">Preview</span><span id="status-preview" class="status-pill idle">Not rendered</span></div>
+              <div class="status-item"><span class="status-label">Last Action</span><span id="status-action" class="status-pill idle">Ready</span></div>
+            </div>
+          </section>
+
           <div class="subgrid">
             <section class="subpanel">
               <h3>Generate DOT</h3>
+              <p class="small">Describe the pipeline outcome in plain language, then generate a first draft DOT graph.</p>
               <textarea id="generate-prompt" rows="3" placeholder="Describe the pipeline goal..."></textarea>
               <div class="actions">
                 <button id="generate-dot" class="btn">Generate (stream)</button>
@@ -119,6 +130,7 @@
             </section>
             <section class="subpanel">
               <h3>Iterate Existing DOT</h3>
+              <p class="small">Apply targeted changes to the current DOT while preserving the existing structure.</p>
               <textarea id="iterate-changes" rows="3" placeholder="Describe changes to existing DOT..."></textarea>
               <div class="actions">
                 <button id="iterate-dot" class="btn">Iterate (stream)</button>
@@ -142,7 +154,7 @@
               <button id="fix-dot" class="btn warning">Fix DOT</button>
               <button id="run-dot" class="btn primary" disabled>Run</button>
             </div>
-            <pre id="dot-diagnostics" class="log"></pre>
+            <pre id="dot-diagnostics" class="log diagnostics">Validation pending.</pre>
             <div id="dot-preview" class="graph"></div>
           </section>
         </article>

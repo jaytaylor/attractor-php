@@ -38,6 +38,12 @@ Verify dev workflows against a running dev server and capture proof screenshot:
 node tests/dev-verify.js
 ```
 
+Run a full prompt-to-DOT UX audit (captures staged screenshots under `.scratch/verification/...`):
+
+```
+node tests/prompt-dot-ux-audit.js
+```
+
 Provider-backed DOT generation/fix/iterate endpoints require:
 
 - `OPENAI_API_KEY` (for `provider=openai`)

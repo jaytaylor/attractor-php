@@ -12,6 +12,12 @@
     runEventLines: {},
     pollTimer: null,
     pollInFlight: false,
+    create: {
+      promptReady: false,
+      dotValid: null,
+      previewReady: false,
+      action: 'Ready',
+    },
   };
 
   const el = (id) => document.getElementById(id);
@@ -21,6 +27,70 @@
     node.textContent = message;
     node.classList.remove('hidden');
     setTimeout(() => node.classList.add('hidden'), 3200);
+  };
+
+  const setStatus = (id, label, tone) => {
+    const node = el(id);
+    node.textContent = label;
+    node.className = `status-pill ${tone}`;
+  };
+
+  const setDiagnostics = (message, tone = 'info') => {
+    const node = el('dot-diagnostics');
+    node.textContent = message;
+    node.classList.remove('success', 'error', 'info');
+    node.classList.add(tone);
+  };
+
+  const setCreateAction = (label, tone = 'idle') => {
+    state.create.action = label;
+    setStatus('status-action', label, tone);
+  };
+
+  const syncPromptStatus = () => {
+    const prompt = el('generate-prompt').value.trim();
+    state.create.promptReady = prompt.length > 0;
+    setStatus('status-prompt', state.create.promptReady ? 'Ready' : 'Not started', state.create.promptReady ? 'success' : 'idle');
+  };
+
+  const setDotValidityStatus = (valid) => {
+    state.create.dotValid = valid;
+    if (valid === true) {
+      setStatus('status-dot', 'Valid', 'success');
+      return;
+    }
+    if (valid === false) {
+      setStatus('status-dot', 'Invalid', 'error');
+      return;
+    }
+    setStatus('status-dot', 'Unknown', 'idle');
+  };
+
+  const setPreviewStatus = (ready) => {
+    state.create.previewReady = ready;
+    setStatus('status-preview', ready ? 'Rendered' : 'Not rendered', ready ? 'success' : 'idle');
+  };
+
+  const setButtonBusy = (buttonId, busy, idleText, busyText) => {
+    const button = el(buttonId);
+    if (busy) {
+      button.dataset.wasDisabled = button.disabled ? 'true' : 'false';
+      button.disabled = true;
+      button.textContent = busyText;
+      return;
+    }
+    button.textContent = idleText;
+    button.disabled = button.dataset.wasDisabled === 'true';
+  };
+
+  const debounce = (fn, delayMs) => {
+    let timer = null;
+    return (...args) => {
+      if (timer !== null) {
+        clearTimeout(timer);
+      }
+      timer = window.setTimeout(() => fn(...args), delayMs);
+    };
   };
 
   const setView = (view) => {
@@ -378,42 +448,84 @@
     renderArchivedList();
   };
 
-  const runValidate = async () => {
+  const clearPreview = (message = 'Preview not rendered yet. Validate and preview to visualize the graph.') => {
+    el('dot-preview').innerHTML = `<div class="preview-empty">${message}</div>`;
+    setPreviewStatus(false);
+  };
+
+  const applyDotResult = async (dotSource) => {
+    el('dot-editor').value = dotSource;
+    await runValidate({ updateAction: false });
+    if (state.create.dotValid === true) {
+      await runPreview();
+    }
+  };
+
+  const runValidate = async ({ updateAction = true } = {}) => {
     const dotSource = el('dot-editor').value;
+    if (updateAction) {
+      setCreateAction('Validating DOT', 'busy');
+    }
     try {
       const result = await api('POST', '/api/v1/dot/validate', { dotSource });
       if (result.valid) {
-        el('dot-diagnostics').textContent = 'DOT is valid.';
+        setDiagnostics('DOT is valid and ready to run.', 'success');
         el('run-dot').disabled = false;
         state.lastDotError = '';
+        setDotValidityStatus(true);
+        if (updateAction) {
+          setCreateAction('Validation passed', 'success');
+        }
       } else {
         const msg = result.diagnostics.map((d) => d.message).join('\n');
-        el('dot-diagnostics').textContent = msg;
+        setDiagnostics(msg, 'error');
         el('run-dot').disabled = true;
         state.lastDotError = msg;
+        setDotValidityStatus(false);
+        clearPreview('Preview hidden because DOT is invalid.');
+        if (updateAction) {
+          setCreateAction('Validation failed', 'error');
+        }
       }
     } catch (error) {
-      el('dot-diagnostics').textContent = error.message;
+      setDiagnostics(error.message, 'error');
       el('run-dot').disabled = true;
       state.lastDotError = error.message;
+      setDotValidityStatus(false);
+      clearPreview('Preview hidden due to validation request failure.');
+      if (updateAction) {
+        setCreateAction('Validation failed', 'error');
+      }
     }
   };
 
   const runPreview = async () => {
+    setButtonBusy('preview-dot', true, 'Preview', 'Rendering...');
+    setCreateAction('Rendering preview', 'busy');
     try {
       const result = await api('POST', '/api/v1/dot/render', { dotSource: el('dot-editor').value });
       el('dot-preview').innerHTML = result.svg;
+      setPreviewStatus(true);
+      setCreateAction('Preview rendered', 'success');
     } catch (error) {
       state.lastDotError = error.message;
-      el('dot-diagnostics').textContent = error.message;
+      setDiagnostics(error.message, 'error');
+      setPreviewStatus(false);
+      setCreateAction('Preview failed', 'error');
       flash(error.message);
+    } finally {
+      setButtonBusy('preview-dot', false, 'Preview', 'Rendering...');
     }
   };
 
   const runCreate = async () => {
+    setButtonBusy('run-dot', true, 'Run', 'Creating...');
+    setCreateAction('Creating run', 'busy');
     await runValidate();
     if (el('run-dot').disabled) {
       flash('DOT must validate before run');
+      setCreateAction('Run blocked: invalid DOT', 'error');
+      setButtonBusy('run-dot', false, 'Run', 'Creating...');
       return;
     }
 
@@ -426,67 +538,107 @@
       originalPrompt: el('generate-prompt').value.trim(),
     };
 
-    const response = await api('POST', '/api/v1/pipelines', payload);
-    flash(`Run started: ${response.id}`);
-    setView('monitor');
-    await refreshRuns({ reloadSelected: false });
-    await selectRun(response.id);
+    try {
+      const response = await api('POST', '/api/v1/pipelines', payload);
+      flash(`Run started: ${response.id}`);
+      setCreateAction('Run created', 'success');
+      setView('monitor');
+      await refreshRuns({ reloadSelected: false });
+      await selectRun(response.id);
+    } catch (error) {
+      setCreateAction('Run failed', 'error');
+      throw error;
+    } finally {
+      setButtonBusy('run-dot', false, 'Run', 'Creating...');
+    }
   };
 
   const runGenerate = async () => {
     const prompt = el('generate-prompt').value.trim();
+    syncPromptStatus();
     if (!prompt) {
       flash('Prompt is required');
+      setCreateAction('Generation blocked: missing prompt', 'error');
       return;
     }
-    el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/generate/stream', { prompt, ...llmPayload() }, (delta) => {
-      el('dot-editor').value += delta;
-    });
-    el('dot-editor').value = doneDot;
-    await runValidate();
-    await runPreview();
+
+    setButtonBusy('generate-dot', true, 'Generate (stream)', 'Generating...');
+    setCreateAction('Generating DOT', 'busy');
+    setPreviewStatus(false);
+    try {
+      el('dot-editor').value = '';
+      const doneDot = await postStream('/api/v1/dot/generate/stream', { prompt, ...llmPayload() }, (delta) => {
+        el('dot-editor').value += delta;
+      });
+      await applyDotResult(doneDot);
+      setCreateAction('Generation complete', 'success');
+    } catch (error) {
+      setCreateAction('Generation failed', 'error');
+      throw error;
+    } finally {
+      setButtonBusy('generate-dot', false, 'Generate (stream)', 'Generating...');
+    }
   };
 
   const runFix = async () => {
     const dotSource = el('dot-editor').value;
     const error = state.lastDotError || 'invalid DOT';
-    el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/fix/stream', { dotSource, error, ...llmPayload() }, (delta) => {
-      el('dot-editor').value += delta;
-    });
-    el('dot-editor').value = doneDot;
-    await runValidate();
-    await runPreview();
+
+    setButtonBusy('fix-dot', true, 'Fix DOT', 'Fixing...');
+    setCreateAction('Fixing DOT', 'busy');
+    setPreviewStatus(false);
+    try {
+      el('dot-editor').value = '';
+      const doneDot = await postStream('/api/v1/dot/fix/stream', { dotSource, error, ...llmPayload() }, (delta) => {
+        el('dot-editor').value += delta;
+      });
+      await applyDotResult(doneDot);
+      setCreateAction('Fix complete', 'success');
+    } catch (error) {
+      setCreateAction('Fix failed', 'error');
+      throw error;
+    } finally {
+      setButtonBusy('fix-dot', false, 'Fix DOT', 'Fixing...');
+    }
   };
 
   const runIterate = async () => {
     const changes = el('iterate-changes').value.trim();
     if (!changes) {
       flash('Iteration changes are required');
+      setCreateAction('Iteration blocked: missing changes', 'error');
       return;
     }
 
+    setButtonBusy('iterate-dot', true, 'Iterate (stream)', 'Iterating...');
+    setCreateAction('Iterating DOT', 'busy');
+    setPreviewStatus(false);
     const baseDot = el('dot-editor').value;
-    el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/iterate/stream', { baseDot, changes, ...llmPayload() }, (delta) => {
-      el('dot-editor').value += delta;
-    });
-    el('dot-editor').value = doneDot;
-    await runValidate();
-    await runPreview();
-
-    if (state.iterateSourceRun) {
-      const created = await api('POST', `/api/v1/pipelines/${encodeURIComponent(state.iterateSourceRun)}/iterate`, {
-        dotSource: doneDot,
-        originalPrompt: changes,
+    try {
+      el('dot-editor').value = '';
+      const doneDot = await postStream('/api/v1/dot/iterate/stream', { baseDot, changes, ...llmPayload() }, (delta) => {
+        el('dot-editor').value += delta;
       });
-      flash(`Iterated run created: ${created.newId}`);
-      setView('monitor');
-      await refreshRuns({ reloadSelected: false });
-      await selectRun(created.newId);
-      state.iterateSourceRun = null;
-      el('iterate-source').textContent = '';
+      await applyDotResult(doneDot);
+      setCreateAction('Iteration complete', 'success');
+
+      if (state.iterateSourceRun) {
+        const created = await api('POST', `/api/v1/pipelines/${encodeURIComponent(state.iterateSourceRun)}/iterate`, {
+          dotSource: doneDot,
+          originalPrompt: changes,
+        });
+        flash(`Iterated run created: ${created.newId}`);
+        setView('monitor');
+        await refreshRuns({ reloadSelected: false });
+        await selectRun(created.newId);
+        state.iterateSourceRun = null;
+        el('iterate-source').textContent = '';
+      }
+    } catch (error) {
+      setCreateAction('Iteration failed', 'error');
+      throw error;
+    } finally {
+      setButtonBusy('iterate-dot', false, 'Iterate (stream)', 'Iterating...');
     }
   };
 
@@ -641,10 +793,29 @@
     el('iterate-dot').addEventListener('click', () => {
       void runIterate().catch((error) => flash(error.message || 'iterate failed'));
     });
+
+    const debouncedValidate = debounce(() => {
+      void runValidate({ updateAction: false });
+    }, 350);
+
+    el('generate-prompt').addEventListener('input', () => {
+      syncPromptStatus();
+    });
+    el('dot-editor').addEventListener('input', () => {
+      setDotValidityStatus(null);
+      clearPreview('DOT changed. Revalidate to refresh preview.');
+      setCreateAction('DOT changed; revalidate', 'warn');
+      debouncedValidate();
+    });
   };
 
   const bootstrap = async () => {
     attachActions();
+    syncPromptStatus();
+    setDotValidityStatus(null);
+    clearPreview();
+    setCreateAction('Ready', 'idle');
+    setDiagnostics('Validation pending.', 'info');
     const hash = window.location.hash || '#monitor';
     const route = hash.replace(/^#/, '');
     if (route.startsWith('monitor/')) {

@@ -175,8 +175,10 @@ main {
   border: 1px solid var(--border);
   background: white;
   border-radius: 10px;
-  padding: 6px 10px;
+  padding: 7px 12px;
   cursor: pointer;
+  font-weight: 600;
+  transition: transform 140ms ease, box-shadow 140ms ease, background 140ms ease;
 }
 
 .input {
@@ -208,6 +210,19 @@ main {
 
 .btn.ghost {
   background: #f5f8ff;
+}
+
+.btn:hover:not(:disabled),
+.tab:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 10px rgba(4, 102, 200, 0.15);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn:focus,
@@ -266,6 +281,7 @@ li.artifact {
   padding: 10px;
   max-height: 260px;
   overflow: auto;
+  margin-top: 8px;
 }
 
 .graph {
@@ -274,6 +290,97 @@ li.artifact {
   max-height: 420px;
   overflow: auto;
   background: #f8fbff;
+}
+
+.graph svg {
+  width: 100%;
+  height: auto;
+  max-height: 420px;
+}
+
+.preview-empty {
+  color: var(--subtle);
+  font-size: 0.95rem;
+  padding: 14px;
+  border-left: 4px solid #c7d7ef;
+  background: #f4f8ff;
+}
+
+.workflow-status-panel {
+  margin-top: 10px;
+}
+
+.status-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.status-item {
+  background: #f7fbff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.status-label {
+  font-size: 0.78rem;
+  color: var(--subtle);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.status-pill {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.status-pill.idle {
+  background: #e2e8f0;
+  color: #334155;
+}
+
+.status-pill.success {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.status-pill.warn {
+  background: #ffedd5;
+  color: #9a3412;
+}
+
+.status-pill.error {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.status-pill.busy {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.diagnostics.success {
+  background: #052e2b;
+  color: #b6f8d5;
+}
+
+.diagnostics.error {
+  background: #3b0d0d;
+  color: #ffd0d0;
+}
+
+.diagnostics.info {
+  background: #0f1727;
+  color: #d4e2ff;
 }
 
 @keyframes fadeIn {
@@ -285,6 +392,10 @@ li.artifact {
   .grid-two,
   .subgrid {
     grid-template-columns: 1fr;
+  }
+
+  .status-grid {
+    grid-template-columns: 1fr 1fr;
   }
 
   .topbar {
