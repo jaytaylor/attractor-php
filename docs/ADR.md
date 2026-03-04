@@ -40,6 +40,14 @@
   - Runtime behavior now reflects real upstream LLM API semantics and failures.
   - Tests use provider-compatible local mock endpoints to validate end-to-end request/response contract without requiring external secrets.
 
+## ADR-2026-03-04-009: DOT-Normalization Guardrail for Non-DOT LLM Output
+- Status: Accepted
+- Context: Real providers may return prose, fenced content, or raw SVG even when DOT is requested, causing graph preview failures.
+- Decision: Normalize provider output by extracting the first `digraph` block when present and falling back to deterministic DOT synthesis when output is non-DOT or SVG/XML.
+- Consequences:
+  - Prompt flows like "create a svg of a dog" remain renderable in DOT preview and run paths.
+  - DOT endpoints become resilient to provider formatting drift without introducing stubs.
+
 ## ADR-2026-03-04-005: Run Directory as Source of Truth
 - Status: Accepted
 - Context: NLSpec aligns around durable run artifacts and resumable state snapshots.

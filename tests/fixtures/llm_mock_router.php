@@ -83,6 +83,19 @@ function extractPrompt(array $body): string
 function buildDot(string $prompt): string
 {
     $normalized = strtolower($prompt);
+    if (str_contains($normalized, 'svg of a dog')) {
+        return <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120">
+  <rect width="240" height="120" fill="#f7fbff"/>
+  <circle cx="70" cy="68" r="26" fill="#d8a56d"/>
+  <circle cx="150" cy="68" r="24" fill="#d8a56d"/>
+  <circle cx="108" cy="56" r="34" fill="#e1b27a"/>
+  <circle cx="95" cy="52" r="4" fill="#111"/>
+  <circle cx="121" cy="52" r="4" fill="#111"/>
+  <ellipse cx="108" cy="66" rx="8" ry="5" fill="#442b18"/>
+</svg>
+SVG;
+    }
     if (str_contains($normalized, 'repair') || str_contains($normalized, 'validation error')) {
         return "digraph fixed_pipeline {\n  start -> repaired;\n  repaired -> exit;\n}\n";
     }

@@ -136,6 +136,24 @@ async function main() {
       throw new Error('anthropic dot generate did not return dotSource');
     }
 
+    const dogPromptDot = await api('POST', '/api/v1/dot/generate', {
+      provider: 'openai',
+      prompt: 'create a svg of a dog',
+    });
+    if (!String(dogPromptDot.dotSource || '').includes('digraph')) {
+      throw new Error('dog svg prompt did not normalize to dotSource');
+    }
+    if (String(dogPromptDot.dotSource || '').includes('<svg')) {
+      throw new Error('dog svg prompt leaked raw svg into dotSource');
+    }
+    const dogPromptRender = await api('POST', '/api/v1/dot/render', { dotSource: dogPromptDot.dotSource });
+    if (!String(dogPromptRender.svg || '').includes('<svg')) {
+      throw new Error('dog svg prompt did not render graph svg');
+    }
+    if (String(dogPromptRender.svg || '').includes('Graph Preview Unavailable')) {
+      throw new Error('dog svg prompt render still produced preview unavailable error');
+    }
+
     const fixed = await api('POST', '/api/v1/dot/fix', {
       provider: 'anthropic',
       dotSource: 'digraph Broken { a -> ; }',

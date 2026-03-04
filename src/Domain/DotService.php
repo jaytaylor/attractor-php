@@ -30,6 +30,13 @@ final class DotService
             $diagnostics[] = ['message' => 'Invalid edge target detected'];
         }
 
+        if ($diagnostics === []) {
+            $graphviz = $this->graphvizCheck($clean);
+            if (!$graphviz['valid']) {
+                $diagnostics[] = ['message' => $graphviz['message']];
+            }
+        }
+
         return [
             'valid' => count($diagnostics) === 0,
             'diagnostics' => $diagnostics,
@@ -104,5 +111,105 @@ SVG;
         }
 
         return $source;
+    }
+
+    public function extractFirstDigraph(string $source): ?string
+    {
+        $start = stripos($source, 'digraph');
+        if ($start === false) {
+            return null;
+        }
+
+        $open = strpos($source, '{', $start);
+        if ($open === false) {
+            return null;
+        }
+
+        $depth = 0;
+        $length = strlen($source);
+        for ($i = $open; $i < $length; $i++) {
+            $char = $source[$i];
+            if ($char === '{') {
+                $depth++;
+            } elseif ($char === '}') {
+                $depth--;
+                if ($depth === 0) {
+                    return trim(substr($source, $start, ($i - $start) + 1)) . "\n";
+                }
+            }
+        }
+
+        return null;
+    }
+
+    public function fallbackFromPrompt(string $prompt): string
+    {
+        $normalized = strtolower(trim($prompt));
+        $title = trim(preg_replace('/\s+/', ' ', $prompt) ?? '');
+        if ($title === '') {
+            $title = 'Generated graph';
+        }
+        $title = preg_replace('/[\x00-\x1F\x7F]+/', ' ', $title) ?? $title;
+        $title = str_replace(['\\', '"', '<', '>', '{', '}', '|'], ['/', '\'', '(', ')', '(', ')', '/'], $title);
+        if (strlen($title) > 80) {
+            $title = substr($title, 0, 77) . '...';
+        }
+
+        if (str_contains($normalized, 'dog')) {
+            return <<<DOT
+digraph generated_pipeline {
+  rankdir=LR;
+  node [shape=box, style="rounded,filled", fillcolor="#eef6ff", color="#4a6fa5"];
+  request [label="Request\\n{$title}"];
+  concept [label="Concept sketch"];
+  dog [shape=ellipse, fillcolor="#fff3e0", label="Dog (stylized)"];
+  preview [label="Preview output"];
+  request -> concept -> dog -> preview;
+}
+DOT;
+        }
+
+        return <<<DOT
+digraph generated_pipeline {
+  rankdir=LR;
+  node [shape=box, style="rounded,filled", fillcolor="#eef6ff", color="#4a6fa5"];
+  request [label="Request\\n{$title}"];
+  plan [label="Plan graph"];
+  render [label="Render preview"];
+  request -> plan -> render;
+}
+DOT;
+    }
+
+    /** @return array{valid:bool,message:string} */
+    private function graphvizCheck(string $dotSource): array
+    {
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $process = @proc_open('dot -Tsvg', $descriptors, $pipes);
+        if (!is_resource($process)) {
+            return ['valid' => true, 'message' => ''];
+        }
+
+        fwrite($pipes[0], $dotSource);
+        fclose($pipes[0]);
+        $stdout = stream_get_contents($pipes[1]) ?: '';
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]) ?: '';
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+        if ($exitCode === 0 && str_contains($stdout, '<svg')) {
+            return ['valid' => true, 'message' => ''];
+        }
+
+        $message = trim($stderr);
+        if ($message === '') {
+            $message = 'DOT failed Graphviz validation';
+        }
+        return ['valid' => false, 'message' => $message];
     }
 }

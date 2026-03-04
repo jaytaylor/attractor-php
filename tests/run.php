@@ -239,6 +239,14 @@ $h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): vo
     $h->assertSame(200, $anthropicGenerate['status'], 'anthropic generate should work');
     $h->assertContains('digraph', (string) ($anthropicGenerate['json']['dotSource'] ?? ''), 'anthropic dot content expected');
 
+    $dogGenerate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'create a svg of a dog']);
+    $h->assertSame(200, $dogGenerate['status'], 'dog svg prompt should still generate DOT');
+    $h->assertContains('digraph', (string) ($dogGenerate['json']['dotSource'] ?? ''), 'dog prompt should normalize to DOT');
+    $dogRender = callApi($app, 'POST', '/api/v1/dot/render', ['dotSource' => (string) ($dogGenerate['json']['dotSource'] ?? '')]);
+    $h->assertSame(200, $dogRender['status'], 'dog prompt DOT should render');
+    $h->assertContains('<svg', (string) ($dogRender['json']['svg'] ?? ''), 'dog prompt render should produce svg');
+    $h->assertTrue(strpos((string) ($dogRender['json']['svg'] ?? ''), 'Graph Preview Unavailable') === false, 'dog prompt render should not fall back to error svg');
+
     $generateMissing = callApi($app, 'POST', '/api/v1/dot/generate', []);
     $h->assertSame(400, $generateMissing['status'], 'missing prompt should fail');
 

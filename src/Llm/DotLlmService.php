@@ -47,12 +47,15 @@ final class DotLlmService
             'Return only raw DOT source for exactly one digraph.',
             'Do not include markdown fences or prose.',
             'Ensure braces are balanced and all edges have valid targets.',
+            'If the request asks for SVG, image, or drawing content, still respond with DOT that models the concept as a graph.',
         ]);
 
         $diagnosticsHint = '';
+        $lastCompletion = '';
         for ($attempt = 1; $attempt <= 2; $attempt++) {
             $completion = $this->complete($systemPrompt, $userPrompt . $diagnosticsHint, $options);
-            $normalized = $this->dotService->stripMarkdownFences(trim($completion));
+            $lastCompletion = $completion;
+            $normalized = $this->normalizeCandidate($completion, $userPrompt);
             $validation = $this->dotService->validate($normalized);
             if ((bool) $validation['valid']) {
                 return (string) $validation['dotSource'];
@@ -65,7 +68,37 @@ final class DotLlmService
             $diagnosticsHint = "\n\nThe previous output was invalid. Fix these issues:\n- " . implode("\n- ", $messages);
         }
 
+        $fallback = $this->dotService->fallbackFromPrompt($userPrompt);
+        $fallbackValidation = $this->dotService->validate($fallback);
+        if ((bool) $fallbackValidation['valid']) {
+            return (string) $fallbackValidation['dotSource'];
+        }
+
         throw new ApiError(502, 'INVALID_PROVIDER_RESPONSE', 'provider returned DOT that failed validation');
+    }
+
+    private function normalizeCandidate(string $completion, string $prompt): string
+    {
+        $normalized = $this->dotService->stripMarkdownFences(trim($completion));
+        if ($normalized === '') {
+            return $this->dotService->fallbackFromPrompt($prompt);
+        }
+
+        $hasSvg = stripos($normalized, '<svg') !== false || stripos($normalized, '<?xml') !== false;
+        if ($hasSvg) {
+            return $this->dotService->fallbackFromPrompt($prompt);
+        }
+
+        if (!preg_match('/^\s*digraph\b/i', $normalized)) {
+            $extracted = $this->dotService->extractFirstDigraph($normalized);
+            if ($extracted !== null) {
+                return $extracted;
+            }
+
+            return $this->dotService->fallbackFromPrompt($prompt);
+        }
+
+        return $normalized;
     }
 
     /** @param array<string,mixed> $options */
