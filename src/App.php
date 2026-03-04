@@ -51,8 +51,8 @@ final class App
             return $this->withCors($response);
         } catch (ApiError $e) {
             return $this->withCors($this->error($e->status, $e->errorCode, $e->getMessage()));
-        } catch (\Throwable $t) {
-            return $this->withCors($this->error(500, 'INTERNAL_ERROR', $t->getMessage()));
+        } catch (\Throwable) {
+            return $this->withCors($this->error(500, 'INTERNAL_ERROR', 'internal server error'));
         }
     }
 
@@ -199,7 +199,8 @@ final class App
         $this->pipelineService->tickRun($runId);
         $run = $this->store->getRun($runId);
         $sinceTs = max(0, $request->queryInt('sinceTs', 0));
-        $body = Sse::frame([
+        $body = Sse::comment('keepalive');
+        $body .= Sse::frame([
             'runId' => $runId,
             'tsMs' => (int) floor(microtime(true) * 1000),
             'type' => 'Snapshot',
@@ -221,7 +222,8 @@ final class App
             'type' => 'Snapshot',
             'payload' => $this->store->listRuns(true),
         ];
-        $body = Sse::frame($snapshot);
+        $body = Sse::comment('keepalive');
+        $body .= Sse::frame($snapshot);
         foreach ($this->store->readGlobalEvents($sinceTs) as $event) {
             $body .= Sse::frame($event);
         }
@@ -264,7 +266,7 @@ final class App
     {
         $prompt = trim((string) ($request->jsonBody()['prompt'] ?? ''));
         if ($prompt === '') {
-            throw new ApiError(400, 'BAD_REQUEST', 'prompt is required');
+            return $this->streamError('prompt is required');
         }
         $dot = $this->dotService->generateFromPrompt($prompt);
         return $this->streamDotResult($dot);
@@ -288,7 +290,7 @@ final class App
         $dotSource = (string) ($body['dotSource'] ?? '');
         $error = (string) ($body['error'] ?? '');
         if ($dotSource === '') {
-            throw new ApiError(400, 'BAD_REQUEST', 'dotSource is required');
+            return $this->streamError('dotSource is required');
         }
 
         return $this->streamDotResult($this->dotService->fixDot($dotSource, $error));
@@ -312,7 +314,7 @@ final class App
         $baseDot = (string) ($body['baseDot'] ?? '');
         $changes = trim((string) ($body['changes'] ?? ''));
         if ($baseDot === '' || $changes === '') {
-            throw new ApiError(400, 'BAD_REQUEST', 'baseDot and changes are required');
+            return $this->streamError('baseDot and changes are required');
         }
 
         return $this->streamDotResult($this->dotService->iterateDot($baseDot, $changes));
@@ -331,7 +333,7 @@ final class App
 
     private function streamDotResult(string $dotSource): Response
     {
-        $body = '';
+        $body = Sse::comment('keepalive');
         foreach ($this->dotService->streamChunks($dotSource) as $chunk) {
             $body .= Sse::frame(['delta' => $chunk]);
         }
@@ -340,9 +342,20 @@ final class App
         return new Response(200, ['content-type' => 'text/event-stream; charset=utf-8'], $body);
     }
 
+    private function streamError(string $message): Response
+    {
+        $body = Sse::comment('keepalive');
+        $body .= Sse::frame(['error' => $message]);
+        return new Response(200, ['content-type' => 'text/event-stream; charset=utf-8'], $body);
+    }
+
     private function error(int $status, string $code, string $message): Response
     {
-        return Response::json(['error' => $message, 'code' => $code], $status);
+        return Response::json([
+            'status' => $status,
+            'error' => $message,
+            'code' => $code,
+        ], $status);
     }
 
     private function withCors(Response $response): Response

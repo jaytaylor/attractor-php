@@ -15,4 +15,10 @@ final class Sse
         }
         return 'data: ' . $json . "\n\n";
     }
+
+    public static function comment(string $message = 'keepalive'): string
+    {
+        $safe = str_replace(["\r", "\n"], ' ', $message);
+        return ': ' . $safe . "\n\n";
+    }
 }

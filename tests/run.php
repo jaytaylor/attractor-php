@@ -198,6 +198,27 @@ $h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): vo
     $h->assertSame(400, $iterateMissing['status'], 'iterate missing changes');
 });
 
+$h->run('dot stream endpoints emit terminal error frame for malformed payloads', function () use ($h, $app): void {
+    $generate = callApi($app, 'POST', '/api/v1/dot/generate/stream', []);
+    $h->assertSame(200, $generate['status'], 'stream generate malformed payload should still stream terminal error');
+    $generateEvents = parseSse($generate['body']);
+    $h->assertTrue(count($generateEvents) >= 1, 'stream generate should emit at least one frame');
+    $h->assertContains('required', (string) ($generateEvents[count($generateEvents) - 1]['error'] ?? ''), 'stream generate terminal error expected');
+    $h->assertTrue(!isset($generateEvents[count($generateEvents) - 1]['done']), 'error frame must not be a done frame');
+
+    $fix = callApi($app, 'POST', '/api/v1/dot/fix/stream', ['error' => 'missing dot']);
+    $h->assertSame(200, $fix['status'], 'stream fix malformed payload should stream terminal error');
+    $fixEvents = parseSse($fix['body']);
+    $h->assertTrue(count($fixEvents) >= 1, 'stream fix should emit at least one frame');
+    $h->assertContains('dotSource is required', (string) ($fixEvents[count($fixEvents) - 1]['error'] ?? ''), 'stream fix terminal error expected');
+
+    $iterate = callApi($app, 'POST', '/api/v1/dot/iterate/stream', ['baseDot' => 'digraph X { start -> exit; }']);
+    $h->assertSame(200, $iterate['status'], 'stream iterate malformed payload should stream terminal error');
+    $iterateEvents = parseSse($iterate['body']);
+    $h->assertTrue(count($iterateEvents) >= 1, 'stream iterate should emit at least one frame');
+    $h->assertContains('baseDot and changes are required', (string) ($iterateEvents[count($iterateEvents) - 1]['error'] ?? ''), 'stream iterate terminal error expected');
+});
+
 $h->run('pipeline create/get/list', function () use ($h, $app): void {
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph P { start -> plan; plan -> implement; implement -> exit; }',
@@ -219,6 +240,9 @@ $h->run('pipeline create/get/list', function () use ($h, $app): void {
 
     $badCreate = callApi($app, 'POST', '/api/v1/pipelines', ['dotSource' => '']);
     $h->assertSame(400, $badCreate['status'], 'empty dot should fail');
+    $h->assertSame(400, (int) ($badCreate['json']['status'] ?? 0), 'error envelope should include status');
+    $h->assertSame('BAD_REQUEST', (string) ($badCreate['json']['code'] ?? ''), 'error envelope should include code');
+    $h->assertTrue(((string) ($badCreate['json']['error'] ?? '')) !== '', 'error envelope should include message');
 });
 
 $h->run('non-sim run progresses to completion over time', function () use ($h, $app): void {
@@ -292,6 +316,46 @@ $h->run('sse snapshot then events (run + global)', function () use ($h, $app): v
     $h->assertSame(200, $global['status'], 'global sse should work');
     $globalEvents = parseSse($global['body']);
     $h->assertSame('Snapshot', (string) ($globalEvents[0]['type'] ?? ''), 'first global event should be snapshot');
+});
+
+$h->run('sse replay cursor filtering and normalization', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph C { start -> plan; plan -> exit; }',
+        'displayName' => 'Cursor Run',
+        'simulate' => true,
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+
+    $all = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/events');
+    $allEvents = parseSse($all['body']);
+    $h->assertSame('Snapshot', (string) ($allEvents[0]['type'] ?? ''), 'cursor baseline starts with snapshot');
+
+    $maxTs = 0;
+    foreach ($allEvents as $event) {
+        if ((string) ($event['type'] ?? '') === 'Snapshot') {
+            continue;
+        }
+        $maxTs = max($maxTs, (int) ($event['tsMs'] ?? 0));
+    }
+    $h->assertTrue($maxTs > 0, 'expect event timestamps');
+
+    $replay = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/events?sinceTs=' . $maxTs);
+    $replayEvents = parseSse($replay['body']);
+    $h->assertSame('Snapshot', (string) ($replayEvents[0]['type'] ?? ''), 'replay response starts with snapshot');
+    $nonSnapshotReplay = array_values(array_filter($replayEvents, static fn(array $event): bool => (string) ($event['type'] ?? '') !== 'Snapshot'));
+    $h->assertSame(0, count($nonSnapshotReplay), 'replay should exclude events at or before cursor');
+
+    $malformed = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/events?sinceTs=abc');
+    $malformedEvents = parseSse($malformed['body']);
+    $h->assertSame('Snapshot', (string) ($malformedEvents[0]['type'] ?? ''), 'malformed cursor is normalized and still snapshot-first');
+    $nonSnapshotMalformed = array_values(array_filter($malformedEvents, static fn(array $event): bool => (string) ($event['type'] ?? '') !== 'Snapshot'));
+    $h->assertTrue(count($nonSnapshotMalformed) >= 1, 'malformed cursor normalization should include deltas');
+
+    $futureGlobal = callApi($app, 'GET', '/api/v1/events?sinceTs=9999999999999');
+    $futureEvents = parseSse($futureGlobal['body']);
+    $h->assertSame('Snapshot', (string) ($futureEvents[0]['type'] ?? ''), 'future cursor still snapshot-first');
+    $futureDeltas = array_values(array_filter($futureEvents, static fn(array $event): bool => (string) ($event['type'] ?? '') !== 'Snapshot'));
+    $h->assertSame(0, count($futureDeltas), 'future cursor should return empty incremental set');
 });
 
 $h->run('human gate question and answer flow', function () use ($h, $app): void {

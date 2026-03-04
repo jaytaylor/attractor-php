@@ -47,3 +47,12 @@
 - Consequences:
   - UI actions can provide clear guardrail messaging on invalid transitions.
   - Backend behavior remains contract-stable for negative lifecycle tests.
+
+## ADR-2026-03-04-007: Error Envelope and Stream Error Consistency
+- Status: Accepted
+- Context: Dashboard clients need deterministic error handling across JSON API and SSE-style DOT streaming endpoints.
+- Decision: Standardize JSON error responses to include `status`, `code`, and `error`; redact unexpected throwable details behind a generic internal error message; make malformed streaming DOT requests terminate with a single SSE `error` frame.
+- Consequences:
+  - UI error rendering can rely on consistent machine and human fields.
+  - Internal exception text is not exposed to clients.
+  - Streaming workflows can fail without mixed payload formats.

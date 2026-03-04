@@ -325,7 +325,7 @@ paths:
                 prompt: { type: string }
       responses:
         '200':
-          description: SSE stream with delta and done frames
+          description: SSE stream with delta frames and a single terminal done or error frame
           content:
             text/event-stream:
               schema: { type: string }
@@ -359,7 +359,7 @@ paths:
                 error: { type: string }
       responses:
         '200':
-          description: SSE stream
+          description: SSE stream with delta frames and a single terminal done or error frame
           content:
             text/event-stream:
               schema: { type: string }
@@ -393,7 +393,7 @@ paths:
                 changes: { type: string }
       responses:
         '200':
-          description: SSE stream
+          description: SSE stream with delta frames and a single terminal done or error frame
           content:
             text/event-stream:
               schema: { type: string }
@@ -422,8 +422,9 @@ components:
   schemas:
     ErrorEnvelope:
       type: object
-      required: [error, code]
+      required: [status, error, code]
       properties:
+        status: { type: integer }
         error: { type: string }
         code: { type: string }
     CreateRunRequest:

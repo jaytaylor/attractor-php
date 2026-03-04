@@ -13,7 +13,7 @@
 All non-2xx API responses return:
 
 ```json
-{ "error": "human readable message", "code": "MACHINE_CODE" }
+{ "status": 400, "error": "human readable message", "code": "MACHINE_CODE" }
 ```
 
 ## SSE Contract
@@ -41,7 +41,7 @@ Global snapshot payload:
 Each emits:
 - Zero or more `{"delta":"..."}` frames
 - Exactly one terminal `{"done":true,"dotSource":"..."}` frame on success
-- Optional terminal `{"error":"..."}` frame on failure
+- Exactly one terminal `{"error":"..."}` frame on malformed input failures
 
 ## Security Invariants
 - Artifact fetch paths reject traversal (`..`) and cannot escape run artifact root.
