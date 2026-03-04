@@ -1,8 +1,9 @@
 const app = document.getElementById('app');
 let selectedRunId = null;
 let latestDot = 'digraph Pipeline {\n  start -> done;\n  done [shape=Msquare];\n}';
+const CUSTOM_MODEL_VALUE = '__custom__';
 const providerDefaultModels = {
-  openai: 'gpt-5.3-chat-latest',
+  openai: 'gpt-5-chat-latest',
   anthropic: 'claude-sonnet-4-6',
   gemini: 'gemini-2.5-flash',
 };
@@ -260,7 +261,9 @@ async function initCreate() {
   const prompt = document.getElementById('prompt-input');
   const changes = document.getElementById('changes-input');
   const provider = document.getElementById('provider-select');
-  const model = document.getElementById('model-input');
+  const modelSelect = document.getElementById('model-select');
+  const modelCustomInput = document.getElementById('model-custom-input');
+  const modelCatalogMeta = document.getElementById('model-catalog-meta');
   const validation = document.getElementById('validation-panel');
   const preview = document.getElementById('preview-panel');
   const previewMeta = document.getElementById('preview-meta');
@@ -294,16 +297,117 @@ async function initCreate() {
   let previewZoom = 1;
 
   dot.value = latestDot;
-  if (!model.value.trim()) model.value = providerDefaultModels[provider.value] || '';
+  modelSelect.innerHTML = `<option value="${esc(providerDefaultModels[provider.value] || '')}">${esc(providerDefaultModels[provider.value] || '')}</option>`;
+  modelCustomInput.classList.add('hidden');
+
+  function selectedModelValue() {
+    const selected = modelSelect.value;
+    if (selected === CUSTOM_MODEL_VALUE) {
+      return modelCustomInput.value.trim();
+    }
+    return selected.trim();
+  }
+
+  function setModelMeta(message, state = 'muted') {
+    modelCatalogMeta.textContent = message;
+    modelCatalogMeta.dataset.state = state;
+  }
+
+  function syncModelInputVisibility() {
+    const custom = modelSelect.value === CUSTOM_MODEL_VALUE;
+    modelCustomInput.classList.toggle('hidden', !custom);
+    modelCustomInput.disabled = !custom;
+  }
+
+  function fallbackModels(providerId) {
+    const fallback = providerDefaultModels[providerId] || '';
+    return fallback ? [fallback] : [];
+  }
+
+  function renderModelOptions(models, selectedValue, customValue = '') {
+    modelSelect.innerHTML = '';
+    const unique = [];
+    const seen = new Set();
+    for (const m of models) {
+      const value = String(m || '').trim();
+      if (!value || seen.has(value)) continue;
+      seen.add(value);
+      unique.push(value);
+    }
+
+    unique.forEach((modelId) => {
+      const opt = document.createElement('option');
+      opt.value = modelId;
+      opt.textContent = modelId;
+      modelSelect.appendChild(opt);
+    });
+
+    const customOpt = document.createElement('option');
+    customOpt.value = CUSTOM_MODEL_VALUE;
+    customOpt.textContent = 'Custom...';
+    modelSelect.appendChild(customOpt);
+
+    if (selectedValue && unique.includes(selectedValue)) {
+      modelSelect.value = selectedValue;
+    } else if (selectedValue && !unique.includes(selectedValue)) {
+      modelSelect.value = CUSTOM_MODEL_VALUE;
+      modelCustomInput.value = selectedValue;
+    } else if (unique.length) {
+      modelSelect.value = unique[0];
+    } else {
+      modelSelect.value = CUSTOM_MODEL_VALUE;
+      modelCustomInput.value = customValue;
+    }
+
+    if (modelSelect.value === CUSTOM_MODEL_VALUE && !modelCustomInput.value.trim()) {
+      modelCustomInput.value = customValue;
+    }
+    syncModelInputVisibility();
+  }
+
+  async function loadModelsForProvider(providerId, preferredModel = '') {
+    const previousSelection = preferredModel || providerDefaultModels[providerId] || '';
+    const previousCustom = modelCustomInput.value.trim();
+    modelSelect.innerHTML = '<option value="">Loading models...</option>';
+    modelSelect.disabled = true;
+    setModelMeta(`Loading ${providerId} model catalog...`, 'muted');
+
+    try {
+      const catalog = await api(`/api/v1/dot/models?provider=${encodeURIComponent(providerId)}`);
+      const models = Array.isArray(catalog.models) ? catalog.models : [];
+      const fallback = fallbackModels(providerId);
+      const combined = models.length ? models : fallback;
+      const defaultModel = String(catalog.defaultModel || providerDefaultModels[providerId] || '').trim();
+      renderModelOptions(combined, previousSelection || defaultModel, previousCustom);
+      const source = String(catalog.source || 'fallback');
+      const count = combined.length;
+      setModelMeta(`${count} models loaded (${source}).`, source === 'live' ? 'success' : 'muted');
+    } catch (e) {
+      const fallback = fallbackModels(providerId);
+      renderModelOptions(fallback, previousSelection || fallback[0] || '', previousCustom);
+      setModelMeta(`Model catalog unavailable (${e.message}). Using fallback list.`, 'error');
+    } finally {
+      modelSelect.disabled = false;
+      syncModelInputVisibility();
+    }
+  }
+
   provider.addEventListener('change', () => {
-    model.value = providerDefaultModels[provider.value] || '';
+    loadModelsForProvider(provider.value).catch((e) => {
+      setModelMeta(`Failed to refresh models: ${e.message}`, 'error');
+    });
+  });
+
+  modelSelect.addEventListener('change', () => {
+    syncModelInputVisibility();
   });
 
   function dotOptionsPayload(basePayload) {
+    const selectedModel = selectedModelValue();
     return {
       ...basePayload,
       provider: provider.value,
-      model: model.value.trim(),
+      model: selectedModel,
     };
   }
 
@@ -369,7 +473,8 @@ async function initCreate() {
       }
     });
     provider.disabled = isBusy;
-    model.disabled = isBusy;
+    modelSelect.disabled = isBusy;
+    modelCustomInput.disabled = isBusy || modelSelect.value !== CUSTOM_MODEL_VALUE;
     prompt.disabled = isBusy;
     changes.disabled = isBusy;
     dot.readOnly = isBusy;
@@ -521,6 +626,10 @@ async function initCreate() {
         preview.innerHTML = renderEmptyHtml(e.message);
       }
     });
+  });
+
+  await loadModelsForProvider(provider.value).catch((e) => {
+    setModelMeta(`Failed to load model catalog: ${e.message}`, 'error');
   });
 
   setValidationMessage('Ready. Generate or edit DOT, then Validate to enable Run.', 'info');

@@ -9,6 +9,47 @@ final class DotService
     private const PROVIDER_OPENAI = 'openai';
     private const PROVIDER_ANTHROPIC = 'anthropic';
     private const PROVIDER_GEMINI = 'gemini';
+    private const MODEL_CATALOG_TTL_SECONDS = 300;
+    private const CUSTOM_MODEL_SENTINEL = '__custom__';
+
+    /**
+     * @var array<string,list<string>>
+     */
+    private const FALLBACK_MODELS = [
+        self::PROVIDER_OPENAI => [
+            'gpt-5-chat-latest',
+            'gpt-5',
+            'gpt-5-mini',
+            'gpt-5-nano',
+            'gpt-5.2-chat-latest',
+            'gpt-5.1-chat-latest',
+            'gpt-4.1',
+            'gpt-4o',
+            'o3',
+            'o4-mini',
+        ],
+        self::PROVIDER_ANTHROPIC => [
+            'claude-sonnet-4-6',
+            'claude-opus-4-6',
+            'claude-sonnet-4-5-20250929',
+            'claude-haiku-4-5-20251001',
+        ],
+        self::PROVIDER_GEMINI => [
+            'gemini-2.5-flash',
+            'gemini-2.5-flash-lite',
+            'gemini-2.5-pro',
+            'gemini-3-flash-preview',
+            'gemini-3.1-pro-preview',
+            'gemini-3.1-flash-lite-preview',
+            'gemini-flash-latest',
+            'gemini-pro-latest',
+        ],
+    ];
+
+    /**
+     * @var array<string,array{cachedAt:int,payload:array{provider:string,defaultModel:string,models:list<string>,source:string,warnings:list<string>}>>
+     */
+    private static array $modelCatalogCache = [];
 
     /**
      * @return array{valid:bool, diagnostics:list<array<string,mixed>>}
@@ -78,6 +119,68 @@ final class DotService
         }
 
         return substr($svg, $svgStart);
+    }
+
+    /**
+     * @return array{provider:string,defaultModel:string,models:list<string>,source:string,warnings:list<string>}
+     */
+    public function listProviderModels(string $provider): array
+    {
+        $provider = strtolower(trim($provider));
+        $validProviders = [self::PROVIDER_OPENAI, self::PROVIDER_ANTHROPIC, self::PROVIDER_GEMINI];
+        if (!in_array($provider, $validProviders, true)) {
+            throw new DotServiceException('provider must be one of: openai, anthropic, gemini', 'BAD_REQUEST', 400);
+        }
+
+        $cached = self::$modelCatalogCache[$provider] ?? null;
+        if (is_array($cached) && ((time() - (int) ($cached['cachedAt'] ?? 0)) < self::MODEL_CATALOG_TTL_SECONDS)) {
+            return $cached['payload'];
+        }
+
+        $warnings = [];
+        $models = $this->fallbackModelsForProvider($provider);
+        $source = 'fallback';
+
+        try {
+            $live = match ($provider) {
+                self::PROVIDER_OPENAI => $this->fetchOpenAIModels(),
+                self::PROVIDER_ANTHROPIC => $this->fetchAnthropicModels(),
+                self::PROVIDER_GEMINI => $this->fetchGeminiModels(),
+                default => [],
+            };
+            if ($live !== []) {
+                $models = $live;
+                $source = 'live';
+            } else {
+                $warnings[] = 'live model catalog returned empty; using fallback list';
+            }
+        } catch (DotServiceException $e) {
+            $warnings[] = $e->getMessage();
+        }
+
+        $models = $this->sortedModels($provider, $models);
+        if ($models === []) {
+            throw new DotServiceException('no models available for provider', 'PROVIDER_MODELS_UNAVAILABLE', 502);
+        }
+
+        $default = $this->defaultModelForProvider($provider);
+        if ($default === '' || !in_array($default, $models, true)) {
+            $default = $this->preferredDefaultForProvider($provider, $models);
+        }
+
+        $payload = [
+            'provider' => $provider,
+            'defaultModel' => $default,
+            'models' => $models,
+            'source' => $source,
+            'warnings' => $warnings,
+        ];
+        self::$modelCatalogCache[$provider] = [
+            'cachedAt' => time(),
+            'payload' => $payload,
+        ];
+
+        return $payload;
     }
 
     /**
@@ -257,7 +360,7 @@ final class DotService
     private function defaultModelForProvider(string $provider): string
     {
         return match ($provider) {
-            self::PROVIDER_OPENAI => (string) (getenv('DOT_OPENAI_MODEL') ?: 'gpt-5.3-chat-latest'),
+            self::PROVIDER_OPENAI => (string) (getenv('DOT_OPENAI_MODEL') ?: 'gpt-5-chat-latest'),
             self::PROVIDER_ANTHROPIC => (string) (getenv('DOT_ANTHROPIC_MODEL') ?: 'claude-sonnet-4-6'),
             self::PROVIDER_GEMINI => (string) (getenv('DOT_GEMINI_MODEL') ?: 'gemini-2.5-flash'),
             default => '',
@@ -482,6 +585,274 @@ final class DotService
         return $combined;
     }
 
+    /**
+     * @return list<string>
+     */
+    private function fallbackModelsForProvider(string $provider): array
+    {
+        return self::FALLBACK_MODELS[$provider] ?? [];
+    }
+
+    /**
+     * @param list<string> $models
+     * @return list<string>
+     */
+    private function sortedModels(string $provider, array $models): array
+    {
+        $clean = [];
+        foreach ($models as $model) {
+            $value = trim((string) $model);
+            if ($value === '' || $value === self::CUSTOM_MODEL_SENTINEL) {
+                continue;
+            }
+            $clean[$value] = true;
+        }
+        $list = array_keys($clean);
+
+        $priority = $this->priorityOrderForProvider($provider);
+        $rank = [];
+        foreach ($priority as $i => $modelId) {
+            $rank[$modelId] = $i;
+        }
+
+        usort($list, static function (string $a, string $b) use ($rank): int {
+            $aRank = $rank[$a] ?? 10_000;
+            $bRank = $rank[$b] ?? 10_000;
+            if ($aRank !== $bRank) {
+                return $aRank <=> $bRank;
+            }
+            return strnatcasecmp($a, $b);
+        });
+
+        return array_values($list);
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function priorityOrderForProvider(string $provider): array
+    {
+        return match ($provider) {
+            self::PROVIDER_OPENAI => [
+                'gpt-5-chat-latest',
+                'gpt-5',
+                'gpt-5-mini',
+                'gpt-5-nano',
+                'gpt-5.2-chat-latest',
+                'gpt-5.2',
+                'gpt-5.1-chat-latest',
+                'gpt-5.1',
+                'gpt-4.1',
+                'gpt-4.1-mini',
+                'gpt-4o',
+                'o3',
+                'o4-mini',
+            ],
+            self::PROVIDER_ANTHROPIC => [
+                'claude-sonnet-4-6',
+                'claude-opus-4-6',
+                'claude-sonnet-4-5-20250929',
+                'claude-opus-4-5-20251101',
+                'claude-haiku-4-5-20251001',
+                'claude-3-haiku-20240307',
+            ],
+            self::PROVIDER_GEMINI => [
+                'gemini-2.5-flash',
+                'gemini-2.5-pro',
+                'gemini-2.5-flash-lite',
+                'gemini-3-flash-preview',
+                'gemini-3.1-pro-preview',
+                'gemini-3.1-flash-lite-preview',
+                'gemini-flash-latest',
+                'gemini-flash-lite-latest',
+                'gemini-pro-latest',
+            ],
+            default => [],
+        };
+    }
+
+    /**
+     * @param list<string> $models
+     */
+    private function preferredDefaultForProvider(string $provider, array $models): string
+    {
+        foreach ($this->priorityOrderForProvider($provider) as $candidate) {
+            if (in_array($candidate, $models, true)) {
+                return $candidate;
+            }
+        }
+        return $models[0] ?? '';
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fetchOpenAIModels(): array
+    {
+        $apiKey = trim((string) getenv('OPENAI_API_KEY'));
+        if ($apiKey === '') {
+            throw new DotServiceException('OPENAI_API_KEY is not configured', 'PROVIDER_NOT_CONFIGURED', 500);
+        }
+
+        $base = trim((string) getenv('OPENAI_BASE_URL'));
+        if ($base === '') {
+            $base = 'https://api.openai.com';
+        }
+
+        $url = $this->joinApiPath($base, '/v1/models');
+        $response = $this->getJson(
+            $url,
+            ['Authorization: Bearer ' . $apiKey],
+            'openai',
+        );
+
+        $models = [];
+        $items = $response['data'] ?? [];
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $id = trim((string) ($item['id'] ?? ''));
+                if ($id === '' || !$this->isOpenAITextModel($id)) {
+                    continue;
+                }
+                $models[] = $id;
+            }
+        }
+
+        return $models;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fetchAnthropicModels(): array
+    {
+        $apiKey = trim((string) getenv('ANTHROPIC_API_KEY'));
+        if ($apiKey === '') {
+            throw new DotServiceException('ANTHROPIC_API_KEY is not configured', 'PROVIDER_NOT_CONFIGURED', 500);
+        }
+
+        $base = trim((string) getenv('ANTHROPIC_BASE_URL'));
+        if ($base === '') {
+            $base = 'https://api.anthropic.com';
+        }
+
+        $url = $this->joinApiPath($base, '/v1/models');
+        $response = $this->getJson(
+            $url,
+            [
+                'x-api-key: ' . $apiKey,
+                'anthropic-version: 2023-06-01',
+            ],
+            'anthropic',
+        );
+
+        $models = [];
+        $items = $response['data'] ?? [];
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $id = trim((string) ($item['id'] ?? ''));
+                if ($id === '' || !str_starts_with($id, 'claude-')) {
+                    continue;
+                }
+                $models[] = $id;
+            }
+        }
+
+        return $models;
+    }
+
+    /**
+     * @return list<string>
+     */
+    private function fetchGeminiModels(): array
+    {
+        $apiKey = trim((string) getenv('GEMINI_API_KEY'));
+        if ($apiKey === '') {
+            $apiKey = trim((string) getenv('GOOGLE_API_KEY'));
+        }
+        if ($apiKey === '') {
+            throw new DotServiceException('GEMINI_API_KEY is not configured', 'PROVIDER_NOT_CONFIGURED', 500);
+        }
+
+        $base = trim((string) getenv('GEMINI_BASE_URL'));
+        if ($base === '') {
+            $base = 'https://generativelanguage.googleapis.com';
+        }
+
+        $url = rtrim($base, '/') . '/v1beta/models?key=' . rawurlencode($apiKey);
+        $response = $this->getJson($url, [], 'gemini');
+
+        $models = [];
+        $items = $response['models'] ?? [];
+        if (is_array($items)) {
+            foreach ($items as $item) {
+                if (!is_array($item)) {
+                    continue;
+                }
+                $name = trim((string) ($item['name'] ?? ''));
+                if ($name === '') {
+                    continue;
+                }
+                if (str_starts_with($name, 'models/')) {
+                    $name = substr($name, strlen('models/'));
+                }
+                if (!preg_match('/^(gemini|gemma)-/i', $name)) {
+                    continue;
+                }
+                $methods = $item['supportedGenerationMethods'] ?? [];
+                if (!is_array($methods) || !in_array('generateContent', $methods, true)) {
+                    continue;
+                }
+                if (
+                    str_contains($name, 'image')
+                    || str_contains($name, 'audio')
+                    || str_contains($name, 'tts')
+                    || str_contains($name, 'embedding')
+                    || str_contains($name, 'computer-use')
+                    || str_contains($name, 'robotics')
+                ) {
+                    continue;
+                }
+                $models[] = $name;
+            }
+        }
+
+        return $models;
+    }
+
+    private function isOpenAITextModel(string $modelId): bool
+    {
+        if (!preg_match('/^(gpt|o[0-9]|chatgpt)/', $modelId)) {
+            return false;
+        }
+
+        $blockedTokens = [
+            'embedding',
+            'moderation',
+            'realtime',
+            'audio',
+            'transcribe',
+            'tts',
+            'image',
+            'search-api',
+            'search-preview',
+            'instruct',
+        ];
+        foreach ($blockedTokens as $token) {
+            if (str_contains($modelId, $token)) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     private function joinApiPath(string $baseUrl, string $defaultPath): string
     {
         $baseUrl = rtrim($baseUrl, '/');
@@ -489,6 +860,55 @@ final class DotService
             return $baseUrl . substr($defaultPath, strlen('/v1'));
         }
         return $baseUrl . $defaultPath;
+    }
+
+    /**
+     * @param list<string> $headers
+     * @return array<string,mixed>
+     */
+    private function getJson(string $url, array $headers, string $provider): array
+    {
+        if (!function_exists('curl_init')) {
+            throw new DotServiceException('curl extension is required for LLM provider calls', 'CONFIG_ERROR', 500);
+        }
+
+        $ch = curl_init($url);
+        if ($ch === false) {
+            throw new DotServiceException('failed to initialize provider request', 'INTERNAL_ERROR', 500);
+        }
+
+        curl_setopt_array($ch, [
+            CURLOPT_HTTPGET => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_TIMEOUT => 90,
+            CURLOPT_CONNECTTIMEOUT => 20,
+        ]);
+
+        $responseBody = curl_exec($ch);
+        $curlError = curl_error($ch);
+        $statusCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
+
+        if (!is_string($responseBody)) {
+            $message = $curlError !== '' ? $curlError : 'provider request failed';
+            throw new DotServiceException($provider . ' request failed: ' . $message, 'UPSTREAM_UNREACHABLE', 502);
+        }
+
+        $decoded = json_decode($responseBody, true);
+        if (!is_array($decoded)) {
+            $decoded = [];
+        }
+
+        if ($statusCode < 200 || $statusCode >= 300) {
+            $providerMessage = $this->providerErrorMessage($decoded, $responseBody);
+            throw new DotServiceException(
+                $provider . ' API error (' . $statusCode . '): ' . $providerMessage,
+                'UPSTREAM_ERROR',
+                502,
+            );
+        }
+
+        return $decoded;
     }
 
     /**

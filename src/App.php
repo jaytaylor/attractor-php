@@ -246,6 +246,23 @@ final class App
             Response::json(200, ['svg' => $svg]);
         }
 
+        if ($method === 'GET' && $path === '/api/v1/dot/models') {
+            $provider = strtolower(trim((string) ($request->query['provider'] ?? '')));
+            try {
+                if ($provider !== '') {
+                    Response::json(200, $this->dotService->listProviderModels($provider));
+                }
+
+                $payload = [];
+                foreach (['openai', 'anthropic', 'gemini'] as $providerId) {
+                    $payload[$providerId] = $this->dotService->listProviderModels($providerId);
+                }
+                Response::json(200, ['providers' => $payload]);
+            } catch (DotServiceException $e) {
+                $this->error($e->httpStatus(), $e->getMessage(), $e->errorCode());
+            }
+        }
+
         if ($method === 'POST' && $path === '/api/v1/dot/generate') {
             $prompt = trim((string) ($request->jsonBody['prompt'] ?? ''));
             if ($prompt === '') {

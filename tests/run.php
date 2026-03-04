@@ -177,6 +177,26 @@ $res = request('POST', $base . '/api/v1/pipelines', ['dotSource' => 'bad']);
 assertTrue($res['status'] === 400, 'invalid create should fail');
 
 $providerConfig = providerForDotTests();
+$defaultProviderModels = [
+    'openai' => trim((string) getenv('DOT_OPENAI_MODEL')),
+    'anthropic' => trim((string) getenv('DOT_ANTHROPIC_MODEL')),
+    'gemini' => trim((string) getenv('DOT_GEMINI_MODEL')),
+];
+
+foreach (['openai', 'anthropic', 'gemini'] as $providerId) {
+    $res = request('GET', $base . '/api/v1/dot/models?provider=' . rawurlencode($providerId));
+    assertTrue($res['status'] === 200, 'dot model catalog should return 200 for ' . $providerId);
+    $models = $res['json']['models'] ?? [];
+    assertTrue(is_array($models) && count($models) > 0, 'dot model catalog should list models for ' . $providerId);
+    $defaultModel = (string) ($res['json']['defaultModel'] ?? '');
+    assertTrue($defaultModel !== '', 'dot model catalog should include default model for ' . $providerId);
+    assertTrue(in_array($defaultModel, $models, true), 'default model should exist in model list for ' . $providerId);
+
+    $expected = (string) ($defaultProviderModels[$providerId] ?? '');
+    if ($expected !== '') {
+        assertTrue(in_array($expected, $models, true), 'configured/default model should exist in model list for ' . $providerId);
+    }
+}
 
 $dot = "digraph Pipeline {\n  start -> review;\n  review -> done;\n  done [shape=Msquare];\n}";
 $res = request('POST', $base . '/api/v1/pipelines', [

@@ -17,6 +17,28 @@ async function waitForText(page, selector, expectedText, timeoutMs = 120000) {
   );
 }
 
+async function setModel(page, modelId) {
+  await page.waitForFunction(() => {
+    const select = document.querySelector('#model-select');
+    if (!select) return false;
+    if (!select.options || select.options.length === 0) return false;
+    return !Array.from(select.options).some((opt) => (opt.textContent || '').includes('Loading models'));
+  }, null, { timeout: 30000 });
+
+  if (!modelId) {
+    return;
+  }
+
+  const values = await page.$$eval('#model-select option', (opts) => opts.map((o) => o.value));
+  if (values.includes(modelId)) {
+    await page.selectOption('#model-select', modelId);
+    return;
+  }
+
+  await page.selectOption('#model-select', '__custom__');
+  await page.fill('#model-custom-input', modelId);
+}
+
 async function validateDot(page) {
   await page.click('#btn-validate');
   await waitForText(page, '#validation-panel', '"valid": true');
@@ -31,7 +53,7 @@ async function previewDot(page) {
 
 async function runGenerateFlow(page, provider, model) {
   await page.selectOption('#provider-select', provider);
-  await page.fill('#model-input', model);
+  await setModel(page, model);
   await page.fill('#prompt-input', `Build release workflow for ${provider} with lint test deploy stages.`);
   await page.click('#btn-generate');
   await waitForText(page, '#validation-panel', 'Generated DOT stream completed.');
@@ -45,7 +67,7 @@ async function runGenerateFlow(page, provider, model) {
 
 async function runFixFlow(page, provider, model) {
   await page.selectOption('#provider-select', provider);
-  await page.fill('#model-input', model);
+  await setModel(page, model);
   await page.fill('#dot-input', '```dot\na->b\n```');
   await page.click('#btn-fix');
   await waitForText(page, '#validation-panel', 'Fix stream completed.');
@@ -58,7 +80,7 @@ async function runFixFlow(page, provider, model) {
 
 async function runIterateFlow(page, provider, model) {
   await page.selectOption('#provider-select', provider);
-  await page.fill('#model-input', model);
+  await setModel(page, model);
   await page.fill('#changes-input', 'Add a qa_gate node before done and connect it.');
   await page.click('#btn-iterate');
   await waitForText(page, '#validation-panel', 'Iterate stream completed.');
@@ -83,9 +105,9 @@ async function runCreateRunFlow(page) {
 async function main() {
   const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:18084';
   const providerConfigs = [
-    { provider: 'openai', model: process.env.DOT_OPENAI_MODEL || 'gpt-5.3-chat-latest' },
-    { provider: 'anthropic', model: process.env.DOT_ANTHROPIC_MODEL || 'claude-sonnet-4-6' },
-    { provider: 'gemini', model: process.env.DOT_GEMINI_MODEL || 'gemini-2.5-flash' },
+    { provider: 'openai', model: process.env.DOT_OPENAI_MODEL || '' },
+    { provider: 'anthropic', model: process.env.DOT_ANTHROPIC_MODEL || '' },
+    { provider: 'gemini', model: process.env.DOT_GEMINI_MODEL || '' },
   ];
 
   const browser = await chromium.launch({ headless: true });

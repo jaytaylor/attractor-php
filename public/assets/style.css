@@ -140,6 +140,10 @@ label {
   color: var(--muted);
 }
 
+.hidden {
+  display: none !important;
+}
+
 input[type="text"], textarea, select {
   width: 100%;
   border: 1px solid #c9d8e8;
@@ -152,6 +156,20 @@ input[type="text"], textarea, select {
 
 textarea {
   min-height: 220px;
+}
+
+#model-catalog-meta {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.82rem;
+}
+
+#model-catalog-meta[data-state="success"] {
+  color: #14532d;
+}
+
+#model-catalog-meta[data-state="error"] {
+  color: #7f1d1d;
 }
 
 .row {
