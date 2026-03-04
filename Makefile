@@ -9,3 +9,4 @@ build: precommit
 
 test: precommit
 	@set -o pipefail; php tests/run.php 2>&1 | tee .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+	@node tests/e2e.js
