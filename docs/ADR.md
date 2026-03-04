@@ -56,6 +56,15 @@
   - New generated graphs preserve Attractor’s validation-driven execution intent.
   - Prompt quality improves through concrete in-context DOT patterns.
 
+## ADR-2026-03-04-011: Graph-Driven Runtime Execution with Provider-Backed Node Work
+- Status: Accepted
+- Context: Runtime path must not rely on simulation flags or synthetic timeline events; monitor status should reflect real node execution against parsed DOT workflows.
+- Decision: Replace timeline/simulated pipeline progression with DOT graph parsing plus node-by-node execution. Execute codergen/validation nodes via provider-backed task LLM calls, execute tool nodes via shell commands, and pause/resume only on real human-gate nodes.
+- Consequences:
+  - Run completion now depends on actual graph traversal and upstream/tool behavior.
+  - Stage/event/checkpoint history mirrors true execution state, including waiting-human and validation pass/fail routing.
+  - Tests require provider-compatible mocks for deterministic CI while preserving real runtime contracts.
+
 ## ADR-2026-03-04-005: Run Directory as Source of Truth
 - Status: Accepted
 - Context: NLSpec aligns around durable run artifacts and resumable state snapshots.
