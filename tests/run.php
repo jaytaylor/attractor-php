@@ -322,7 +322,6 @@ $h->run('pipeline create/get/list', function () use ($h, $app): void {
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph P { start -> plan; plan -> implement; implement -> exit; }',
         'displayName' => 'Run One',
-        'simulate' => true,
     ]);
     $h->assertSame(201, $create['status'], 'create should return 201');
     $runId = (string) ($create['json']['id'] ?? '');
@@ -331,7 +330,10 @@ $h->run('pipeline create/get/list', function () use ($h, $app): void {
     $get = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
     $h->assertSame(200, $get['status'], 'get run should work');
     $h->assertSame($runId, (string) ($get['json']['id'] ?? ''), 'get run id match');
-    $h->assertSame('completed', (string) ($get['json']['status'] ?? ''), 'run should complete in simulation');
+    $h->assertSame('running', (string) ($get['json']['status'] ?? ''), 'run should start as running');
+
+    $terminal = waitForRunStatus($app, $runId, ['completed', 'failed'], 5000);
+    $h->assertSame('completed', (string) ($terminal['json']['status'] ?? ''), 'run should complete via real graph traversal');
 
     $list = callApi($app, 'GET', '/api/v1/pipelines');
     $h->assertSame(200, $list['status'], 'list should work');
@@ -348,7 +350,6 @@ $h->run('non-sim run progresses to completion over time', function () use ($h, $
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph N { start -> plan; plan -> implement; implement -> test; test -> exit; }',
         'displayName' => 'Async Progression',
-        'simulate' => false,
     ]);
     $runId = (string) ($create['json']['id'] ?? '');
     $h->assertTrue($runId !== '', 'run id expected');
@@ -356,7 +357,7 @@ $h->run('non-sim run progresses to completion over time', function () use ($h, $
     $initial = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
     $h->assertSame('running', (string) ($initial['json']['status'] ?? ''), 'run should start as running');
 
-    $terminal = waitForRunStatus($app, $runId, ['completed']);
+    $terminal = waitForRunStatus($app, $runId, ['completed'], 5000);
     $h->assertSame('completed', (string) ($terminal['json']['status'] ?? ''), 'non-sim run should complete after progression');
 });
 
@@ -421,9 +422,9 @@ $h->run('sse replay cursor filtering and normalization', function () use ($h, $a
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph C { start -> plan; plan -> exit; }',
         'displayName' => 'Cursor Run',
-        'simulate' => true,
     ]);
     $runId = (string) ($create['json']['id'] ?? '');
+    waitForRunStatus($app, $runId, ['completed'], 5000);
 
     $all = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/events');
     $allEvents = parseSse($all['body']);
@@ -465,7 +466,7 @@ $h->run('human gate question and answer flow', function () use ($h, $app): void 
     ]);
     $runId = (string) ($create['json']['id'] ?? '');
 
-    $run = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $run = waitForRunStatus($app, $runId, ['waiting_human'], 5000);
     $h->assertSame('waiting_human', (string) ($run['json']['status'] ?? ''), 'human gate should pause run');
 
     $questions = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/questions');
@@ -497,7 +498,7 @@ $h->run('running status actions and state guards', function () use ($h, $app): v
     $h->assertSame(409, $archiveWaiting['status'], 'archive waiting_human should fail');
 
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
-        'dotSource' => 'digraph R { start -> STATUS_RUNNING; STATUS_RUNNING -> exit; }',
+        'dotSource' => 'digraph R { start -> node1; node1 -> node2; node2 -> node3; node3 -> node4; node4 -> node5; node5 -> exit; }',
         'displayName' => 'Running Run',
     ]);
     $runId = (string) ($create['json']['id'] ?? '');

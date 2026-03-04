@@ -349,7 +349,7 @@
     el('run-detail-empty').classList.add('hidden');
     el('run-detail').classList.remove('hidden');
     el('run-title').textContent = run.displayName || run.id;
-    el('run-meta').innerHTML = `${runBadge(run.status)} | familyId=${run.familyId} | simulate=${run.simulate} | archived=${run.archived}`;
+    el('run-meta').innerHTML = `${runBadge(run.status)} | familyId=${run.familyId} | provider=${run.provider || 'default'} | archived=${run.archived}`;
 
     const stages = el('stage-list');
     stages.innerHTML = '';
@@ -600,9 +600,9 @@
       dotSource: el('dot-editor').value,
       fileName: 'pipeline.dot',
       displayName: 'Dashboard Run',
-      simulate: el('simulate').checked,
       autoApprove: el('auto-approve').checked,
       originalPrompt: el('generate-prompt').value.trim(),
+      ...llmPayload(),
     };
 
     try {

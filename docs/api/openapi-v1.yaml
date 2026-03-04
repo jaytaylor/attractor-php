@@ -470,7 +470,8 @@ components:
         dotSource: { type: string }
         fileName: { type: string }
         displayName: { type: string }
-        simulate: { type: boolean }
+        provider: { type: string, enum: [openai, anthropic] }
+        model: { type: string }
         autoApprove: { type: boolean }
         originalPrompt: { type: string }
     PendingQuestion:
@@ -490,14 +491,15 @@ components:
               label: { type: string }
     PipelineDetail:
       type: object
-      required: [id, status, archived, simulate, autoApprove, familyId, startedAtMs]
+      required: [id, status, archived, autoApprove, familyId, startedAtMs]
       properties:
         id: { type: string }
         displayName: { type: string }
         fileName: { type: string }
         status: { type: string }
         archived: { type: boolean }
-        simulate: { type: boolean }
+        provider: { type: string }
+        model: { type: string }
         autoApprove: { type: boolean }
         familyId: { type: string }
         originalPrompt: { type: string }

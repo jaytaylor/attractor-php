@@ -83,6 +83,12 @@ function extractPrompt(array $body): string
 function buildDot(string $prompt): string
 {
     $normalized = strtolower($prompt);
+    if (str_contains($normalized, 'strict pipeline validator') || str_contains($normalized, 'validation node:')) {
+        return "PASS: validation succeeded for current node output.\n";
+    }
+    if (str_contains($normalized, 'executing one node of a software-factory pipeline') || str_contains($normalized, 'node id:')) {
+        return "Task completed with concrete output for the current node.\n";
+    }
     if (str_contains($normalized, 'svg of a dog')) {
         return <<<SVG
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 120">

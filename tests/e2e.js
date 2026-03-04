@@ -187,7 +187,6 @@ async function main() {
     const created = await api('POST', '/api/v1/pipelines', {
       dotSource: iterated.dotSource,
       displayName: 'E2E Demo',
-      simulate: true,
     });
     log(`created run ${created.id}`);
 

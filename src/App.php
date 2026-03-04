@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AttractorPhp;
 
 use AttractorPhp\Domain\DotService;
+use AttractorPhp\Domain\DotGraphParser;
 use AttractorPhp\Domain\PipelineService;
 use AttractorPhp\Http\ApiError;
 use AttractorPhp\Http\Request;
@@ -12,6 +13,7 @@ use AttractorPhp\Http\Response;
 use AttractorPhp\Http\Router;
 use AttractorPhp\Http\Sse;
 use AttractorPhp\Llm\DotLlmService;
+use AttractorPhp\Llm\TaskLlmService;
 use AttractorPhp\Storage\RunStore;
 
 final class App
@@ -36,7 +38,9 @@ final class App
         $store = new RunStore($effectiveLogsRoot);
         $dot = new DotService();
         $dotLlm = new DotLlmService($dot);
-        $pipeline = new PipelineService($store, $dot);
+        $graphParser = new DotGraphParser();
+        $taskLlm = new TaskLlmService();
+        $pipeline = new PipelineService($store, $dot, $graphParser, $taskLlm);
         return new self($store, $dot, $dotLlm, $pipeline, $root . '/web');
     }
 
