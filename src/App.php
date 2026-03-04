@@ -37,8 +37,8 @@ final class App
         $effectiveLogsRoot = $logsRoot ?? (getenv('ATTRACTOR_LOGS_ROOT') ?: $root . '/.scratch/runs');
         $store = new RunStore($effectiveLogsRoot);
         $dot = new DotService();
-        $dotLlm = new DotLlmService($dot);
         $graphParser = new DotGraphParser();
+        $dotLlm = new DotLlmService($dot, $graphParser);
         $taskLlm = new TaskLlmService();
         $pipeline = new PipelineService($store, $dot, $graphParser, $taskLlm);
         return new self($store, $dot, $dotLlm, $pipeline, $root . '/web');

@@ -4,15 +4,18 @@ declare(strict_types=1);
 
 namespace AttractorPhp\Llm;
 
+use AttractorPhp\Domain\DotGraphParser;
 use AttractorPhp\Domain\DotService;
 use AttractorPhp\Http\ApiError;
 
 final class DotLlmService
 {
     private ?string $cachedGenerationExamples = null;
+    private readonly DotGraphParser $graphParser;
 
-    public function __construct(private readonly DotService $dotService)
+    public function __construct(private readonly DotService $dotService, ?DotGraphParser $graphParser = null)
     {
+        $this->graphParser = $graphParser ?? new DotGraphParser();
     }
 
     /** @param array<string,mixed> $options */
@@ -44,6 +47,10 @@ final class DotLlmService
     /** @param array<string,mixed> $options */
     private function requestValidDot(string $userPrompt, array $options, bool $isGenerationRequest): string
     {
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(240);
+        }
+
         $systemPrompt = implode("\n", [
             'You are a Graphviz DOT expert.',
             'Return only raw DOT source for exactly one digraph.',
@@ -52,6 +59,9 @@ final class DotLlmService
             'Generated workflows must model validation explicitly.',
             'Include at least one validation node plus pass/fail branching.',
             'The fail branch must kick work back to planning or implementation and then return through a follow-up validation node.',
+            'Use sensible retry loops: fail -> rework -> revised artifact -> follow-up validation.',
+            'If a Draft node exists, retry/fail loops should route back through Draft (or RevisedDraft) before re-validation.',
+            'Avoid trivial loops that jump from fail directly back to the same validator without substantive rework.',
             'If the request asks for SVG, image, or drawing content, still respond with DOT that models the concept as a graph.',
         ]);
         if ($isGenerationRequest) {
@@ -63,13 +73,21 @@ final class DotLlmService
 
         $diagnosticsHint = '';
         $lastCompletion = '';
-        for ($attempt = 1; $attempt <= 2; $attempt++) {
+        for ($attempt = 1; $attempt <= 3; $attempt++) {
             $completion = $this->complete($systemPrompt, $userPrompt . $diagnosticsHint, $options);
             $lastCompletion = $completion;
             $normalized = $this->normalizeCandidate($completion, $userPrompt);
             $validation = $this->dotService->validate($normalized);
             if ((bool) $validation['valid']) {
-                return (string) $validation['dotSource'];
+                $candidate = (string) $validation['dotSource'];
+                if ($isGenerationRequest) {
+                    $qualityDiagnostics = $this->generationQualityDiagnostics($candidate);
+                    if ($qualityDiagnostics !== []) {
+                        $diagnosticsHint = "\n\nThe previous output was syntactically valid but failed workflow quality checks. Fix these issues:\n- " . implode("\n- ", $qualityDiagnostics);
+                        continue;
+                    }
+                }
+                return $candidate;
             }
 
             $messages = array_map(
@@ -86,6 +104,212 @@ final class DotLlmService
         }
 
         throw new ApiError(502, 'INVALID_PROVIDER_RESPONSE', 'provider returned DOT that failed validation');
+    }
+
+    /** @return list<string> */
+    private function generationQualityDiagnostics(string $dotSource): array
+    {
+        try {
+            $graph = $this->graphParser->parse($dotSource);
+        } catch (\Throwable) {
+            return ['Unable to parse generated DOT graph for workflow quality checks.'];
+        }
+
+        $nodes = is_array($graph['nodes'] ?? null) ? $graph['nodes'] : [];
+        $outgoing = is_array($graph['outgoing'] ?? null) ? $graph['outgoing'] : [];
+        $diagnostics = [];
+        $validationNodeIds = [];
+        $reworkNodeIds = [];
+        $draftLikeNodeIds = [];
+
+        foreach ($nodes as $id => $node) {
+            if (!is_array($node)) {
+                continue;
+            }
+            $label = strtolower(trim((string) ($node['label'] ?? $id)));
+            $shape = strtolower(trim((string) ($node['shape'] ?? '')));
+            $text = strtolower($id . ' ' . $label);
+
+            if ($shape === 'diamond' || str_contains($text, 'validate') || str_contains($text, 'verification') || str_contains($text, 'quality gate')) {
+                $validationNodeIds[$id] = true;
+            }
+            if ($this->isReworkLikeText($text)) {
+                $reworkNodeIds[$id] = true;
+            }
+            if ($this->isDraftLikeText($text)) {
+                $draftLikeNodeIds[$id] = true;
+            }
+        }
+
+        if (count($validationNodeIds) < 2) {
+            $diagnostics[] = 'Include at least two validation nodes (initial + follow-up validation).';
+        }
+
+        $failEdges = [];
+        foreach ($validationNodeIds as $validationNodeId => $_trueValue) {
+            foreach ((array) ($outgoing[$validationNodeId] ?? []) as $edge) {
+                if (!is_array($edge)) {
+                    continue;
+                }
+                $label = strtolower(trim((string) ($edge['label'] ?? '')));
+                if ($label === '' || (!str_contains($label, 'fail') && !str_contains($label, 'retry') && !str_contains($label, 'rework'))) {
+                    continue;
+                }
+                $failEdges[] = [
+                    'from' => $validationNodeId,
+                    'to' => (string) ($edge['to'] ?? ''),
+                    'label' => $label,
+                ];
+            }
+        }
+
+        if ($failEdges === []) {
+            $diagnostics[] = 'Add at least one FAIL branch from a validation node into a rework loop.';
+            return $diagnostics;
+        }
+
+        foreach ($failEdges as $edge) {
+            $from = (string) ($edge['from'] ?? '');
+            $to = (string) ($edge['to'] ?? '');
+            if ($to === '') {
+                $diagnostics[] = "FAIL branch from {$from} is missing a target node.";
+                continue;
+            }
+            $targetNode = $nodes[$to] ?? [];
+            $targetLabel = is_array($targetNode) ? (string) ($targetNode['label'] ?? $to) : $to;
+            $targetText = strtolower($to . ' ' . $targetLabel);
+            if (isset($validationNodeIds[$to])) {
+                $diagnostics[] = "FAIL branch from {$from} jumps directly to validation node {$to}; route it to rework first.";
+                continue;
+            }
+            if (!isset($reworkNodeIds[$to]) && !$this->isEscalationLikeText($targetText)) {
+                $diagnostics[] = "FAIL branch target {$to} should be a planning/rework/implementation node.";
+            }
+
+            $pathToValidation = $this->findPathToNextValidation($to, $from, $outgoing, $validationNodeIds, 4);
+            if ($pathToValidation === null) {
+                if ($this->isEscalationLikeText($targetText)) {
+                    continue;
+                }
+                $diagnostics[] = "FAIL branch target {$to} must flow into a follow-up validation node.";
+                continue;
+            }
+
+            if ($draftLikeNodeIds !== [] && !$this->pathContainsDraftOrRework($pathToValidation, $nodes)) {
+                $diagnostics[] = "Retry path from {$to} should pass through a revised draft/implementation stage before validation.";
+            }
+        }
+
+        return array_values(array_unique($diagnostics));
+    }
+
+    /** @param array<string,list<array<string,mixed>>> $outgoing
+      * @param array<string,bool> $validationNodeIds
+      * @return list<string>|null
+      */
+    private function findPathToNextValidation(
+        string $startNodeId,
+        string $sourceValidationId,
+        array $outgoing,
+        array $validationNodeIds,
+        int $maxDepth
+    ): ?array {
+        $queue = [[
+            'node' => $startNodeId,
+            'path' => [$startNodeId],
+            'depth' => 0,
+        ]];
+        $visited = [$startNodeId => true];
+
+        while ($queue !== []) {
+            $current = array_shift($queue);
+            if (!is_array($current)) {
+                continue;
+            }
+
+            $nodeId = (string) ($current['node'] ?? '');
+            $depth = (int) ($current['depth'] ?? 0);
+            $path = is_array($current['path'] ?? null) ? $current['path'] : [$nodeId];
+
+            if ($depth > 0 && isset($validationNodeIds[$nodeId]) && $nodeId !== $sourceValidationId) {
+                return array_values(array_filter(array_map(static fn(mixed $id): string => (string) $id, $path), static fn(string $id): bool => $id !== ''));
+            }
+
+            if ($depth >= $maxDepth) {
+                continue;
+            }
+
+            foreach ((array) ($outgoing[$nodeId] ?? []) as $edge) {
+                if (!is_array($edge)) {
+                    continue;
+                }
+                $next = (string) ($edge['to'] ?? '');
+                if ($next === '' || isset($visited[$next])) {
+                    continue;
+                }
+                $visited[$next] = true;
+                $nextPath = $path;
+                $nextPath[] = $next;
+                $queue[] = [
+                    'node' => $next,
+                    'path' => $nextPath,
+                    'depth' => $depth + 1,
+                ];
+            }
+        }
+
+        return null;
+    }
+
+    /** @param list<string> $path
+      * @param array<string,array<string,mixed>> $nodes
+      */
+    private function pathContainsDraftOrRework(array $path, array $nodes): bool
+    {
+        foreach ($path as $nodeId) {
+            $node = $nodes[$nodeId] ?? [];
+            if (!is_array($node)) {
+                continue;
+            }
+            $label = strtolower(trim((string) ($node['label'] ?? $nodeId)));
+            $text = strtolower($nodeId . ' ' . $label);
+            if ($this->isDraftLikeText($text) || $this->isReworkLikeText($text)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function isDraftLikeText(string $text): bool
+    {
+        return str_contains($text, 'draft')
+            || str_contains($text, 'implement')
+            || str_contains($text, 'plan')
+            || str_contains($text, 'build')
+            || str_contains($text, 'design')
+            || str_contains($text, 'create');
+    }
+
+    private function isReworkLikeText(string $text): bool
+    {
+        return str_contains($text, 'rework')
+            || str_contains($text, 'fix')
+            || str_contains($text, 'retry')
+            || str_contains($text, 'revise')
+            || str_contains($text, 'adjust')
+            || str_contains($text, 'improve')
+            || str_contains($text, 'repair')
+            || $this->isDraftLikeText($text);
+    }
+
+    private function isEscalationLikeText(string $text): bool
+    {
+        return str_contains($text, 'escalate')
+            || str_contains($text, 'review')
+            || str_contains($text, 'manual')
+            || str_contains($text, 'human')
+            || str_contains($text, 'approve')
+            || str_contains($text, 'decision');
     }
 
     private function generationExamplesPrompt(): string
