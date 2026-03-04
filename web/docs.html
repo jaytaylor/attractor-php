@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Attractor PHP Docs</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <main>
+      <article class="panel docs-page">
+        <h1>Attractor PHP Dashboard Docs</h1>
+        <p>Use <code>/</code> for the live dashboard and <code>/docs</code> for this static reference.</p>
+
+        <h2>Core API</h2>
+        <ul>
+          <li><code>GET /api/v1/pipelines</code>, <code>POST /api/v1/pipelines</code></li>
+          <li><code>GET /api/v1/pipelines/{id}</code>, <code>POST /api/v1/pipelines/{id}/cancel</code></li>
+          <li><code>GET /api/v1/pipelines/{id}/events</code>, <code>GET /api/v1/events</code></li>
+          <li><code>GET /api/v1/pipelines/{id}/questions</code>, <code>POST /api/v1/pipelines/{id}/questions/{qid}/answer</code></li>
+          <li><code>POST /api/v1/dot/generate/stream</code>, <code>POST /api/v1/dot/fix/stream</code>, <code>POST /api/v1/dot/iterate/stream</code></li>
+        </ul>
+
+        <h2>SSE Contract</h2>
+        <p>Each SSE response is <code>text/event-stream</code> and sends newline-delimited <code>data: {json}</code> frames.</p>
+        <pre class="log">data: {"type":"Snapshot","payload":{...}}
+
+data: {"runId":"run-...","type":"StageCompleted","payload":{...}}</pre>
+      </article>
+    </main>
+  </body>
+</html>

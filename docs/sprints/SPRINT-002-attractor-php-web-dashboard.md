@@ -23,7 +23,7 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
 - This sprint assumes the Attractor engine and core run directory artifacts exist (see Sprint 001’s objective: full NLSpec parity). If that foundation is missing, Phase 1 must include the minimum scaffolding to run pipelines and emit events.
 - This sprint assumes the local Corey’s Attractor reference repo exists at `../../coreys-attractor/` (relative to this document). If it is missing, Phase 0 must include fetching it and recording the pinned commit hash in the evidence log so code references remain stable.
 
-## Current State Snapshot (2026-03-03)
+## Current State Snapshot (2026-03-04)
 - This repo is currently NLSpecs + docs only (no PHP runtime implementation, no HTTP server, no UI assets).
 - A local reference implementation of a similar dashboard approach exists in this worktree (`coreys-attractor/`) and is used only as inspiration (not a deliverable).
 
@@ -50,6 +50,113 @@ What must carry over into Attractor PHP (behavioral contract, not implementation
 
 ## Execution Order
 Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
+
+## Implementation Plan (Execution Blueprint)
+This section translates the sprint requirements into an implementation-ready plan with concrete repository targets, sequencing, and verification scopes.
+
+### 1) Pre-Implementation Gates (must pass before coding)
+1. Confirm whether Sprint 001 runtime artifacts already exist in this repo.
+2. If Sprint 001 is incomplete, implement only the minimum HTTP runtime scaffolding required by this sprint:
+   - Pipeline run registry
+   - Run directory persistence
+   - Event bus + SSE fanout
+   - Human-gate queueing + answer submission
+3. Create and record ADR entries in `docs/ADR.md` before endpoint/UI implementation:
+   - Dashboard serving architecture (embedded static assets)
+   - SSE contract (`Snapshot` then deltas)
+   - DOT validation/render strategy (Graphviz dependency behavior)
+   - LLM-backed DOT generation/fix/iterate strategy (with simulation fallback)
+
+### 2) Planned Repository Targets (implementation map)
+The implementation should create or extend these areas so engineers can work in parallel with minimal conflicts.
+
+| Area | Path(s) | Responsibilities |
+|---|---|---|
+| HTTP entrypoint + routing | `bin/attractor`, `src/Web/HttpServer.php`, `src/Web/Router.php` | Serve `/`, `/docs`, JSON API, and SSE endpoints |
+| API handlers (runs/events/human/artifacts) | `src/Web/Api/*` | Implement `/api/v1/pipelines*`, `/api/v1/events`, questions, archive/delete/cancel |
+| DOT handlers | `src/Web/Dot/*` | Validate/render + generate/fix/iterate (sync + streaming) |
+| Run state + persistence | `src/Pipeline/Runtime/*`, `src/Pipeline/RunStore/*` | Manifest/checkpoint/context loading, artifact enumeration, run status transitions |
+| SSE streaming | `src/Web/Sse/*` | Framing, subscriber registry, snapshot-first connect behavior |
+| Dashboard static app | `web/index.html`, `web/app.js`, `web/styles.css` | Monitor/Create/Archived/Docs views and API integration |
+| API + contract docs | `docs/api/openapi-v1.yaml`, `docs/api/web-dashboard.md` | Authoritative endpoint contracts and request/response shapes |
+| Verification harness | `.scratch/tests/SPRINT-002/*`, `.scratch/verification/SPRINT-002/*` | Guardrail checks, API probes, SSE probes, UI evidence artifacts |
+
+### 3) Phase-by-Phase Engineering Workplan
+Follow this order to minimize rework and unblock parallel UI/API work quickly.
+
+#### Phase 0 Implementation Sequence (contracts + foundations)
+1. Add/extend `docs/ADR.md` with Sprint 002 architecture decisions.
+2. Publish OpenAPI v1 spec and SSE contract docs under `docs/api/`.
+3. Extract and pin Coreys Attractor reference commit + notes into `.scratch/refs/SPRINT-002/`.
+4. Create `.scratch/verification/SPRINT-002/` evidence tree and guardrail script in `.scratch/tests/SPRINT-002/`.
+5. Materialize mermaid source files in `.scratch/mermaid/SPRINT-002/` and render outputs into `.scratch/verification/SPRINT-002/phase0/diagrams/`.
+
+#### Phase 1 Implementation Sequence (backend first usable surface)
+1. Build HTTP router + static file serving (`/`, `/docs`).
+2. Implement run lifecycle endpoints (`list/create/get/cancel/delete/archive/unarchive`).
+3. Implement run state endpoints (`checkpoint/context`) and artifact endpoints.
+4. Implement global + per-run SSE with snapshot-first semantics.
+5. Implement human-gate endpoints and run-state validation rules.
+6. Implement DOT validate/render endpoints.
+7. Implement DOT generate/fix/iterate (sync + streaming), including markdown-fence stripping.
+8. Implement iterate-run lineage-preserving endpoint (`familyId` contract).
+9. Add spec-core alias routes as thin wrappers around v1 handlers.
+
+#### Phase 2 Implementation Sequence (Monitor UI)
+1. Build navigation shell and route state (Monitor/Create/Archived/Docs).
+2. Implement run list + run detail loading.
+3. Wire SSE subscriptions and state reducers (snapshot then deltas).
+4. Add stage list, live log, graph panel, and artifact viewer.
+5. Add human-gate interaction UI and action controls (cancel/archive/delete).
+6. Add iterate entrypoint for terminal runs into Create iterate mode.
+
+#### Phase 3 Implementation Sequence (Create UI + history)
+1. Build DOT editor flow: validate -> render preview -> run.
+2. Add streaming DOT generation UX (delta append + done handling).
+3. Add fix workflow from validation/render failures (streaming).
+4. Add iterate mode UX (`baseDot` + change request -> streamed modified DOT).
+5. Wire create/iterate run creation and lineage-aware navigation back to Monitor.
+6. Finalize Archived and Docs views.
+
+#### Phase 4 Implementation Sequence (hardening + proof)
+1. Complete backend contract test suites for every UI-called endpoint.
+2. Complete SSE contract tests (framing, ordering, reconnect snapshot behavior).
+3. Complete browser E2E for Monitor/Create/Archived + negative scenarios.
+4. Finalize developer/operator docs and attach final evidence index.
+
+### 4) Parallelization Plan (safe concurrent streams)
+Use these parallel streams once Phase 0 contracts are merged:
+- Stream A: backend API + run-store + SSE implementation (Phase 1)
+- Stream B: dashboard shell + Monitor UI skeleton (Phase 2 scaffolding against mock JSON)
+- Stream C: DOT agentic-loop backend + Create UI streaming UX (Phase 1.25-1.28 and Phase 3)
+- Stream D: verification harness and guardrail scripts (Phase 4 prep, starts in Phase 0)
+
+Merge gates:
+1. Merge Gate A (end of Phase 1): API + SSE contracts pass automated probes.
+2. Merge Gate B (end of Phase 2/3): UI flows pass E2E positive/negative baselines.
+3. Merge Gate C (end of Phase 4): full evidence tree complete and docs finalized.
+
+### 5) Verification Plan (implementation proof strategy)
+For every endpoint and major UI flow, provide both positive and negative proofs with durable artifacts.
+
+Backend proof sets:
+1. Contract tests: shape/status/error envelope conformance for all API paths.
+2. State transition tests: running -> completed/failed/cancelled with persisted run artifacts.
+3. Security tests: artifact path traversal rejection and output escaping behavior.
+4. DOT loop tests: generate/fix/iterate (sync + streaming) with delta/done/error semantics.
+5. Simulation tests: deterministic completion with no external model dependencies.
+
+UI proof sets:
+1. Monitor live updates via SSE and correct state convergence after reconnect.
+2. Human-gate handling end-to-end.
+3. Create flow validate/render/run happy path + invalid DOT blocking path.
+4. Fix/iterate flows with streaming deltas and terminal `done` behavior.
+5. Archive/unarchive/delete safety and clear user feedback on invalid actions.
+
+Evidence completion gate:
+1. No checklist item is marked `[X]` without command, exit code, and artifact links.
+2. Guardrail script must fail when placeholders remain under completed items.
+3. Mermaid renders must be present and verifiably generated from tracked sources.
 
 ## Product Requirements (User Flows)
 1. **Create a pipeline run**

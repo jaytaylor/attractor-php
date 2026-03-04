@@ -1,0 +1,171 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Attractor PHP Dashboard</title>
+    <link rel="stylesheet" href="/styles.css">
+  </head>
+  <body>
+    <div class="bg-shape bg-shape-a" aria-hidden="true"></div>
+    <div class="bg-shape bg-shape-b" aria-hidden="true"></div>
+    <header class="topbar">
+      <div class="brand">
+        <span class="brand-mark">A</span>
+        <div>
+          <h1>Attractor PHP</h1>
+          <p>Pipeline Dashboard</p>
+        </div>
+      </div>
+      <nav class="tabs" id="tabs">
+        <button data-view="monitor" class="tab active">Monitor</button>
+        <button data-view="create" class="tab">Create</button>
+        <button data-view="archived" class="tab">Archived</button>
+        <button data-view="docs" class="tab">Docs</button>
+      </nav>
+    </header>
+
+    <main>
+      <section id="flash" class="flash hidden"></section>
+
+      <section id="view-monitor" class="view active">
+        <div class="grid-two">
+          <aside class="panel">
+            <div class="panel-head">
+              <h2>Runs</h2>
+              <button id="refresh-runs" class="btn ghost">Refresh</button>
+            </div>
+            <ul id="run-list" class="run-list"></ul>
+          </aside>
+
+          <article class="panel" id="run-detail-panel">
+            <div id="run-detail-empty">Select a run to inspect status, graph, logs, artifacts, and questions.</div>
+            <div id="run-detail" class="hidden">
+              <div class="panel-head">
+                <h2 id="run-title"></h2>
+                <div class="actions">
+                  <button id="cancel-run" class="btn warning">Cancel</button>
+                  <button id="archive-run" class="btn">Archive</button>
+                  <button id="unarchive-run" class="btn">Unarchive</button>
+                  <button id="iterate-run" class="btn">Iterate</button>
+                  <button id="delete-run" class="btn danger">Delete</button>
+                </div>
+              </div>
+              <div id="run-meta" class="meta"></div>
+
+              <div class="subgrid">
+                <section class="subpanel">
+                  <h3>Stages</h3>
+                  <ul id="stage-list"></ul>
+                </section>
+                <section class="subpanel">
+                  <h3>Pending Question</h3>
+                  <div id="question-box">No pending questions.</div>
+                </section>
+              </div>
+
+              <section class="subpanel">
+                <h3>Graph</h3>
+                <div class="actions">
+                  <button id="download-dot" class="btn ghost">Download .dot</button>
+                </div>
+                <div id="graph-svg" class="graph"></div>
+              </section>
+
+              <div class="subgrid">
+                <section class="subpanel">
+                  <h3>Live Log</h3>
+                  <pre id="live-log" class="log"></pre>
+                </section>
+                <section class="subpanel">
+                  <h3>Artifacts</h3>
+                  <div class="actions">
+                    <button id="download-zip" class="btn ghost">Download ZIP</button>
+                  </div>
+                  <ul id="artifact-list"></ul>
+                  <pre id="artifact-preview" class="log"></pre>
+                </section>
+              </div>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="view-create" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Create / Iterate Pipeline</h2>
+            <div class="actions">
+              <label><input type="checkbox" id="simulate" checked> simulate</label>
+              <label><input type="checkbox" id="auto-approve"> autoApprove</label>
+            </div>
+          </div>
+
+          <div class="subgrid">
+            <section class="subpanel">
+              <h3>Generate DOT</h3>
+              <textarea id="generate-prompt" rows="3" placeholder="Describe the pipeline goal..."></textarea>
+              <div class="actions">
+                <button id="generate-dot" class="btn">Generate (stream)</button>
+              </div>
+            </section>
+            <section class="subpanel">
+              <h3>Iterate Existing DOT</h3>
+              <textarea id="iterate-changes" rows="3" placeholder="Describe changes to existing DOT..."></textarea>
+              <div class="actions">
+                <button id="iterate-dot" class="btn">Iterate (stream)</button>
+                <span id="iterate-source" class="small"></span>
+              </div>
+            </section>
+          </div>
+
+          <section class="subpanel">
+            <h3>DOT Editor</h3>
+            <textarea id="dot-editor" rows="16" spellcheck="false">digraph demo {
+  start -> plan;
+  plan -> implement;
+  implement -> test;
+  test -> exit;
+}
+            </textarea>
+            <div class="actions">
+              <button id="validate-dot" class="btn">Validate</button>
+              <button id="preview-dot" class="btn">Preview</button>
+              <button id="fix-dot" class="btn warning">Fix DOT</button>
+              <button id="run-dot" class="btn primary" disabled>Run</button>
+            </div>
+            <pre id="dot-diagnostics" class="log"></pre>
+            <div id="dot-preview" class="graph"></div>
+          </section>
+        </article>
+      </section>
+
+      <section id="view-archived" class="view">
+        <article class="panel">
+          <div class="panel-head">
+            <h2>Archived Runs</h2>
+            <button id="refresh-archived" class="btn ghost">Refresh</button>
+          </div>
+          <ul id="archived-list" class="run-list"></ul>
+        </article>
+      </section>
+
+      <section id="view-docs" class="view">
+        <article class="panel">
+          <h2>Dashboard Docs</h2>
+          <p>This embedded UI talks to the JSON + SSE API served by Attractor PHP.</p>
+          <ul>
+            <li><code>GET /api/v1/pipelines</code> list runs</li>
+            <li><code>POST /api/v1/pipelines</code> create run</li>
+            <li><code>GET /api/v1/events</code> global SSE snapshot + deltas</li>
+            <li><code>POST /api/v1/dot/generate/stream</code> streaming DOT generation</li>
+            <li><code>POST /api/v1/dot/fix/stream</code> streaming DOT fix</li>
+            <li><code>POST /api/v1/dot/iterate/stream</code> streaming DOT iterate</li>
+          </ul>
+        </article>
+      </section>
+    </main>
+
+    <script src="/app.js"></script>
+  </body>
+</html>

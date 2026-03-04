@@ -1,0 +1,27 @@
+#!/usr/bin/env php
+<?php
+
+declare(strict_types=1);
+
+$root = dirname(__DIR__);
+$public = $root . '/public';
+
+$argv = $_SERVER['argv'] ?? [];
+$command = $argv[1] ?? 'help';
+
+if ($command === 'serve') {
+    $host = $argv[2] ?? '127.0.0.1';
+    $port = $argv[3] ?? '8080';
+    $router = $public . '/index.php';
+    $cmd = sprintf('php -S %s:%s %s', escapeshellarg($host), escapeshellarg($port), escapeshellarg($router));
+    passthru($cmd, $exitCode);
+    exit($exitCode);
+}
+
+if ($command === 'help') {
+    fwrite(STDOUT, "Attractor PHP\n\nUsage:\n  bin/attractor serve [host] [port]\n");
+    exit(0);
+}
+
+fwrite(STDERR, "Unknown command: {$command}\n");
+exit(1);

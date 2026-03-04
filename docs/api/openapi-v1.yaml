@@ -1,0 +1,467 @@
+openapi: 3.1.0
+info:
+  title: Attractor PHP Web Dashboard API
+  version: 1.0.0
+servers:
+  - url: http://127.0.0.1:8080
+paths:
+  /api/v1/pipelines:
+    get:
+      summary: List pipeline runs
+      parameters:
+        - in: query
+          name: includeArchived
+          schema: { type: boolean }
+      responses:
+        '200':
+          description: Runs list
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PipelineDetail' }
+    post:
+      summary: Create run from DOT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: '#/components/schemas/CreateRunRequest' }
+      responses:
+        '201':
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [id, status]
+                properties:
+                  id: { type: string }
+                  status: { type: string }
+        '400':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}:
+    get:
+      summary: Get run detail
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Run detail
+          content:
+            application/json:
+              schema: { $ref: '#/components/schemas/PipelineDetail' }
+        '404':
+          $ref: '#/components/responses/ErrorEnvelope'
+    delete:
+      summary: Delete non-running run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200': { description: Deleted }
+        '404':
+          $ref: '#/components/responses/ErrorEnvelope'
+        '409':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/cancel:
+    post:
+      summary: Cancel running run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200': { description: Cancelled }
+        '409':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/archive:
+    post:
+      summary: Archive terminal run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200': { description: Archived }
+        '409':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/unarchive:
+    post:
+      summary: Unarchive terminal run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200': { description: Unarchived }
+        '409':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/events:
+    get:
+      summary: Per-run SSE stream
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /api/v1/events:
+    get:
+      summary: Global SSE stream
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema:
+                type: string
+  /api/v1/pipelines/{id}/questions:
+    get:
+      summary: List pending questions
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Pending questions
+          content:
+            application/json:
+              schema:
+                type: array
+                items: { $ref: '#/components/schemas/PendingQuestion' }
+  /api/v1/pipelines/{id}/questions/{qid}/answer:
+    post:
+      summary: Submit answer
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - in: path
+          name: qid
+          required: true
+          schema: { type: string }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [answer]
+              properties:
+                answer: { type: string }
+      responses:
+        '200': { description: Answer accepted }
+        '400':
+          $ref: '#/components/responses/ErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/graph:
+    get:
+      summary: Graph SVG for run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: SVG
+          content:
+            image/svg+xml:
+              schema: { type: string }
+  /api/v1/pipelines/{id}/artifacts:
+    get:
+      summary: List artifacts
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Artifacts list
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  required: [path, sizeBytes, isText]
+                  properties:
+                    path: { type: string }
+                    sizeBytes: { type: integer }
+                    isText: { type: boolean }
+  /api/v1/pipelines/{id}/artifacts/{path}:
+    get:
+      summary: Fetch artifact file
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+        - in: path
+          name: path
+          required: true
+          schema: { type: string }
+      responses:
+        '200':
+          description: Artifact payload
+        '400':
+          $ref: '#/components/responses/ErrorEnvelope'
+        '404':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/pipelines/{id}/artifacts.zip:
+    get:
+      summary: Download artifacts zip
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Zip payload
+          content:
+            application/zip:
+              schema: { type: string, format: binary }
+  /api/v1/pipelines/{id}/checkpoint:
+    get:
+      summary: Checkpoint snapshot
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Checkpoint
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [current_node, completed_nodes, timestamp]
+                properties:
+                  current_node: { type: string }
+                  completed_nodes:
+                    type: array
+                    items: { type: string }
+                  timestamp: { type: string }
+  /api/v1/pipelines/{id}/context:
+    get:
+      summary: Context key/value snapshot
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      responses:
+        '200':
+          description: Context snapshot
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+  /api/v1/pipelines/{id}/iterate:
+    post:
+      summary: Create lineage-preserving iteration run
+      parameters:
+        - $ref: '#/components/parameters/RunId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dotSource]
+              properties:
+                dotSource: { type: string }
+                originalPrompt: { type: string }
+      responses:
+        '200':
+          description: Iterated run id
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [newId]
+                properties:
+                  newId: { type: string }
+  /api/v1/dot/validate:
+    post:
+      summary: Validate DOT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dotSource]
+              properties:
+                dotSource: { type: string }
+      responses:
+        '200':
+          description: Validation result
+  /api/v1/dot/render:
+    post:
+      summary: Render DOT to SVG
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dotSource]
+              properties:
+                dotSource: { type: string }
+      responses:
+        '200': { description: SVG wrapper }
+        '400':
+          $ref: '#/components/responses/ErrorEnvelope'
+  /api/v1/dot/generate:
+    post:
+      summary: Generate DOT from prompt
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string }
+      responses:
+        '200': { description: Generated DOT }
+  /api/v1/dot/generate/stream:
+    post:
+      summary: Streaming DOT generation
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [prompt]
+              properties:
+                prompt: { type: string }
+      responses:
+        '200':
+          description: SSE stream with delta and done frames
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /api/v1/dot/fix:
+    post:
+      summary: Fix invalid DOT
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dotSource]
+              properties:
+                dotSource: { type: string }
+                error: { type: string }
+      responses:
+        '200': { description: Fixed DOT }
+  /api/v1/dot/fix/stream:
+    post:
+      summary: Streaming DOT fix
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [dotSource]
+              properties:
+                dotSource: { type: string }
+                error: { type: string }
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+  /api/v1/dot/iterate:
+    post:
+      summary: Modify DOT from NL changes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseDot, changes]
+              properties:
+                baseDot: { type: string }
+                changes: { type: string }
+      responses:
+        '200': { description: Iterated DOT }
+  /api/v1/dot/iterate/stream:
+    post:
+      summary: Streaming DOT iteration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [baseDot, changes]
+              properties:
+                baseDot: { type: string }
+                changes: { type: string }
+      responses:
+        '200':
+          description: SSE stream
+          content:
+            text/event-stream:
+              schema: { type: string }
+components:
+  parameters:
+    RunId:
+      in: path
+      name: id
+      required: true
+      schema: { type: string }
+  responses:
+    ErrorEnvelope:
+      description: Structured error payload
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorEnvelope'
+  schemas:
+    ErrorEnvelope:
+      type: object
+      required: [error, code]
+      properties:
+        error: { type: string }
+        code: { type: string }
+    CreateRunRequest:
+      type: object
+      required: [dotSource]
+      properties:
+        dotSource: { type: string }
+        fileName: { type: string }
+        displayName: { type: string }
+        simulate: { type: boolean }
+        autoApprove: { type: boolean }
+        originalPrompt: { type: string }
+    PendingQuestion:
+      type: object
+      required: [id, stage, type, text]
+      properties:
+        id: { type: string }
+        stage: { type: string }
+        type: { type: string }
+        text: { type: string }
+        options:
+          type: array
+          items:
+            type: object
+            properties:
+              key: { type: string }
+              label: { type: string }
+    PipelineDetail:
+      type: object
+      required: [id, status, archived, simulate, autoApprove, familyId, startedAtMs]
+      properties:
+        id: { type: string }
+        displayName: { type: string }
+        fileName: { type: string }
+        status: { type: string }
+        archived: { type: boolean }
+        simulate: { type: boolean }
+        autoApprove: { type: boolean }
+        familyId: { type: string }
+        originalPrompt: { type: string }
+        startedAtMs: { type: integer }
+        finishedAtMs: { type: [integer, 'null'] }
+        currentNodeId: { type: string }
+        stages:
+          type: array
+          items:
+            type: object
+            additionalProperties: true
+        logs:
+          type: array
+          items: { type: string }
+        dotSource: { type: string }

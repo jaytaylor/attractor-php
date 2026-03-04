@@ -1,0 +1,394 @@
+<?php
+
+declare(strict_types=1);
+
+require_once dirname(__DIR__) . '/src/Autoload.php';
+
+use AttractorPhp\App;
+use AttractorPhp\Http\Request;
+
+final class TestFailed extends RuntimeException
+{
+}
+
+final class Harness
+{
+    private int $assertions = 0;
+
+    /** @var list<string> */
+    private array $failures = [];
+
+    public function run(string $name, callable $test): void
+    {
+        try {
+            $test();
+            fwrite(STDOUT, "PASS {$name}\n");
+        } catch (Throwable $t) {
+            $this->failures[] = "FAIL {$name}: {$t->getMessage()}";
+            fwrite(STDOUT, end($this->failures) . "\n");
+        }
+    }
+
+    public function assertTrue(bool $condition, string $message): void
+    {
+        $this->assertions++;
+        if (!$condition) {
+            throw new TestFailed($message);
+        }
+    }
+
+    public function assertSame(mixed $expected, mixed $actual, string $message): void
+    {
+        $this->assertions++;
+        if ($expected !== $actual) {
+            throw new TestFailed($message . ' expected=' . var_export($expected, true) . ' actual=' . var_export($actual, true));
+        }
+    }
+
+    public function assertContains(string $needle, string $haystack, string $message): void
+    {
+        $this->assertions++;
+        if (!str_contains($haystack, $needle)) {
+            throw new TestFailed($message . ' missing=' . $needle);
+        }
+    }
+
+    public function summary(): int
+    {
+        fwrite(STDOUT, "\nAssertions: {$this->assertions}\n");
+        if ($this->failures !== []) {
+            fwrite(STDERR, implode("\n", $this->failures) . "\n");
+            return 1;
+        }
+        return 0;
+    }
+}
+
+/** @return array{status:int,headers:array<string,string>,body:string,json:array<string,mixed>|list<mixed>|null} */
+function callApi(App $app, string $method, string $path, ?array $body = null): array
+{
+    $parts = parse_url($path);
+    $routePath = $parts['path'] ?? $path;
+    $query = [];
+    parse_str($parts['query'] ?? '', $query);
+    $request = new Request($method, $routePath, $query, [], $body ? (json_encode($body) ?: '{}') : '');
+    $response = $app->handle($request);
+
+    $json = null;
+    $contentType = $response->headers['content-type'] ?? '';
+    if (str_contains($contentType, 'application/json')) {
+        $decoded = json_decode($response->body, true);
+        if (is_array($decoded)) {
+            $json = $decoded;
+        }
+    }
+
+    return [
+        'status' => $response->status,
+        'headers' => $response->headers,
+        'body' => $response->body,
+        'json' => $json,
+    ];
+}
+
+/** @return list<array<string,mixed>> */
+function parseSse(string $raw): array
+{
+    $events = [];
+    foreach (explode("\n\n", trim($raw)) as $frame) {
+        $line = trim($frame);
+        if (!str_starts_with($line, 'data: ')) {
+            continue;
+        }
+        $payload = json_decode(substr($line, 6), true);
+        if (is_array($payload)) {
+            $events[] = $payload;
+        }
+    }
+    return $events;
+}
+
+$logsRoot = dirname(__DIR__) . '/.scratch/tests/SPRINT-002/runs';
+if (is_dir($logsRoot)) {
+    $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($logsRoot, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
+    foreach ($it as $item) {
+        if ($item->isDir()) {
+            rmdir($item->getPathname());
+        } else {
+            unlink($item->getPathname());
+        }
+    }
+    rmdir($logsRoot);
+}
+mkdir($logsRoot, 0777, true);
+
+$app = App::createDefault($logsRoot);
+$h = new Harness();
+
+$h->run('root and docs served', function () use ($h, $app): void {
+    $root = callApi($app, 'GET', '/');
+    $h->assertSame(200, $root['status'], '/ should be available');
+    $h->assertContains('Attractor PHP', $root['body'], 'root HTML');
+
+    $docs = callApi($app, 'GET', '/docs');
+    $h->assertSame(200, $docs['status'], '/docs should be available');
+    $h->assertContains('Dashboard Docs', $docs['body'], 'docs HTML');
+
+    $h->assertSame('*', $root['headers']['access-control-allow-origin'] ?? '', 'CORS header should exist');
+});
+
+$h->run('dot validate and render', function () use ($h, $app): void {
+    $valid = callApi($app, 'POST', '/api/v1/dot/validate', ['dotSource' => 'digraph P { a -> b; }']);
+    $h->assertSame(200, $valid['status'], 'valid dot should pass');
+    $h->assertTrue((bool) ($valid['json']['valid'] ?? false), 'valid=true');
+
+    $invalid = callApi($app, 'POST', '/api/v1/dot/validate', ['dotSource' => 'digraph P { a -> ; }']);
+    $h->assertSame(200, $invalid['status'], 'validate endpoint still 200 with diagnostics');
+    $h->assertTrue(!(bool) ($invalid['json']['valid'] ?? true), 'invalid dot should fail');
+
+    $render = callApi($app, 'POST', '/api/v1/dot/render', ['dotSource' => 'digraph P { a -> b; }']);
+    $h->assertSame(200, $render['status'], 'render should work');
+    $h->assertContains('<svg', (string) ($render['json']['svg'] ?? ''), 'svg payload expected');
+});
+
+$h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): void {
+    $generate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'Create build pipeline']);
+    $h->assertSame(200, $generate['status'], 'generate should work');
+    $h->assertContains('digraph', (string) ($generate['json']['dotSource'] ?? ''), 'dot content expected');
+
+    $generateMissing = callApi($app, 'POST', '/api/v1/dot/generate', []);
+    $h->assertSame(400, $generateMissing['status'], 'missing prompt should fail');
+
+    $stream = callApi($app, 'POST', '/api/v1/dot/generate/stream', ['prompt' => 'Stream this']);
+    $h->assertSame(200, $stream['status'], 'stream endpoint should work');
+    $h->assertContains('text/event-stream', $stream['headers']['content-type'] ?? '', 'stream content type');
+    $events = parseSse($stream['body']);
+    $h->assertTrue(count($events) >= 2, 'expect delta + done');
+    $h->assertTrue(isset($events[count($events) - 1]['done']), 'last event should be done');
+
+    $fix = callApi($app, 'POST', '/api/v1/dot/fix', ['dotSource' => 'digraph P { a -> ; }', 'error' => 'syntax']);
+    $h->assertSame(200, $fix['status'], 'fix should work');
+
+    $fixMissing = callApi($app, 'POST', '/api/v1/dot/fix', ['error' => 'missing']);
+    $h->assertSame(400, $fixMissing['status'], 'fix missing dotSource');
+
+    $iterate = callApi($app, 'POST', '/api/v1/dot/iterate', ['baseDot' => 'digraph P { start -> exit; }', 'changes' => 'add approval gate']);
+    $h->assertSame(200, $iterate['status'], 'iterate should work');
+    $h->assertContains('change_', (string) ($iterate['json']['dotSource'] ?? ''), 'iterated node expected');
+
+    $iterateMissing = callApi($app, 'POST', '/api/v1/dot/iterate', ['baseDot' => 'digraph P { start -> exit; }']);
+    $h->assertSame(400, $iterateMissing['status'], 'iterate missing changes');
+});
+
+$h->run('pipeline create/get/list', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph P { start -> plan; plan -> implement; implement -> exit; }',
+        'displayName' => 'Run One',
+        'simulate' => true,
+    ]);
+    $h->assertSame(201, $create['status'], 'create should return 201');
+    $runId = (string) ($create['json']['id'] ?? '');
+    $h->assertTrue($runId !== '', 'run id expected');
+
+    $get = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $h->assertSame(200, $get['status'], 'get run should work');
+    $h->assertSame($runId, (string) ($get['json']['id'] ?? ''), 'get run id match');
+    $h->assertSame('completed', (string) ($get['json']['status'] ?? ''), 'run should complete in simulation');
+
+    $list = callApi($app, 'GET', '/api/v1/pipelines');
+    $h->assertSame(200, $list['status'], 'list should work');
+    $h->assertTrue(count($list['json']) >= 1, 'at least one run listed');
+
+    $badCreate = callApi($app, 'POST', '/api/v1/pipelines', ['dotSource' => '']);
+    $h->assertSame(400, $badCreate['status'], 'empty dot should fail');
+});
+
+$h->run('run artifacts/graph/checkpoint/context', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph G { start -> implement; implement -> exit; }',
+        'displayName' => 'Artifacts Run',
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+
+    $graph = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/graph');
+    $h->assertSame(200, $graph['status'], 'graph should work');
+    $h->assertContains('<svg', $graph['body'], 'graph body should be svg');
+
+    $artifacts = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts');
+    $h->assertSame(200, $artifacts['status'], 'artifact list should work');
+    $h->assertTrue(count($artifacts['json']) >= 1, 'artifact files expected');
+
+    $firstPath = (string) ($artifacts['json'][0]['path'] ?? '');
+    $artifact = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts/' . $firstPath);
+    $h->assertSame(200, $artifact['status'], 'artifact fetch should work');
+
+    $traversal = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts/../manifest.json');
+    $h->assertTrue(in_array($traversal['status'], [400, 404], true), 'path traversal must be rejected');
+
+    $zip = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts.zip');
+    $h->assertSame(200, $zip['status'], 'zip should work');
+    $h->assertContains('application/zip', $zip['headers']['content-type'] ?? '', 'zip content type');
+
+    $checkpoint = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/checkpoint');
+    $h->assertSame(200, $checkpoint['status'], 'checkpoint should work');
+    $h->assertTrue(isset($checkpoint['json']['current_node']), 'checkpoint shape');
+
+    $context = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/context');
+    $h->assertSame(200, $context['status'], 'context should work');
+    $h->assertTrue(isset($context['json']['graph.goal']), 'context shape');
+
+    $missingContext = callApi($app, 'GET', '/api/v1/pipelines/does-not-exist/context');
+    $h->assertSame(404, $missingContext['status'], 'missing run context should 404');
+});
+
+$h->run('sse snapshot then events (run + global)', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph S { start -> implement; implement -> exit; }',
+        'displayName' => 'SSE Run',
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+
+    $perRun = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/events');
+    $h->assertSame(200, $perRun['status'], 'run sse should work');
+    $runEvents = parseSse($perRun['body']);
+    $h->assertSame('Snapshot', (string) ($runEvents[0]['type'] ?? ''), 'first per-run event should be snapshot');
+
+    $global = callApi($app, 'GET', '/api/v1/events');
+    $h->assertSame(200, $global['status'], 'global sse should work');
+    $globalEvents = parseSse($global['body']);
+    $h->assertSame('Snapshot', (string) ($globalEvents[0]['type'] ?? ''), 'first global event should be snapshot');
+});
+
+$h->run('human gate question and answer flow', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph H { start -> review_gate; review_gate -> exit; }',
+        'displayName' => 'Human Run',
+        'autoApprove' => false,
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+
+    $run = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $h->assertSame('waiting_human', (string) ($run['json']['status'] ?? ''), 'human gate should pause run');
+
+    $questions = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/questions');
+    $h->assertSame(200, $questions['status'], 'question list should work');
+    $qid = (string) ($questions['json'][0]['id'] ?? '');
+    $h->assertTrue($qid !== '', 'question id expected');
+
+    $badAnswer = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/questions/' . $qid . '/answer', ['answer' => 'Z']);
+    $h->assertSame(400, $badAnswer['status'], 'invalid answer option should fail');
+
+    $missingQ = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/questions/nope/answer', ['answer' => 'A']);
+    $h->assertSame(404, $missingQ['status'], 'unknown question should fail');
+
+    $ok = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/questions/' . $qid . '/answer', ['answer' => 'A']);
+    $h->assertSame(200, $ok['status'], 'answer should resume run');
+
+    $final = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $h->assertSame('completed', (string) ($final['json']['status'] ?? ''), 'run should complete after answer');
+});
+
+$h->run('running status actions and state guards', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph R { start -> STATUS_RUNNING; STATUS_RUNNING -> exit; }',
+        'displayName' => 'Running Run',
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+
+    $run = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $h->assertSame('running', (string) ($run['json']['status'] ?? ''), 'run should remain running');
+
+    $deleteRunning = callApi($app, 'DELETE', '/api/v1/pipelines/' . $runId);
+    $h->assertSame(409, $deleteRunning['status'], 'delete running should fail');
+
+    $archiveRunning = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/archive');
+    $h->assertSame(409, $archiveRunning['status'], 'archive running should fail');
+
+    $cancel = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/cancel');
+    $h->assertSame(200, $cancel['status'], 'cancel running should work');
+
+    $cancelAgain = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/cancel');
+    $h->assertSame(409, $cancelAgain['status'], 'cancel terminal should fail');
+
+    $archive = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/archive');
+    $h->assertSame(200, $archive['status'], 'archive terminal should work');
+
+    $listDefault = callApi($app, 'GET', '/api/v1/pipelines');
+    $listedDefaultIds = array_map(static fn(array $r): string => (string) ($r['id'] ?? ''), $listDefault['json']);
+    $h->assertTrue(!in_array($runId, $listedDefaultIds, true), 'archived run hidden by default list');
+
+    $listAll = callApi($app, 'GET', '/api/v1/pipelines?includeArchived=true');
+    $listedAllIds = array_map(static fn(array $r): string => (string) ($r['id'] ?? ''), $listAll['json']);
+    $h->assertTrue(in_array($runId, $listedAllIds, true), 'archived run present with includeArchived');
+
+    $unarchive = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/unarchive');
+    $h->assertSame(200, $unarchive['status'], 'unarchive should work');
+
+    $deleteFinal = callApi($app, 'DELETE', '/api/v1/pipelines/' . $runId);
+    $h->assertSame(200, $deleteFinal['status'], 'delete terminal should work');
+
+    $missingDelete = callApi($app, 'DELETE', '/api/v1/pipelines/' . $runId);
+    $h->assertSame(404, $missingDelete['status'], 'delete missing run should 404');
+});
+
+$h->run('iterate run lineage preserved', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph I { start -> implement; implement -> exit; }',
+        'displayName' => 'Iter Source',
+    ]);
+    $sourceId = (string) ($create['json']['id'] ?? '');
+
+    $source = callApi($app, 'GET', '/api/v1/pipelines/' . $sourceId);
+    $sourceFamily = (string) ($source['json']['familyId'] ?? '');
+
+    $iter = callApi($app, 'POST', '/api/v1/pipelines/' . $sourceId . '/iterate', [
+        'dotSource' => 'digraph I2 { start -> review_gate; review_gate -> exit; }',
+        'originalPrompt' => 'add gate',
+    ]);
+    $h->assertSame(200, $iter['status'], 'iterate endpoint should work');
+    $newId = (string) ($iter['json']['newId'] ?? '');
+    $h->assertTrue($newId !== '' && $newId !== $sourceId, 'new run id should differ');
+
+    $newRun = callApi($app, 'GET', '/api/v1/pipelines/' . $newId);
+    $h->assertSame($sourceFamily, (string) ($newRun['json']['familyId'] ?? ''), 'family id should be preserved');
+
+    $sourceAfter = callApi($app, 'GET', '/api/v1/pipelines/' . $sourceId);
+    $h->assertSame((string) ($source['json']['status'] ?? ''), (string) ($sourceAfter['json']['status'] ?? ''), 'source run should remain unchanged');
+
+    $runningCreate = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph IR { start -> STATUS_RUNNING; STATUS_RUNNING -> exit; }',
+        'displayName' => 'Iter Running',
+    ]);
+    $runningId = (string) ($runningCreate['json']['id'] ?? '');
+    $iterRunning = callApi($app, 'POST', '/api/v1/pipelines/' . $runningId . '/iterate', [
+        'dotSource' => 'digraph X { start -> exit; }',
+        'originalPrompt' => 'nope',
+    ]);
+    $h->assertSame(409, $iterRunning['status'], 'iterating running run must fail');
+});
+
+$h->run('spec aliases behave like v1', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/pipelines', ['dotSource' => 'digraph A { start -> exit; }']);
+    $h->assertSame(201, $create['status'], 'alias create should work');
+    $id = (string) ($create['json']['id'] ?? '');
+
+    $get = callApi($app, 'GET', '/pipelines/' . $id);
+    $h->assertSame(200, $get['status'], 'alias get should work');
+
+    $events = callApi($app, 'GET', '/pipelines/' . $id . '/events');
+    $h->assertSame(200, $events['status'], 'alias events should work');
+
+    $checkpoint = callApi($app, 'GET', '/pipelines/' . $id . '/checkpoint');
+    $h->assertSame(200, $checkpoint['status'], 'alias checkpoint should work');
+
+    $context = callApi($app, 'GET', '/pipelines/' . $id . '/context');
+    $h->assertSame(200, $context['status'], 'alias context should work');
+});
+
+$exit = $h->summary();
+$artifactDir = dirname(__DIR__) . '/.scratch/verification/SPRINT-002/phase4/backend-tests';
+if (!is_dir($artifactDir)) {
+    mkdir($artifactDir, 0777, true);
+}
+file_put_contents($artifactDir . '/test-summary.txt', 'exit=' . $exit . "\n");
+exit($exit);
