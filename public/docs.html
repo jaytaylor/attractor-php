@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attractor PHP Docs</title>
+  <style>
+    body{font-family:Menlo,Consolas,monospace;max-width:980px;margin:0 auto;padding:24px;background:#fafafa;color:#0f172a}
+    h1,h2{margin-bottom:8px}
+    code{background:#e2e8f0;padding:2px 6px;border-radius:4px}
+  </style>
+</head>
+<body>
+  <h1>Attractor PHP Dashboard Docs</h1>
+  <p>This page is fully served by the application with no external dependencies.</p>
+
+  <h2>Views</h2>
+  <ul>
+    <li>Monitor: run list/details, logs, graph, artifacts, human-gate actions</li>
+    <li>Create: DOT edit/validate/preview/run, DOT generate/fix/iterate</li>
+    <li>Archived: archived runs with unarchive/open</li>
+    <li>Docs: this documentation page</li>
+  </ul>
+
+  <h2>Core API</h2>
+  <ul>
+    <li><code>GET /api/v1/pipelines</code></li>
+    <li><code>POST /api/v1/pipelines</code></li>
+    <li><code>GET /api/v1/pipelines/{id}</code></li>
+    <li><code>GET /api/v1/pipelines/{id}/events</code> (SSE)</li>
+    <li><code>GET /api/v1/events</code> (SSE)</li>
+    <li><code>POST /api/v1/dot/generate/stream</code> (SSE)</li>
+    <li><code>POST /api/v1/dot/fix/stream</code> (SSE)</li>
+    <li><code>POST /api/v1/dot/iterate/stream</code> (SSE)</li>
+  </ul>
+
+  <h2>Error Envelope</h2>
+  <pre>{ "error": "human readable message", "code": "MACHINE_CODE" }</pre>
+</body>
+</html>

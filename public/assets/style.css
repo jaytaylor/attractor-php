@@ -1,0 +1,116 @@
+:root {
+  --bg: #f2f4f8;
+  --surface: #ffffff;
+  --ink: #0f172a;
+  --muted: #475569;
+  --accent: #0b7285;
+  --danger: #b42318;
+}
+
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "IBM Plex Sans", "Avenir Next", sans-serif;
+  background: radial-gradient(circle at 20% 0%, #d9f0ff 0%, #f2f4f8 45%, #eef2ff 100%);
+  color: var(--ink);
+}
+
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid #dbe2ea;
+  background: linear-gradient(120deg, #ffffff 0%, #eaf6fb 100%);
+}
+
+.topbar nav button {
+  margin-left: 8px;
+}
+
+button {
+  border: 1px solid #9ecad3;
+  background: #e7f7fb;
+  color: #084c5a;
+  border-radius: 7px;
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+button[disabled] {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.app { padding: 16px 20px; }
+
+.grid {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+}
+
+.create-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+aside, article, section {
+  background: var(--surface);
+  border: 1px solid #d8e1ea;
+  border-radius: 10px;
+  padding: 14px;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  padding: 7px 8px;
+  border-bottom: 1px solid #ebeff5;
+}
+
+li:last-child { border-bottom: none; }
+
+label { display: block; margin-bottom: 10px; color: var(--muted); }
+input[type="text"], textarea {
+  width: 100%;
+  border: 1px solid #d1d9e3;
+  border-radius: 8px;
+  padding: 8px;
+  font-family: "IBM Plex Mono", Menlo, monospace;
+  color: var(--ink);
+}
+
+.buttons { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0 12px; }
+
+.panel {
+  border: 1px dashed #c4d2df;
+  border-radius: 8px;
+  min-height: 80px;
+  padding: 10px;
+  background: #fbfdff;
+  overflow: auto;
+  max-height: 280px;
+  white-space: pre-wrap;
+}
+
+.docs-frame {
+  width: 100%;
+  min-height: 620px;
+  border: 1px solid #ced7e2;
+  border-radius: 8px;
+}
+
+.status-running { color: #0369a1; }
+.status-completed { color: #166534; }
+.status-failed, .status-cancelled { color: var(--danger); }
+
+@media (max-width: 920px) {
+  .grid, .create-grid { grid-template-columns: 1fr; }
+  .topbar { flex-direction: column; align-items: flex-start; gap: 8px; }
+}

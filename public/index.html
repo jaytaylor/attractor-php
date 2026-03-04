@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Attractor PHP Dashboard</title>
+  <link rel="stylesheet" href="/assets/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <h1>Attractor PHP Dashboard</h1>
+    <nav>
+      <button data-view="monitor">Monitor</button>
+      <button data-view="create">Create</button>
+      <button data-view="archived">Archived</button>
+      <button data-view="docs">Docs</button>
+    </nav>
+  </header>
+
+  <main id="app" class="app"></main>
+
+  <template id="monitor-template">
+    <section class="grid">
+      <aside>
+        <h2>Runs</h2>
+        <button id="refresh-runs">Refresh</button>
+        <ul id="run-list"></ul>
+      </aside>
+      <article>
+        <h2 id="run-title">Run Details</h2>
+        <div id="run-status"></div>
+        <div id="run-actions"></div>
+        <h3>Stages</h3>
+        <ul id="stage-list"></ul>
+        <h3>Graph</h3>
+        <div id="graph-panel" class="panel"></div>
+        <h3>Live Log</h3>
+        <pre id="log-panel" class="panel"></pre>
+        <h3>Human Gate</h3>
+        <div id="question-panel" class="panel"></div>
+        <h3>Artifacts</h3>
+        <ul id="artifact-list"></ul>
+      </article>
+    </section>
+  </template>
+
+  <template id="create-template">
+    <section class="create-grid">
+      <article>
+        <h2>Create / Iterate</h2>
+        <label>Prompt
+          <input id="prompt-input" type="text" placeholder="Describe pipeline goal">
+        </label>
+        <div class="buttons">
+          <button id="btn-generate">Generate DOT</button>
+          <button id="btn-fix">Fix DOT</button>
+        </div>
+        <label>DOT Source
+          <textarea id="dot-input" rows="18"></textarea>
+        </label>
+        <label>Changes (iterate)
+          <input id="changes-input" type="text" placeholder="Describe changes for iterate mode">
+        </label>
+        <div class="buttons">
+          <button id="btn-iterate">Iterate DOT</button>
+          <button id="btn-validate">Validate</button>
+          <button id="btn-preview">Preview</button>
+          <button id="btn-run" disabled>Run</button>
+        </div>
+        <label><input type="checkbox" id="simulate-toggle" checked> simulate</label>
+        <label><input type="checkbox" id="auto-approve-toggle"> autoApprove</label>
+        <pre id="validation-panel" class="panel"></pre>
+      </article>
+      <article>
+        <h3>DOT Preview</h3>
+        <div id="preview-panel" class="panel"></div>
+      </article>
+    </section>
+  </template>
+
+  <template id="archived-template">
+    <section>
+      <h2>Archived Runs</h2>
+      <ul id="archived-list"></ul>
+    </section>
+  </template>
+
+  <template id="docs-template">
+    <section>
+      <h2>Embedded Docs</h2>
+      <p>The embedded API and UI docs are available at <code>/docs</code>.</p>
+      <iframe src="/docs" class="docs-frame"></iframe>
+    </section>
+  </template>
+
+  <script src="/assets/app.js"></script>
+</body>
+</html>
