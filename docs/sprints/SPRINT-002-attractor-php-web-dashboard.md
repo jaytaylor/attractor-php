@@ -299,7 +299,7 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.4 - Define UI information architecture and view-to-endpoint mapping**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.5 - Agentic loop reference extraction (Coreys Attractor): DOT generate/fix/iterate + iterate-run loop**
+- [ ] **P0.5 - Agentic loop reference extraction (Coreys Attractor): DOT generate/fix/iterate + iterate-run loop (notes in `../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.6 - Mermaid appendix diagrams render via `mmdc` (outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -307,7 +307,7 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 #### Acceptance Criteria (Phase 0)
 - [ ] ADR(s) exist and explicitly justify: UI stack choice, API surface choice, persistence approach, and SSE format
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] Agentic DOT loops are explicitly specified as contracts (generate → validate/render → fix → iterate; plus iterate-run lineage) and include links to the Coreys Attractor reference notes
+- [ ] Agentic DOT loops are explicitly specified as contracts (generate → validate/render → fix → iterate; plus iterate-run lineage) and include links to the Coreys Attractor reference notes (`../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`)
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] OpenAPI spec covers every endpoint the UI will call, including error envelopes
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -693,6 +693,8 @@ Positive cases:
 9. Generate DOT from NL prompt (simulation/mocked mode) returns DOT that validates and renders.
 10. Iterate DOT from a base DOT + NL changes (simulation/mocked mode) returns modified DOT and preserves required graph invariants (start/exit nodes present, reachable nodes, etc.).
 11. Fix DOT with a provided error message returns DOT that validates and renders (or returns a stable error envelope explaining refusal).
+12. DOT streaming endpoints (`dot/*/stream`) return `text/event-stream` and emit `delta` frames that end with exactly one `done` frame; the `done.dotSource` equals the full concatenated output.
+13. DOT LLM endpoints strip markdown fences: returned `dotSource` contains no ``` fences and is raw DOT.
 
 Negative cases:
 1. Create run rejects missing/empty `dotSource` with 400 + error envelope.
