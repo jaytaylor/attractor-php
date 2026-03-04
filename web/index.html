@@ -17,11 +17,11 @@
           <p>Pipeline Dashboard</p>
         </div>
       </div>
-      <nav class="tabs" id="tabs">
-        <button data-view="monitor" class="tab active">Monitor</button>
-        <button data-view="create" class="tab">Create</button>
-        <button data-view="archived" class="tab">Archived</button>
-        <button data-view="docs" class="tab">Docs</button>
+      <nav class="tabs" id="tabs" role="tablist" aria-label="Dashboard views">
+        <button data-view="monitor" class="tab active" role="tab" aria-selected="true">Monitor</button>
+        <button data-view="create" class="tab" role="tab" aria-selected="false">Create</button>
+        <button data-view="archived" class="tab" role="tab" aria-selected="false">Archived</button>
+        <button data-view="docs" class="tab" role="tab" aria-selected="false">Docs</button>
       </nav>
     </header>
 
@@ -144,7 +144,10 @@
         <article class="panel">
           <div class="panel-head">
             <h2>Archived Runs</h2>
-            <button id="refresh-archived" class="btn ghost">Refresh</button>
+            <div class="actions">
+              <input id="archived-search" class="input" type="search" placeholder="Search archived runs">
+              <button id="refresh-archived" class="btn ghost">Refresh</button>
+            </div>
           </div>
           <ul id="archived-list" class="run-list"></ul>
         </article>

@@ -2,6 +2,8 @@
   const state = {
     view: 'monitor',
     runs: [],
+    archivedRuns: [],
+    archivedFilter: '',
     selectedRunId: null,
     selectedRun: null,
     iterateSourceRun: null,
@@ -25,10 +27,12 @@
     state.view = view;
     document.querySelectorAll('.tab').forEach((tab) => {
       tab.classList.toggle('active', tab.dataset.view === view);
+      tab.setAttribute('aria-selected', tab.dataset.view === view ? 'true' : 'false');
     });
     document.querySelectorAll('.view').forEach((node) => {
       node.classList.toggle('active', node.id === `view-${view}`);
     });
+    window.location.hash = view === 'monitor' && state.selectedRunId ? `#monitor/${state.selectedRunId}` : `#${view}`;
 
     if (view === 'archived') {
       void refreshArchived();
@@ -181,9 +185,19 @@
     for (const run of state.runs) {
       const item = document.createElement('li');
       item.className = `run-item ${run.id === state.selectedRunId ? 'active' : ''}`;
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', `Open run ${run.displayName || run.id}`);
       item.innerHTML = `<strong>${run.displayName || run.id}</strong><br><span class="small">${runBadge(run.status)}</span><br><span class="small">${run.currentNodeId || 'n/a'}</span>`;
-      item.addEventListener('click', () => {
+      const openRun = () => {
         void selectRun(run.id);
+      };
+      item.addEventListener('click', openRun);
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          openRun();
+        }
       });
       list.appendChild(item);
     }
@@ -191,6 +205,9 @@
 
   const selectRun = async (runId) => {
     state.selectedRunId = runId;
+    if (state.view === 'monitor') {
+      window.location.hash = `#monitor/${runId}`;
+    }
     state.selectedRun = await api('GET', `/api/v1/pipelines/${encodeURIComponent(runId)}`);
     await syncRunEvents(runId, true);
     renderRunList();
@@ -236,8 +253,11 @@
     for (const item of artifacts) {
       const li = document.createElement('li');
       li.className = 'artifact';
+      li.setAttribute('tabindex', '0');
+      li.setAttribute('role', 'button');
+      li.setAttribute('aria-label', `Open artifact ${item.path}`);
       li.textContent = `${item.path} (${item.sizeBytes} bytes)`;
-      li.addEventListener('click', async () => {
+      const showArtifact = async () => {
         try {
           const resp = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/artifacts/${item.path}`);
           const text = await resp.text();
@@ -245,6 +265,15 @@
           el('artifact-preview').textContent = preview;
         } catch (error) {
           flash(error.message || 'artifact preview failed');
+        }
+      };
+      li.addEventListener('click', () => {
+        void showArtifact();
+      });
+      li.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          void showArtifact();
         }
       });
       artifactList.appendChild(li);
@@ -272,15 +301,42 @@
     }
   };
 
-  const refreshArchived = async () => {
-    const runs = await api('GET', '/api/v1/pipelines?includeArchived=true');
-    const archived = runs.filter((r) => r.archived);
+  const renderArchivedList = () => {
     const list = el('archived-list');
     list.innerHTML = '';
-    for (const run of archived) {
+    const needle = state.archivedFilter.trim().toLowerCase();
+    const visible = state.archivedRuns.filter((run) => {
+      if (needle === '') {
+        return true;
+      }
+      const haystack = `${run.id} ${run.displayName || ''} ${run.status}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+
+    if (visible.length === 0) {
+      const empty = document.createElement('li');
+      empty.className = 'run-item';
+      empty.textContent = 'No archived runs match the current filter.';
+      list.appendChild(empty);
+      return;
+    }
+
+    for (const run of visible) {
       const item = document.createElement('li');
       item.className = 'run-item';
+      item.setAttribute('tabindex', '0');
+      item.setAttribute('role', 'button');
+      item.setAttribute('aria-label', `Open archived run ${run.displayName || run.id}`);
       item.innerHTML = `<strong>${run.displayName || run.id}</strong><br><span class="small">${run.status}</span><br><button class="btn unarchive" data-id="${run.id}">Unarchive</button> <button class="btn open" data-id="${run.id}">Open</button>`;
+      item.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter' || event.key === ' ') {
+          event.preventDefault();
+          const openButton = item.querySelector('.open');
+          if (openButton instanceof HTMLButtonElement) {
+            openButton.click();
+          }
+        }
+      });
       item.querySelector('.unarchive').addEventListener('click', async () => {
         try {
           await api('POST', `/api/v1/pipelines/${encodeURIComponent(run.id)}/unarchive`);
@@ -301,6 +357,12 @@
       });
       list.appendChild(item);
     }
+  };
+
+  const refreshArchived = async () => {
+    const runs = await api('GET', '/api/v1/pipelines?includeArchived=true');
+    state.archivedRuns = runs.filter((r) => r.archived);
+    renderArchivedList();
   };
 
   const runValidate = async () => {
@@ -447,7 +509,38 @@
   };
 
   const attachActions = () => {
-    document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => setView(tab.dataset.view)));
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => setView(tab.dataset.view));
+      tab.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowRight') {
+          event.preventDefault();
+          const next = tabs[(index + 1) % tabs.length];
+          next.focus();
+          setView(next.dataset.view);
+        } else if (event.key === 'ArrowLeft') {
+          event.preventDefault();
+          const prev = tabs[(index - 1 + tabs.length) % tabs.length];
+          prev.focus();
+          setView(prev.dataset.view);
+        } else if (event.key === 'Home') {
+          event.preventDefault();
+          tabs[0].focus();
+          setView(tabs[0].dataset.view);
+        } else if (event.key === 'End') {
+          event.preventDefault();
+          const last = tabs[tabs.length - 1];
+          last.focus();
+          setView(last.dataset.view);
+        }
+      });
+    });
+
+    el('archived-search').addEventListener('input', (event) => {
+      state.archivedFilter = String(event.target.value || '');
+      renderArchivedList();
+    });
+
     el('refresh-runs').addEventListener('click', () => {
       void refreshRuns({ reloadSelected: true }).catch((error) => flash(error.message || 'refresh failed'));
     });
@@ -457,6 +550,7 @@
 
     el('cancel-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
+      if (!window.confirm('Cancel this run?')) return;
       void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/cancel`)
         .then(() => selectRun(state.selectedRunId))
         .catch((error) => flash(error.message || 'cancel failed'));
@@ -464,6 +558,7 @@
 
     el('archive-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
+      if (!window.confirm('Archive this run?')) return;
       void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/archive`)
         .then(() => refreshRuns({ reloadSelected: true }))
         .catch((error) => flash(error.message || 'archive failed'));
@@ -471,6 +566,7 @@
 
     el('unarchive-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
+      if (!window.confirm('Unarchive this run?')) return;
       void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/unarchive`)
         .then(() => refreshRuns({ reloadSelected: true }))
         .catch((error) => flash(error.message || 'unarchive failed'));
@@ -536,10 +632,21 @@
 
   const bootstrap = async () => {
     attachActions();
-    await refreshRuns({ reloadSelected: false });
-    if (window.location.hash.startsWith('#monitor/')) {
-      const runId = window.location.hash.replace('#monitor/', '');
-      await selectRun(runId);
+    const hash = window.location.hash || '#monitor';
+    const route = hash.replace(/^#/, '');
+    if (route.startsWith('monitor/')) {
+      setView('monitor');
+      await refreshRuns({ reloadSelected: false });
+      const runId = route.replace(/^monitor\//, '');
+      if (runId) {
+        await selectRun(runId);
+      }
+    } else if (route === 'create' || route === 'archived' || route === 'docs' || route === 'monitor') {
+      setView(route);
+      await refreshRuns({ reloadSelected: false });
+    } else {
+      setView('monitor');
+      await refreshRuns({ reloadSelected: false });
     }
     startPolling();
   };

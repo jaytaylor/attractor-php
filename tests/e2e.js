@@ -81,7 +81,7 @@ async function main() {
     await page.screenshot({ path: path.join(root, '.scratch/verification/SPRINT-002/phase2/screenshots/monitor-desktop.png'), fullPage: true });
     log('captured monitor desktop screenshot');
 
-    await page.getByRole('button', { name: 'Create' }).click();
+    await page.getByRole('tab', { name: 'Create' }).click();
     await page.locator('#dot-editor').fill('digraph Broken { a -> ; }');
     await page.getByRole('button', { name: 'Validate' }).click();
     await page.waitForTimeout(250);
@@ -96,19 +96,19 @@ async function main() {
     await page.screenshot({ path: path.join(root, '.scratch/verification/SPRINT-002/phase3/ui-create/create-flow.png'), fullPage: true });
     log('captured create flow screenshot');
 
-    await page.getByRole('button', { name: 'Monitor' }).click();
+    await page.getByRole('tab', { name: 'Monitor' }).click();
     await page.waitForTimeout(250);
     await page.screenshot({ path: path.join(root, '.scratch/verification/SPRINT-002/phase2/ui-monitor/monitor-flow.png'), fullPage: true });
 
     const runList = await api('GET', '/api/v1/pipelines');
     const firstRunId = runList[0].id;
     await api('POST', `/api/v1/pipelines/${firstRunId}/archive`);
-    await page.getByRole('button', { name: 'Archived' }).click();
+    await page.getByRole('tab', { name: 'Archived' }).click();
     await page.waitForTimeout(350);
     await page.screenshot({ path: path.join(root, '.scratch/verification/SPRINT-002/phase3/ui-archived/archived-view.png'), fullPage: true });
     log('captured archived view screenshot');
 
-    await page.getByRole('button', { name: 'Docs' }).click();
+    await page.getByRole('tab', { name: 'Docs' }).click();
     await page.waitForTimeout(250);
     await page.screenshot({ path: path.join(root, '.scratch/verification/SPRINT-002/phase3/ui-docs/docs-view.png'), fullPage: true });
     log('captured docs view screenshot');

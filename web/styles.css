@@ -179,6 +179,15 @@ main {
   cursor: pointer;
 }
 
+.input {
+  border: 1px solid var(--border);
+  background: #fcfdff;
+  border-radius: 10px;
+  padding: 6px 10px;
+  min-width: 200px;
+  color: var(--ink);
+}
+
 .btn.primary {
   background: var(--accent);
   color: white;
