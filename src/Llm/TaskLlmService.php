@@ -111,7 +111,10 @@ final class TaskLlmService
 
         $model = trim((string) ($options['model'] ?? ''));
         if ($model === '') {
-            $model = trim((string) (getenv('ATTRACTOR_ANTHROPIC_MODEL') ?: getenv('ANTHROPIC_MODEL') ?: 'claude-3-5-sonnet-latest'));
+            $model = trim((string) (getenv('ATTRACTOR_ANTHROPIC_MODEL') ?: getenv('ANTHROPIC_MODEL') ?: ''));
+        }
+        if ($model === '') {
+            throw new ApiError(500, 'CONFIG_ERROR', 'Anthropic model is required; set ATTRACTOR_ANTHROPIC_MODEL, ANTHROPIC_MODEL, or request model');
         }
 
         $payload = [
@@ -207,4 +210,3 @@ final class TaskLlmService
         return $decoded;
     }
 }
-
