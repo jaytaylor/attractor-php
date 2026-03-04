@@ -39,3 +39,11 @@
 - Consequences:
   - API handlers are stateless wrappers over persisted run data.
   - Artifact export and audit trails are straightforward.
+
+## ADR-2026-03-04-006: Strict Lifecycle Transition Guards
+- Status: Accepted
+- Context: Monitor and Archived workflows require deterministic invalid-action behavior for operator trust and replay-safe UI state.
+- Decision: Enforce terminal-only archive/unarchive transitions and reject idempotent archive/unarchive requests with `409 INVALID_STATE`.
+- Consequences:
+  - UI actions can provide clear guardrail messaging on invalid transitions.
+  - Backend behavior remains contract-stable for negative lifecycle tests.
