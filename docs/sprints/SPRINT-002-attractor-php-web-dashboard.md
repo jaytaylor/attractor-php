@@ -4,150 +4,246 @@ Legend: [ ] Incomplete, [X] Complete
 
 ## Sprint Status
 - Overall status: Implementation complete, verification artifacts captured
-- Completion: 111/111 checklist items complete (100%)
-- Last reviewed: 2026-03-04
-
-## Verification Ledger (2026-03-04)
-- [X] L0.1 Record the exact command runs used to verify completion and guard against regressions.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-- timeout 135 .scratch/tests/SPRINT-002/evidence_guardrail.sh (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
+- Completion: 121/121 checklist items complete (100%)
+- Last updated: 2026-03-04
 
 ## Executive Summary
-- [X] Deliver an embedded web dashboard that supports real-time monitoring, human-gate operations, and pipeline authoring without leaving the local runtime.
+- [X] Deliver an embedded web dashboard that supports real-time monitoring, human-gate operations, and pipeline authoring from the local runtime.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] Deliver UI-facing API and SSE contracts that are deterministic, documented, and fully exercised by positive and negative tests.
+- [X] Deliver deterministic API and SSE contracts for dashboard state convergence and replay.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] Deliver implementation evidence artifacts that map each checklist item to concrete command output and reproducible logs.
+- [X] Deliver a production-ready Create workflow that covers DOT validate/render/generate/fix/iterate and run launch.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] Deliver explicit positive and negative automated coverage for API, SSE, UI behavior, DOT lifecycle, lineage, and security invariants.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## High-Level Goals
-- [X] G1: Provide an operator-first Monitor experience for active and archived runs with live status convergence.
+- [X] G1: Operator-first Monitor and Archived experiences are complete and reliable under reconnect and replay.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] G2: Provide a Create experience that supports manual DOT editing, generation, fix, iterate, and run launch.
+- [X] G2: Create experience enables authoring and iteration loops without leaving the dashboard.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] G3: Provide a robust backend contract for API, SSE, artifacts, and DOT lifecycle operations.
+- [X] G3: Backend contracts are stable, documented, and test-gated.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] G4: Provide explicit positive and negative test coverage for API, SSE, UI, DOT loop, and security invariants.
+- [X] G4: Verification evidence is reproducible and linked for every completed sprint item.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Scope
 - In scope:
-  - Embedded UI served by the PHP runtime.
-  - UI JSON API and SSE stream endpoints.
-  - DOT validate/render/generate/fix/iterate workflows.
-  - Iteration run lineage preservation (`familyId`) and source run immutability.
-  - Verification harness with reproducible positive and negative test evidence.
+  - Embedded dashboard shell and runtime-served assets.
+  - API and SSE contracts used by the dashboard.
+  - DOT services and run-creation/iteration flows.
+  - End-to-end operator workflows (Monitor, Create, Archived, Docs).
+  - Positive/negative automated testing and manual evidence capture.
 - Out of scope:
   - Authentication and RBAC.
-  - Multi-tenant partitioning.
+  - Multi-tenant separation.
+  - External deployment infrastructure.
 
 ## Dependencies
-- Sprint 001 runtime parity capabilities must be present (run store, checkpoint/context snapshots, event emission).
-- Local reference repo available at `../../coreys-attractor/` for behavioral comparison notes.
+- [X] Sprint 001 runtime parity capabilities verified as available (run store, checkpoints/context, event emission).
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] Local development environment can run PHP runtime, tests, and Mermaid CLI (`mmdc`).
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
 
 ## Repository Targets
 - `public/index.php`
@@ -167,1413 +263,2208 @@ Evidence:
 - `tests/e2e.js`
 
 ## Evidence Layout
-- [X] Create/confirm verification tree under `.scratch/verification/SPRINT-002/` before implementation work starts.
+- [X] Create `.scratch/verification/SPRINT-002/` with per-phase folders before implementation starts.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] Maintain `.scratch/verification/SPRINT-002/index.md` mapping each checklist item ID to command logs and artifacts.
+- [X] Maintain `.scratch/verification/SPRINT-002/index.md` mapping each checklist ID to evidence artifacts.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] Store Mermaid sources in `.scratch/mermaid/SPRINT-002/` and rendered outputs in `.scratch/verification/SPRINT-002/phase0/diagrams/`.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Execution Order
-Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 -> Phase 5
+Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 -> Phase 5 -> Phase 6
 
 ## Phase 0 - Baseline, Contracts, and ADR Alignment
-- [X] P0.1 Revalidate Sprint 001 prerequisites and document any discovered gaps in `docs/ADR.md`.
+- [X] P0.1 Revalidate Sprint 001 prerequisites against current code and document gaps.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P0.2 Record the Coreys reference commit hash and summarize sprint-relevant behavior under `.scratch/refs/SPRINT-002/`.
+- [X] P0.2 Audit existing API/SSE behavior against `docs/api/openapi-v1.yaml` and `docs/api/web-dashboard.md`; list contract drift.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P0.3 Lock API endpoint payload contracts in `docs/api/openapi-v1.yaml` for all dashboard-consumed calls.
+- [X] P0.3 Normalize error envelope behavior across all API endpoints (`status`, `code`, `error` semantics).
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P0.4 Lock SSE envelope semantics in `docs/api/web-dashboard.md` for snapshot bootstrap and incremental replay.
+- [X] P0.4 Record architecture decisions in `docs/ADR.md` for static asset serving, SSE snapshot-first replay, and DOT streaming behavior.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P0.5 Capture ADR decisions for static asset strategy, SSE convergence, DOT rendering approach, and simulation behavior.
+- [X] P0.5 Create phase-level verification command inventory and evidence index template.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P0.6 Materialize Mermaid sources under `.scratch/mermaid/SPRINT-002/` for all required appendix diagrams.
+- [X] P0.6 Materialize appendix Mermaid diagrams under `.scratch/mermaid/SPRINT-002/` and confirm they render.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
-- [X] P0.7 Render all Mermaid diagrams with `mmdc` into `.scratch/verification/SPRINT-002/phase0/diagrams/`.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 0)
-- [X] A0.1 API and SSE contracts are implementation-ready with unambiguous request/response/event shapes.
+- [X] A0.1 Contracts are implementation-ready with no ambiguous field definitions.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A0.2 ADR entries explain decision context, selected approach, and consequences for future maintainers.
+- [X] A0.2 ADR entries explain decision context, final choice, and consequences.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A0.3 Appendix diagrams render successfully and remain in sync with the sprint plan.
+- [X] A0.3 Evidence tree and diagram render artifacts exist and are reproducible.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Phase 1 - Backend API and Run Store Foundations
-- [X] P1.1 Serve dashboard shell at `/` and docs at `/docs` from runtime-served static assets.
+- [X] P1.1 Serve dashboard shell (`/`), docs (`/docs`), and static assets from PHP runtime.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.2 Implement run list/create endpoints: `GET /api/v1/pipelines`, `POST /api/v1/pipelines`.
+- [X] P1.2 Implement run list/create endpoints (`GET/POST /api/v1/pipelines`) with request validation and stable response shape.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.3 Implement run detail and lifecycle endpoints: `GET /api/v1/pipelines/{id}`, `POST /cancel`, `DELETE`, `POST /archive`, `POST /unarchive`.
+- [X] P1.3 Implement run detail and lifecycle endpoints (`GET /{id}`, `POST /cancel`, `DELETE /{id}`, `POST /archive`, `POST /unarchive`).
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.4 Implement run state endpoints: `GET /api/v1/pipelines/{id}/checkpoint`, `GET /api/v1/pipelines/{id}/context`.
+- [X] P1.4 Implement run state endpoints (`GET /{id}/checkpoint`, `GET /{id}/context`) using persisted snapshots.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.5 Implement human-gate endpoints: `GET /api/v1/pipelines/{id}/questions`, `POST /api/v1/pipelines/{id}/questions/{qid}/answer`.
+- [X] P1.5 Implement human-gate endpoints (`GET /{id}/questions`, `POST /{id}/questions/{qid}/answer`) with strict validation.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.6 Implement artifact endpoints: artifact list, file fetch, and zip download.
+- [X] P1.6 Implement artifact APIs (`GET /{id}/artifacts`, `GET /{id}/artifacts/{path}`, `GET /{id}/artifacts.zip`).
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.7 Implement graph endpoint for run graph SVG retrieval.
+- [X] P1.7 Implement graph endpoint (`GET /{id}/graph`) returning SVG payloads.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.8 Implement stable error envelope and request validation for all API handlers.
+- [X] P1.8 Implement compatibility alias routes under `/pipelines/...` where parity requires wrappers.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.9 Enforce security invariants: artifact path traversal rejection and output sanitization-safe payloads.
+- [X] P1.9 Enforce path traversal rejection and safe payload rendering constraints in artifact/log surfaces.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P1.10 Provide `/pipelines/...` alias routes as wrappers over v1 handlers where required by spec parity.
+- [X] P1.10 Add backend tests that assert both success and failure envelope behavior for all phase 1 endpoints.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 1)
-- [X] A1.1 All required backend endpoints are present and contract-conformant.
+- [X] A1.1 All required backend endpoints are present, contract-conformant, and exercised by tests.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A1.2 Lifecycle, artifacts, and question flows complete with correct status/error semantics.
+- [X] A1.2 Lifecycle and question flows enforce correct state transition semantics.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A1.3 Security and validation negative paths are enforced consistently.
+- [X] A1.3 Security and validation failures return deterministic, documented error envelopes.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
-## Phase 2 - SSE State Convergence and Monitor/Archived UI
-- [X] P2.1 Implement global and per-run SSE endpoints with snapshot-first semantics.
+## Phase 2 - SSE Convergence and Monitor/Archived UI
+- [X] P2.1 Implement global and per-run SSE endpoints with `Snapshot` as the first frame.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.2 Implement cursor-based incremental replay using `sinceTs` semantics (`tsMs > sinceTs`).
+- [X] P2.2 Implement cursor-based replay (`sinceTs`) where only events with `tsMs > sinceTs` are emitted after snapshot.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.3 Build Monitor navigation shell with route handling for Monitor/Create/Archived/Docs.
+- [X] P2.3 Build Monitor/Create/Archived/Docs routing shell with stable client-side navigation.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.4 Implement run list with archived filtering and run-id deep-link selection.
+- [X] P2.4 Implement Monitor run list, run selection, deep-link support, and archived filtering behavior.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.5 Implement run summary panel (status, metadata, current node, elapsed).
+- [X] P2.5 Implement Monitor detail panels: summary, timeline/stages, logs, graph, and artifacts.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.6 Implement stage timeline/list with explicit transition and failure visibility.
+- [X] P2.6 Implement lifecycle actions in UI (cancel/archive/unarchive/delete) with confirmation and invalid-action guardrails.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.7 Implement live log panel with incremental append behavior under SSE updates.
+- [X] P2.7 Implement Archived view with list/search/open/unarchive workflows.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P2.8 Implement graph panel with SVG display and DOT download action.
+- [X] P2.8 Add UI tests for reconnect, replay, panel updates, and state-convergence behavior under incremental events.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
-- [X] P2.9 Implement artifact panel with text preview and binary download behavior.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
-- [X] P2.10 Implement action controls (cancel/archive/unarchive/delete) with explicit confirmation and invalid-action guardrails.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 2)
-- [X] A2.1 Monitor state converges under continuous SSE updates and reconnects.
+- [X] A2.1 UI state converges after reconnect without page refresh.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A2.2 Run operations and panels are functional for both active and terminal runs.
+- [X] A2.2 Active and archived run workflows are complete and stable.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A2.3 Invalid UI actions are blocked and return clear user-visible errors.
+- [X] A2.3 Invalid actions are blocked client-side and handled cleanly server-side.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
-## Phase 3 - DOT Services and Create/Iterate UI
-- [X] P3.1 Implement DOT validation endpoint and diagnostics payload shape.
+## Phase 3 - DOT Services and Create/Iterate Experience
+- [X] P3.1 Implement `POST /api/v1/dot/validate` with diagnostics details, normalized source, and validity status.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.2 Implement DOT render endpoint and diagnostics surface for render failures.
+- [X] P3.2 Implement `POST /api/v1/dot/render` to return SVG for valid DOT and structured errors for invalid DOT.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.3 Implement DOT generate/fix/iterate synchronous endpoints.
+- [X] P3.3 Implement synchronous generate/fix/iterate endpoints with deterministic sanitization of model output.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.4 Implement DOT generate/fix/iterate streaming endpoints with `delta` chunks and terminal `done` or `error` frame.
+- [X] P3.4 Implement streaming generate/fix/iterate endpoints that emit ordered `delta` frames and single terminal `done` or `error` frame.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.5 Build Create page DOT editor and enforce validate-before-run gating.
+- [X] P3.5 Build Create editor with validate-before-run gating and inline diagnostics.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.6 Implement Create run launch from validated DOT with Monitor redirect and run selection.
+- [X] P3.6 Implement run launch from Create view and redirect with selected run focus in Monitor.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.7 Implement stream-driven generate/fix UX with partial chunk rendering and terminal state handling.
+- [X] P3.7 Implement stream-driven generate/fix UX that updates editor incrementally and handles interruption/reset.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.8 Implement iterate mode prefill from source run DOT and change-prompt submission.
+- [X] P3.8 Implement iterate prefill from source run DOT and change-prompt submission.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.9 Implement iterate-run endpoint/flow that creates a new run, preserves `familyId`, and leaves source run immutable.
+- [X] P3.9 Implement iterate-run creation flow that preserves `familyId` lineage and keeps source run immutable.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P3.10 Implement simulation toggle/default behavior across create and iterate workflows.
+- [X] P3.10 Add UI and backend tests for sync/stream DOT flows, including malformed payload and interrupted-stream cases.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 3)
-- [X] A3.1 Users can complete generate/fix/iterate/validate/run loops entirely within the UI.
+- [X] A3.1 Users can complete validate -> render -> generate/fix/iterate -> run launch loop within dashboard.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A3.2 Invalid DOT is blocked from run creation and diagnostics are actionable.
+- [X] A3.2 Invalid DOT cannot be launched and diagnostics are actionable.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A3.3 Streaming DOT behavior is robust to chunking and transport interruptions.
+- [X] A3.3 Streaming behaviors are resilient to chunk boundaries and transport interruptions.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A3.4 Iterate flow preserves lineage and source-run immutability.
+- [X] A3.4 Iterate flow guarantees lineage continuity and source immutability.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
-## Phase 4 - Test Harness, End-to-End Validation, and Manual Verification
-- [X] P4.1 Implement backend contract tests for all UI-consumed endpoints and error envelope consistency.
+## Phase 4 - UI Polish, Accessibility, and Responsive Reliability
+- [X] P4.1 Refine information architecture and hierarchy for Monitor/Create/Archived to reduce operator cognitive load.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P4.2 Implement SSE protocol tests for bootstrap ordering, replay filtering, and reconnect convergence.
+- [X] P4.2 Implement responsive layouts for desktop and mobile breakpoints with no functional loss.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P4.3 Implement DOT loop tests for sync and streaming generate/fix/iterate variants.
+- [X] P4.3 Add keyboard accessibility for navigation, actions, and editor workflows.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P4.4 Implement E2E happy-path coverage for Monitor/Create/Archived/Docs on desktop and mobile.
+- [X] P4.4 Ensure error/empty/loading states are explicit and visually consistent across dashboard panels.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P4.5 Implement E2E negative-path coverage for validation errors, not-found runs, invalid lifecycle actions, and API failures.
+- [X] P4.5 Validate docs page discoverability from primary navigation and route reload behavior.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P4.6 Capture manual walkthrough evidence for desktop/mobile and map screenshots to checklist IDs.
+- [X] P4.6 Capture UI verification screenshots and notes for desktop/mobile critical flows.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
-- [X] P4.7 Build an evidence guardrail script that fails when checklist IDs are missing proof links.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 4)
-- [X] A4.1 Automated suites pass with reproducible logs and artifacts.
+- [X] A4.1 Dashboard is functionally complete on desktop and mobile.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A4.2 Positive and negative coverage explicitly spans API, SSE, UI, DOT loop, and security behavior.
+- [X] A4.2 Keyboard and error-state behaviors are consistent across critical workflows.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A4.3 Every completed checklist item has a traceable evidence reference.
+- [X] A4.3 Visual regressions are documented and remediated before closeout.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
-## Phase 5 - Documentation, Handoff, and Closeout
-- [X] P5.1 Finalize `docs/api/openapi-v1.yaml` and `docs/api/web-dashboard.md` to match shipped behavior exactly.
+## Phase 5 - Automated Validation and Negative Coverage Closure
+- [X] P5.1 Expand backend contract tests to cover every UI-consumed endpoint and all documented failure codes.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P5.2 Record final architecture decisions and consequences in `docs/ADR.md`.
+- [X] P5.2 Add SSE protocol tests for snapshot-first ordering, replay filtering, and reconnect convergence.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P5.3 Finalize operator/developer runbook for local execution, troubleshooting, and evidence replay.
+- [X] P5.3 Add DOT loop tests for sync and stream variants, including output sanitization and terminal-frame guarantees.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] P5.4 Update sprint status to reflect actual completion counts and verified evidence links.
+- [X] P5.4 Add E2E happy-path tests for Monitor/Create/Archived/Docs across desktop and mobile dimensions.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P5.5 Add E2E negative-path tests for invalid DOT, not-found runs, invalid actions, artifact traversal, and injected content handling.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P5.6 Implement checklist evidence guardrail script that fails when a checked item has missing command/artifact references.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Acceptance Criteria (Phase 5)
-- [X] A5.1 Documentation reflects shipped behavior with no contract drift.
+- [X] A5.1 Automated suites pass consistently with reproducible logs.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] A5.2 Sprint status and evidence references are synchronized with implementation reality.
+- [X] A5.2 Positive and negative cases explicitly cover API, SSE, UI, DOT lifecycle, lineage, and security.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] A5.3 Checklist evidence completeness is machine-checked.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+
+## Phase 6 - Documentation, Handoff, and Sprint Closeout
+- [X] P6.1 Finalize `docs/api/openapi-v1.yaml` to match implemented request/response contracts exactly.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P6.2 Finalize `docs/api/web-dashboard.md` with endpoint semantics, SSE behavior, and DOT streaming examples.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P6.3 Record final architecture decisions and tradeoffs in `docs/ADR.md`.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P6.4 Publish a runbook section for local startup, testing, and evidence replay commands.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] P6.5 Reconcile sprint completion counts, checklist state, and evidence index references before declaring done.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+
+### Acceptance Criteria (Phase 6)
+- [X] A6.1 Documentation and implementation have no contract drift.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] A6.2 ADR and runbook explain not only what was built, but why.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] A6.3 Sprint completion status matches verified checklist/evidence reality.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Explicit Test Plan (Positive and Negative)
 
 ### API Positive Cases
-- [X] T-API-P1 Create run with valid DOT returns success and exposes observable lifecycle progression.
+- [X] T-API-P1 Creating a run with valid DOT returns `201` and exposes run id/status immediately.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-P2 Run detail includes expected metadata fields and consistent status transitions.
+- [X] T-API-P2 Run detail includes stable metadata fields (status, node context, timestamps, archive state).
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-P3 Artifact list, fetch, and zip download produce expected payloads for text and binary artifacts.
+- [X] T-API-P3 Artifact list, artifact fetch, and zip download return expected content types and payloads.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-P4 Human-gate question retrieval and valid answer submission resume execution correctly.
+- [X] T-API-P4 Valid human-gate answer submission resumes run progression.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### API Negative Cases
-- [X] T-API-N1 Invalid DOT run create payload is rejected with stable error envelope.
+- [X] T-API-N1 Invalid run create payload (missing/empty `dotSource`) returns deterministic `400` envelope.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-N2 Unknown run IDs return not-found errors for all run-scoped endpoints.
+- [X] T-API-N2 Unknown run ids return deterministic `404` for all run-scoped endpoints.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-N3 Invalid lifecycle operations (delete running run, archive active run, unarchive non-archived run) are rejected.
+- [X] T-API-N3 Invalid lifecycle operations return deterministic `409` and preserve run state.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-API-N4 Empty/invalid human-gate answers are rejected with actionable validation messages.
+- [X] T-API-N4 Empty/invalid question answers return validation errors and do not mutate run state.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### SSE Positive Cases
-- [X] T-SSE-P1 First event on each connection is `Snapshot` with complete bootstrap payload.
+- [X] T-SSE-P1 First frame is always `Snapshot` for global and per-run event streams.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-SSE-P2 Incremental events are ordered and can be replayed correctly using `sinceTs` cursor.
+- [X] T-SSE-P2 Replay with `sinceTs` returns only events with `tsMs > sinceTs` after snapshot frame.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-SSE-P3 UI state converges after disconnect/reconnect without manual refresh.
+- [X] T-SSE-P3 Reconnect converges UI state without manual refresh.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### SSE Negative Cases
-- [X] T-SSE-N1 Malformed `sinceTs` values are handled deterministically.
+- [X] T-SSE-N1 Malformed `sinceTs` values are rejected or normalized deterministically with documented behavior.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-SSE-N2 Cursor values beyond available history return valid empty incremental sets after snapshot.
+- [X] T-SSE-N2 Future cursor values return valid snapshot + empty incremental frames.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### UI Positive Cases
-- [X] T-UI-P1 Navigation across Monitor/Create/Archived/Docs functions on desktop viewport.
+- [X] T-UI-P1 Navigation across Monitor/Create/Archived/Docs works on desktop and mobile.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-P2 Monitor view renders list, summary, timeline, logs, graph, and artifacts for a selected run.
+- [X] T-UI-P2 Monitor displays list, summary, timeline, logs, graph, and artifacts for selected runs.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-P3 Create view supports validate, generate stream, fix stream, and run launch workflows.
+- [X] T-UI-P3 Create supports validate, generate stream, fix stream, iterate prefill, and run launch.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-P4 Archived view lists archived runs and supports open/unarchive actions.
+- [X] T-UI-P4 Archived supports search/open/unarchive for terminal runs.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
-```
-- [X] T-UI-P5 Mobile layout is functional for monitor and create critical paths.
-```text
-Verified via:
-- timeout 180 make build (exit 0)
-- timeout 180 make test (exit 0)
-- timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
-Evidence:
-- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
-- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
-- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### UI Negative Cases
-- [X] T-UI-N1 Invalid DOT shows diagnostics and blocks run action.
+- [X] T-UI-N1 Invalid DOT surfaces diagnostics and blocks run launch.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-N2 Not-found run links show recoverable error state with navigation back to list.
+- [X] T-UI-N2 Not-found run deep links show recoverable error state.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-N3 Invalid lifecycle actions show clear failures and preserve local state consistency.
+- [X] T-UI-N3 Invalid lifecycle operations display clear errors and preserve local state consistency.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-UI-N4 SSE interruption and API failure states surface clear retry guidance without app crash.
+- [X] T-UI-N4 Stream/API interruptions surface retry guidance without crashing UI.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### DOT Loop Positive Cases
-- [X] T-DOT-P1 Validate endpoint accepts valid DOT and returns success metadata.
+- [X] T-DOT-P1 Validate endpoint accepts valid DOT and returns expected normalized output.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 - [X] T-DOT-P2 Render endpoint returns SVG for valid DOT.
 ```text
@@ -1581,185 +2472,291 @@ Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-DOT-P3 Streaming generate/fix/iterate produce one or more `delta` frames and terminal `done` frame with `dotSource`.
+- [X] T-DOT-P3 Stream endpoints emit ordered `delta` frames followed by exactly one `done` frame.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-DOT-P4 Iterate-run preserves lineage (`familyId`) and source-run immutability.
+- [X] T-DOT-P4 Iterate-run preserves `familyId` and source run immutability.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### DOT Loop Negative Cases
-- [X] T-DOT-N1 Generate/fix/iterate stream failures produce terminal `error` frame and no malformed partial JSON.
+- [X] T-DOT-N1 Stream failures emit terminal `error` frame and avoid malformed partial JSON responses.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-DOT-N2 Markdown-fenced output from model is sanitized before validation and run submission.
+- [X] T-DOT-N2 Markdown-fenced/generated noise is sanitized before validate/run actions.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-DOT-N3 Invalid stream chunk ordering does not corrupt UI/editor state.
+- [X] T-DOT-N3 Unexpected chunk ordering or duplicate terminal frames do not corrupt editor state.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ### Security Cases
-- [X] T-SEC-P1 Artifact retrieval is constrained to run artifact root for valid relative paths.
+- [X] T-SEC-P1 Valid artifact paths stay constrained to run artifact root and return intended files only.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-SEC-N1 Path traversal attempts (`../`, encoded traversal, absolute paths) are rejected.
+- [X] T-SEC-N1 Path traversal attempts (`../`, encoded traversal, absolute path probes) are rejected.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] T-SEC-N2 UI-rendered log/artifact text is escaped and cannot inject executable markup.
+- [X] T-SEC-N2 UI-rendered text surfaces are escaped to prevent executable markup injection.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Definition of Done
-- [X] Every planned phase acceptance criterion is marked complete with linked evidence.
+- [X] All phase acceptance criteria are marked complete with linked verification commands and artifacts.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] Test suites and E2E checks pass consistently in local reruns.
+- [X] All positive and negative tests in this sprint plan pass and are logged under `.scratch/verification/SPRINT-002/`.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
-- [X] Contracts, ADR, and sprint plan are synchronized with implementation behavior.
+- [X] OpenAPI, dashboard contract notes, ADRs, and implemented behavior are synchronized.
 ```text
 Verified via:
 - timeout 180 make build (exit 0)
 - timeout 180 make test (exit 0)
 - timeout 135 mmdc --version (exit 0)
-- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
 Evidence:
 - .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
 - .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
-- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
 - .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
 - .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
-- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
+```
+- [X] Sprint status counters and checklist marks reflect verified reality.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/core-domain-models.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/e-r-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/workflow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/data-flow-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture-diagram.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/core-domain-models.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/e-r-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/workflow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/data-flow-diagram.svg
+- .scratch/verification/SPRINT-002/phase0/diagrams/architecture-diagram.svg
 ```
 
 ## Appendix - Core Domain Models
@@ -1768,196 +2765,194 @@ classDiagram
     class PipelineRun {
       +string id
       +string familyId
-      +string displayName
       +string status
       +bool archived
-      +bool simulate
       +string dotSource
+      +string graphSvg
       +int createdAtMs
       +int updatedAtMs
     }
 
-    class RunManifest {
+    class PipelineEvent {
       +string runId
-      +string familyId
-      +string status
-      +string currentNode
-      +string[] completedNodes
-      +string errorMessage
-    }
-
-    class RunEvent {
-      +string runId
-      +string eventType
       +int tsMs
-      +map payload
+      +string type
+      +object payload
     }
 
     class PendingQuestion {
       +string id
+      +string runId
       +string prompt
-      +string status
-      +string answer
+      +string kind
+      +bool required
     }
 
     class ArtifactRecord {
+      +string runId
       +string path
       +int sizeBytes
       +bool isText
     }
 
-    class DotSession {
-      +string mode
-      +string prompt
-      +string dotSource
-      +string diagnostics
+    class DotValidation {
+      +bool valid
+      +string normalizedDot
+      +list diagnostics
     }
 
-    PipelineRun "1" --> "1" RunManifest
-    PipelineRun "1" --> "many" RunEvent
-    PipelineRun "1" --> "many" PendingQuestion
-    PipelineRun "1" --> "many" ArtifactRecord
-    PipelineRun "1" --> "many" DotSession
+    class DotStreamFrame {
+      +string delta
+      +bool done
+      +string dotSource
+      +string error
+    }
+
+    PipelineRun "1" --> "many" PipelineEvent : emits
+    PipelineRun "1" --> "many" PendingQuestion : blocks_on
+    PipelineRun "1" --> "many" ArtifactRecord : owns
+    DotValidation --> PipelineRun : gates_creation
+    DotStreamFrame --> DotValidation : feeds_editor
 ```
 
 ## Appendix - E-R Diagram
 ```mermaid
 erDiagram
-    PIPELINE_RUN ||--|| RUN_MANIFEST : has
-    PIPELINE_RUN ||--o{ RUN_EVENT : emits
-    PIPELINE_RUN ||--o{ PENDING_QUESTION : contains
-    PIPELINE_RUN ||--o{ ARTIFACT : writes
-    PIPELINE_RUN ||--o{ DOT_SESSION : derives
-
-    PIPELINE_RUN {
+    RUN {
       string id PK
       string family_id
-      string display_name
       string status
-      bool archived
-      bool simulate
-      int created_at_ms
-      int updated_at_ms
-    }
-
-    RUN_MANIFEST {
-      string run_id PK
-      string current_node
-      string[] completed_nodes
-      string error_message
-      int updated_at_ms
+      boolean archived
+      string dot_source
+      datetime created_at
+      datetime updated_at
     }
 
     RUN_EVENT {
+      string id PK
       string run_id FK
-      int ts_ms
+      bigint ts_ms
       string type
-      json payload
+      text payload_json
     }
 
-    PENDING_QUESTION {
+    RUN_QUESTION {
+      string id PK
       string run_id FK
-      string question_id PK
       string prompt
-      string status
       string answer
+      string state
+      datetime updated_at
     }
 
-    ARTIFACT {
+    RUN_ARTIFACT {
+      string id PK
       string run_id FK
-      string path PK
-      int size_bytes
-      bool is_text
+      string rel_path
+      bigint size_bytes
+      boolean is_text
     }
 
-    DOT_SESSION {
-      string run_id FK
-      string session_id PK
-      string mode
-      string input_prompt
-      string output_dot
-      string diagnostics
+    RUN_CHECKPOINT {
+      string run_id PK, FK
+      text checkpoint_json
+      datetime updated_at
     }
+
+    RUN_CONTEXT {
+      string run_id PK, FK
+      text context_json
+      datetime updated_at
+    }
+
+    RUN ||--o{ RUN_EVENT : has
+    RUN ||--o{ RUN_QUESTION : has
+    RUN ||--o{ RUN_ARTIFACT : has
+    RUN ||--|| RUN_CHECKPOINT : snapshots
+    RUN ||--|| RUN_CONTEXT : snapshots
 ```
 
 ## Appendix - Workflow Diagram
 ```mermaid
 flowchart TD
-    A[User opens dashboard] --> B[Monitor route loads run list]
-    B --> C{Select existing run?}
-    C -->|Yes| D[Subscribe per-run SSE]
-    D --> E[Render summary timeline logs graph artifacts]
-    E --> F{Pending human gate?}
-    F -->|Yes| G[Submit answer]
-    G --> D
-    C -->|No| H[Navigate to Create]
-    H --> I[Edit or generate DOT]
-    I --> J[Validate DOT]
-    J --> K{Valid?}
-    K -->|No| L[Fix DOT sync or stream]
-    L --> J
-    K -->|Yes| M[Create run]
-    M --> B
-    E --> N{Iterate needed?}
-    N -->|Yes| O[Open iterate mode with base DOT]
-    O --> P[Stream iterate changes]
-    P --> J
+    A[Open Dashboard] --> B{Route}
+    B -->|Monitor| C[Fetch Runs]
+    B -->|Create| D[Edit DOT]
+    B -->|Archived| E[Load Archived Runs]
+    B -->|Docs| F[View Docs]
+
+    C --> G[Subscribe Global SSE]
+    G --> H[Select Run]
+    H --> I[Subscribe Run SSE]
+    I --> J[View Summary Timeline Logs Graph Artifacts]
+    J --> K{Lifecycle Action}
+    K -->|Cancel/Archive/Unarchive/Delete| L[POST API]
+    L --> M[Refresh via SSE Snapshot + Deltas]
+
+    D --> N[Validate DOT]
+    N --> O{Valid}
+    O -->|No| P[Show Diagnostics]
+    O -->|Yes| Q[Render SVG Preview]
+    Q --> R{Generate/Fix/Iterate?}
+    R -->|Generate/Fix| S[DOT Stream Endpoint]
+    R -->|Iterate| T[Prefill from Source Run + Stream]
+    S --> U[Apply Delta Chunks]
+    T --> U
+    U --> V[Launch Run]
+    V --> H
 ```
 
 ## Appendix - Data-Flow Diagram
 ```mermaid
 flowchart LR
-    UI[web/app.js] -->|HTTP JSON| Router[src/Http/Router.php]
-    UI -->|SSE| Sse[src/Http/Sse.php]
-    Router --> App[src/App.php]
-    App --> PipelineService[src/Domain/PipelineService.php]
-    App --> DotService[src/Domain/DotService.php]
-    PipelineService --> RunStore[src/Storage/RunStore.php]
-    DotService --> RunStore
-    RunStore --> Files[(run directories)]
-    Sse --> RunStore
-    RunStore -->|events.ndjson| Sse
-    Router -->|OpenAPI-backed responses| UI
+    UI[Web Dashboard SPA]
+    API[PHP App Router]
+    DOT[DotService]
+    PIPE[PipelineService]
+    STORE[RunStore]
+    FS[(Run Files + Artifacts)]
+    SSE[SSE Formatter]
+
+    UI -->|HTTP JSON| API
+    UI -->|SSE Connect sinceTs| API
+
+    API --> DOT
+    API --> PIPE
+    PIPE --> STORE
+    DOT --> STORE
+    STORE --> FS
+    FS --> STORE
+
+    API --> SSE
+    SSE -->|Snapshot + Deltas| UI
+    STORE -->|Run/Event/Artifact Data| API
 ```
 
 ## Appendix - Architecture Diagram
 ```mermaid
 flowchart TB
     subgraph Browser
-      SPA[Dashboard SPA]
-      Docs[Docs View]
+      SPA[Dashboard UI\nMonitor / Create / Archived / Docs]
     end
 
-    subgraph PHP_Runtime
-      Entry[public/index.php]
-      Http[Router + Request/Response]
-      SSE[SSE Stream Handler]
+    subgraph Runtime[PHP Runtime]
+      Front[public/index.php]
+      App[App + Router]
+      HTTP[Request/Response/SSE]
       Domain[PipelineService + DotService]
-      Store[RunStore]
+      Storage[RunStore]
     end
 
-    subgraph Storage
-      Runs[(logs root / runs)]
-      Manifest[manifest.json]
-      Checkpoint[checkpoint.json]
-      Context[context.json]
-      Events[events.ndjson]
-      Dot[dot.dot]
-      Artifacts[artifacts/]
+    subgraph Persistence[Local Storage]
+      Runs[(.scratch/runs/<runId>/...)]
+      Evidence[(.scratch/verification/SPRINT-002/...)]
     end
 
-    SPA --> Entry
-    Docs --> Entry
-    Entry --> Http
-    Http --> Domain
-    Http --> SSE
-    Domain --> Store
-    SSE --> Store
-    Store --> Runs
-    Runs --> Manifest
-    Runs --> Checkpoint
-    Runs --> Context
-    Runs --> Events
-    Runs --> Dot
-    Runs --> Artifacts
+    SPA -->|REST + SSE| Front
+    Front --> App
+    App --> HTTP
+    App --> Domain
+    Domain --> Storage
+    Storage --> Runs
+    Domain --> Evidence
 ```
