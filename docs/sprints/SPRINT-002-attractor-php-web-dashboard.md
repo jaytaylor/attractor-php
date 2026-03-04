@@ -10,7 +10,7 @@ Evidence rule:
 Deliver a built-in web dashboard for Attractor PHP that enables:
 - Real-time pipeline monitoring (status, stages, logs, rendered graph)
 - Remote human-gate operation (view pending questions and submit answers)
-- Pipeline creation workflow (paste/upload DOT and optionally generate DOT from a prompt)
+- Pipeline creation workflow (paste/upload DOT, generate DOT from a prompt, and iterate an existing run’s DOT via the agentic loop)
 
 This sprint explicitly uses the embedded dashboard in [`coreys-attractor`](../../coreys-attractor/README.md) as a UX and API inspiration source, while implementing behavior consistent with the Attractor NLSpec (`attractor-spec.md`) HTTP server mode and event stream requirements.
 
@@ -24,6 +24,21 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
 - This repo is currently NLSpecs + docs only (no PHP runtime implementation, no HTTP server, no UI assets).
 - A local reference implementation of a similar dashboard approach exists in this worktree (`coreys-attractor/`) and is used only as inspiration (not a deliverable).
 
+## Golden References (Must-Read: Agentic Loops, Especially DOT Expansion/Generation)
+This sprint treats DOT pipelines as an agentic artifact: users must be able to **generate**, **validate/render**, **fix**, and **iterate** DOT in a loop until it converges into a runnable pipeline. A one-shot “generate DOT and hope it parses” implementation is explicitly insufficient.
+
+Coreys Attractor references (code + intent):
+- Agentic loop notes (local scratch extraction; required reading; created/updated in P0.5): [`../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`](../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md)
+- DOT generator + fence stripping: [`../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt)
+- Streaming DOT endpoints + iterate-run endpoint (server) and Create-view generate/iterate/fix JS loop (client): [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt)
+- “Iterate” user story (dotfile expansion loop intent): [`../../coreys-attractor/docs/sprints/drafts/SPRINT-002-INTENT.md`](../../coreys-attractor/docs/sprints/drafts/SPRINT-002-INTENT.md)
+
+What must carry over into Attractor PHP (behavioral contract, not implementation details):
+- Streaming DOT generation and streaming DOT iteration (delta chunks appended to the editor).
+- Validation-gated “Run”: refuse to run invalid DOT.
+- DOT fix loop: take a Graphviz/validator error and converge to renderable DOT.
+- Iterate a terminal run into a *new run* that preserves lineage (`familyId`) and keeps the source run unchanged.
+
 ## Non-Goals
 - Authentication/authorization, multi-user sessions, or RBAC
 - Multi-tenant isolation
@@ -36,8 +51,9 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
 ## Product Requirements (User Flows)
 1. **Create a pipeline run**
    - Paste DOT source into an editor and run it.
-   - (Optional but planned) Describe a goal in natural language and generate candidate DOT.
-   - Validate DOT before running and show actionable diagnostics.
+   - Describe a goal in natural language and generate candidate DOT (streaming).
+   - Validate DOT before running and show actionable diagnostics (block run until valid).
+   - If DOT fails render/validate, provide a fix workflow (LLM-assisted) that converges to renderable DOT or refuses to run with clear diagnostics.
 2. **Monitor a pipeline run**
    - See overall run status, current node, and stage list with per-stage status.
    - See a rendered graph visualization with stage status overlays.
@@ -50,6 +66,10 @@ Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
    - Download all artifacts as a ZIP.
 5. **Run history basics**
    - List recent runs, open an older run, and delete a run (with safeguards).
+6. **Iterate a pipeline run (dotfile expansion loop)**
+   - From a terminal run, open Create view in “iterate mode” with the run’s DOT pre-populated.
+   - Describe modifications in natural language and stream back a modified DOT (without losing the ability to hand-edit the DOT).
+   - Start a new run from the modified DOT while preserving lineage (`familyId`) and leaving the source run untouched.
 
 ## Architectural Approach (High Level)
 - **Server**: Attractor PHP runs the pipeline engine and exposes an HTTP API plus SSE endpoints for events.
@@ -86,6 +106,24 @@ This UI intentionally mirrors the flow that makes Corey’s Attractor productive
 ### Create View - Minimum Behaviors
 - Paste DOT, validate, preview as SVG, then run.
 - Validation diagnostics must be shown inline and block run creation until fixed.
+- Generate DOT from a natural-language prompt using a streaming endpoint (delta chunks) and show progressive DOT output in the editor as it arrives.
+- Support “iterate mode”: pre-populate DOT from an existing run and stream back modifications from a natural-language change request.
+- Provide a DOT fix workflow that takes a render/validator error and converges the DOT into a renderable graph, or refuses to run with clear diagnostics.
+
+### DOT Agentic Loop Contract (Do Not Skip)
+This is the critical “dotfile expansion / generation” loop. The implementation must follow this shape (Coreys Attractor reference: [`../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`](../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md)).
+
+1. Generate (streaming): UI starts generation with `POST /api/v1/dot/generate/stream` and receives `delta` chunks until `done`.
+2. Validate: UI calls `POST /api/v1/dot/validate`; if invalid, disable Run and show diagnostics.
+3. Render: UI calls `POST /api/v1/dot/render` for preview; if render fails, show the error.
+4. Fix (streaming): UI can call `POST /api/v1/dot/fix/stream` with `{dotSource, error}`; then re-validate and re-render.
+5. Iterate (streaming): when iterating, UI calls `POST /api/v1/dot/iterate/stream` with `{baseDot, changes}`; then re-validate and re-render.
+6. Run: only when DOT validates does the UI enable Run and call `POST /api/v1/pipelines` (or iterate-run endpoint when preserving lineage).
+
+Streaming DOT SSE payload expectations (minimum):
+- `data: {"delta":"...chunk..."}` (0..N occurrences)
+- `data: {"done":true,"dotSource":"...full dot..."}` (exactly once on success)
+- `data: {"error":"...message..."}` (0..1, terminal)
 
 ## API Shapes (Selected, Starting Point)
 The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to remove ambiguity for implementers and test authors.
@@ -214,11 +252,13 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 .scratch/verification/SPRINT-002/
   phase0/
     adr/
+    agentic-loops/
     openapi/
     sse-contract/
     diagrams/
   phase1/
     api/
+    dot-agentic/
     sse/
     artifacts/
     security/
@@ -239,7 +279,7 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ### Phase 0 - Contracts, IA, and Decision Log
 - [ ] **P0.0 - Evidence scaffolding: create `.scratch/verification/SPRINT-002/` tree + an index README**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.1 - Capture key architecture decisions in ADR**
+- [ ] **P0.1 - Capture key architecture decisions in `docs/ADR.md` (ADR log)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.2 - Define the HTTP API contract (OpenAPI + written invariants)**
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -247,11 +287,15 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.4 - Define UI information architecture and view-to-endpoint mapping**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.5 - Mermaid appendix diagrams render via `mmdc` (outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`)**
+- [ ] **P0.5 - Agentic loop reference extraction (Coreys Attractor): DOT generate/fix/iterate + iterate-run loop**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P0.6 - Mermaid appendix diagrams render via `mmdc` (outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 0)
 - [ ] ADR(s) exist and explicitly justify: UI stack choice, API surface choice, persistence approach, and SSE format
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Agentic DOT loops are explicitly specified as contracts (generate → validate/render → fix → iterate; plus iterate-run lineage) and include links to the Coreys Attractor reference notes
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] OpenAPI spec covers every endpoint the UI will call, including error envelopes
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -311,6 +355,14 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P1.24 - Hermetic simulation mode for UI + tests (`simulate=true` runs without real LLM calls)**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.25 - DOT generate endpoints: `POST /api/v1/dot/generate` and `POST /api/v1/dot/generate/stream`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.26 - DOT fix endpoints (LLM-assisted): `POST /api/v1/dot/fix` and `POST /api/v1/dot/fix/stream`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.27 - DOT iterate endpoints (LLM-assisted): `POST /api/v1/dot/iterate` and `POST /api/v1/dot/iterate/stream`**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P1.28 - Iterate-run endpoint (lineage-preserving): `POST /api/v1/pipelines/{id}/iterate` (new run; source run unchanged)**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 1)
 - [ ] `GET /` returns a functional dashboard shell and loads without external network dependencies
@@ -318,6 +370,8 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 - [ ] Creating a run persists a run directory and emits lifecycle + stage events to SSE clients
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Invalid DOT is rejected by validation endpoints with structured diagnostics and a stable error envelope
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] DOT generation/iteration endpoints stream deltas, strip markdown fences, and (in simulation mode) can be tested without network access
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Human-gate operations work end-to-end: pending question appears, answer submission is validated and recorded, run resumes
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -349,6 +403,8 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P2.8 - Archive/unarchive + delete actions wired into the Monitor view with confirmations**
 ```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P2.9 - Iterate action for terminal runs: “Iterate” opens Create view in iterate mode (base DOT + original prompt)**
+```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 2)
 - [ ] Monitor view reflects state changes in near-real-time from SSE without manual refresh
@@ -373,21 +429,29 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P3.3 - Create run from edited DOT and automatically navigate to Monitor view**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P3.4 - Optional: DOT generation from a natural-language prompt (streaming UI)**
+- [ ] **P3.4 - DOT generation from a natural-language prompt (streaming UI; validate-gated)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P3.5 - Run history basics: list recent runs and delete a run with confirmation**
+- [ ] **P3.5 - DOT fix workflow: on render/validate failure, provide a “Fix DOT” flow (streaming) that converges or refuses to run**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P3.6 - Built-in documentation page (`/docs`) describing UI + API + DOT**
+- [ ] **P3.6 - Iterate mode (dotfile expansion loop): modify an existing run’s DOT (streaming) and create a new run preserving lineage (`familyId`)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P3.7 - Archived view: list archived runs and allow unarchive/open**
+- [ ] **P3.7 - Run history basics: list recent runs and delete a run with confirmation**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P3.8 - Create view options: `simulate` toggle (and `autoApprove` if implemented) are passed to run creation**
+- [ ] **P3.8 - Built-in documentation page (`/docs`) describing UI + API + DOT**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P3.9 - Archived view: list archived runs and allow unarchive/open**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P3.10 - Create view options: `simulate` toggle (and `autoApprove` if implemented) are passed to run creation**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 3)
 - [ ] Users can paste DOT, validate, preview, and run without leaving the UI
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Validation failures are actionable (diagnostics point to node/edge when available) and do not start a run
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] DOT generation is agentic: generation streams, run is validation-gated, and a DOT fix flow exists for render failures
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Iterating a pipeline run works end-to-end (terminal run → iterate mode → modified DOT → new run) and the source run is unchanged
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Run delete is safe: requires explicit confirmation and refuses to delete a currently running run
 ```{placeholder for verification justification/reasoning and evidence log}```
@@ -454,6 +518,13 @@ This section is a concrete starting point; the authoritative version must live i
 | Artifacts | `GET` | `/api/v1/pipelines/{id}/artifacts.zip` | Download all artifacts as ZIP | Monitor |
 | DOT | `POST` | `/api/v1/dot/validate` | Validate DOT and return diagnostics | Create |
 | DOT | `POST` | `/api/v1/dot/render` | Render DOT to SVG | Create |
+| DOT | `POST` | `/api/v1/dot/generate` | Generate DOT from NL prompt | Create |
+| DOT | `POST` | `/api/v1/dot/generate/stream` | Generate DOT from NL prompt (streaming) | Create |
+| DOT | `POST` | `/api/v1/dot/fix` | Fix DOT using Graphviz/validator error | Create |
+| DOT | `POST` | `/api/v1/dot/fix/stream` | Fix DOT (streaming) | Create |
+| DOT | `POST` | `/api/v1/dot/iterate` | Modify an existing DOT using NL changes | Create (Iterate mode) |
+| DOT | `POST` | `/api/v1/dot/iterate/stream` | Modify DOT (streaming) | Create (Iterate mode) |
+| Runs | `POST` | `/api/v1/pipelines/{id}/iterate` | Create a new run from modified DOT, inheriting the family | Monitor → Create |
 
 ### Create Run Request (`POST /api/v1/pipelines`)
 Request body:
@@ -492,6 +563,13 @@ Response 201:
 - `GET /api/v1/pipelines/{id}/artifacts.zip` download all artifacts as zip
 - `POST /api/v1/dot/validate` validate DOT and return diagnostics
 - `POST /api/v1/dot/render` render DOT to SVG (used by Create preview)
+- `POST /api/v1/dot/generate` generate DOT from a natural-language prompt
+- `POST /api/v1/dot/generate/stream` generate DOT from a natural-language prompt (streaming)
+- `POST /api/v1/dot/fix` fix a broken DOT using a provided error message
+- `POST /api/v1/dot/fix/stream` fix a broken DOT (streaming)
+- `POST /api/v1/dot/iterate` modify an existing DOT using a natural-language change request
+- `POST /api/v1/dot/iterate/stream` modify an existing DOT (streaming)
+- `POST /api/v1/pipelines/{id}/iterate` create a new run from modified DOT, preserving lineage (`familyId`)
 
 Spec-core aliases (non-versioned, thin wrappers around the v1 implementation):
 - `POST /pipelines`
@@ -517,6 +595,9 @@ Positive cases:
 6. Cancel run transitions status to `cancelled` and emits a terminal event on SSE.
 7. `GET /api/v1/pipelines/{id}/checkpoint` and `/context` return expected shapes while the run is active.
 8. Create run with `simulate=true` completes deterministically and produces the expected artifact tree.
+9. Generate DOT from NL prompt (simulation/mocked mode) returns DOT that validates and renders.
+10. Iterate DOT from a base DOT + NL changes (simulation/mocked mode) returns modified DOT and preserves required graph invariants (start/exit nodes present, reachable nodes, etc.).
+11. Fix DOT with a provided error message returns DOT that validates and renders (or returns a stable error envelope explaining refusal).
 
 Negative cases:
 1. Create run rejects missing/empty `dotSource` with 400 + error envelope.
@@ -530,17 +611,24 @@ Negative cases:
 9. Archive on a running run is rejected with 409 + error envelope.
 10. Unarchive on a running run is rejected with 409 + error envelope.
 11. Checkpoint/context endpoints on a nonexistent run id return 404 + error envelope.
+12. DOT generate missing `prompt` returns 400 + error envelope.
+13. DOT iterate missing `baseDot` or `changes` returns 400 + error envelope.
+14. DOT fix missing `dotSource` returns 400 + error envelope.
+15. Iterate-run endpoint refuses to iterate a running source run with 409 + error envelope.
 
 ### UI E2E (Selected)
 Positive cases:
 1. Paste DOT, validate, preview, run, then observe stage updates in Monitor view via SSE.
 2. When a human gate appears, the UI presents answer buttons and the pipeline proceeds after selection.
 3. Artifact viewer previews prompt/response and downloads the artifacts zip.
+4. Generate DOT from NL prompt (streaming), validate passes, preview renders, and run starts successfully.
+5. Iterate a terminal run: click Iterate, modify description, stream back modified DOT, and run as a new run (source run preserved).
 
 Negative cases:
 1. Invalid DOT shows a validation error and disables Run until fixed.
 2. Network error (API returns 500) shows a user-visible error banner without breaking the SPA.
 3. Selecting a deleted run id shows a clear not-found state and navigates safely back to the run list.
+4. Graph render failure triggers the “Fix DOT” flow (or shows a clear fix affordance) and refuses to run until DOT is valid.
 
 ---
 
@@ -702,4 +790,49 @@ flowchart LR
   ENG --> Q
   ENG --> DISK
   API --> DISK
+```
+
+### A6. DOT Agentic Loop (Generate / Validate / Fix / Iterate)
+```mermaid
+sequenceDiagram
+  participant U as Browser UI
+  participant S as Attractor PHP Server
+  participant L as DOT LLM Backend
+  participant V as DOT Validator/Renderer
+
+  Note over U,S: Generate DOT (new pipeline)
+  U->>S: POST /api/v1/dot/generate/stream {prompt}
+  S->>L: generate DOT (stream)
+  L-->>S: delta chunks
+  S-->>U: data: {"delta":"..."}
+  S-->>U: data: {"done":true,"dotSource":"..."}
+
+  U->>S: POST /api/v1/dot/validate {dotSource}
+  S->>V: validate
+  V-->>S: {valid, diagnostics}
+  S-->>U: {valid, diagnostics}
+
+  alt valid
+    U->>S: POST /api/v1/dot/render {dotSource}
+    S->>V: render SVG
+    V-->>S: {svg}
+    S-->>U: {svg}
+  else invalid or render error
+    Note over U,S: Fix DOT (agentic convergence)
+    U->>S: POST /api/v1/dot/fix/stream {dotSource, error}
+    S->>L: fix DOT (stream)
+    L-->>S: delta chunks
+    S-->>U: data: {"delta":"..."}
+    S-->>U: data: {"done":true,"dotSource":"..."}
+  end
+
+  Note over U,S: Iterate existing run DOT (dotfile expansion)
+  U->>S: POST /api/v1/dot/iterate/stream {baseDot, changes}
+  S->>L: iterate DOT (stream)
+  L-->>S: delta chunks
+  S-->>U: data: {"delta":"..."}
+  S-->>U: data: {"done":true,"dotSource":"..."}
+
+  U->>S: POST /api/v1/pipelines/{id}/iterate {dotSource}
+  S-->>U: 200 {newId}
 ```
