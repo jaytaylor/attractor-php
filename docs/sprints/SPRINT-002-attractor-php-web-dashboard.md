@@ -31,6 +31,96 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
   - End-to-end verification harness (`make build`, `make test`, Playwright UI e2e, guardrail checks)
 - Reference implementation notes were extracted and pinned under `.scratch/refs/SPRINT-002/`.
 
+## Implementation Delta Tracker (2026-03-04)
+- [X] **D1 - Re-baseline runtime to support time-based non-sim run progression (`running` -> terminal) without background worker processes**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+```
+- [X] **D2 - Add incremental SSE cursor support for run/global event feeds via `sinceTs` query parameter**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+```
+- [X] **D3 - Update backend tests to prove non-sim progression and maintain endpoint/state guard invariants**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+```
+- [X] **D4 - Replace one-shot Monitor event loading with continuous polling + incremental event application in `web/app.js`**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
+```
+- [X] **D5 - Improve UI action-path resilience (error surfacing for create/generate/fix/iterate/archive/delete flows)**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
+```
+- [X] **D6 - Sync API/docs to reflect incremental SSE cursor semantics (`openapi-v1.yaml`, `web-dashboard.md`, `/docs`)**
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
+```
+
+#### Acceptance Criteria (Implementation Delta)
+- [X] Non-sim runs are observable as `running` before they converge to terminal state, and tests verify this transition
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+```
+- [X] Monitor view updates state/events without manual refresh through incremental polling + cursor-based event retrieval
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
+```
+- [X] Regression baseline remains green (`make build`, `make test`) after runtime/UI contract changes
+```
+Verified via:
+- `timeout 180 make build` (exit 0)
+- `timeout 180 make test` (exit 0)
+Evidence:
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
+- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
+- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
+```
+
 ## Golden References (Must-Read: Agentic Loops, Especially DOT Expansion/Generation)
 This sprint treats DOT pipelines as an agentic artifact: users must be able to **generate**, **validate/render**, **fix**, and **iterate** DOT in a loop until it converges into a runnable pipeline. A one-shot “generate DOT and hope it parses” implementation is explicitly insufficient.
 
@@ -76,11 +166,11 @@ The implementation should create or extend these areas so engineers can work in 
 
 | Area | Path(s) | Responsibilities |
 |---|---|---|
-| HTTP entrypoint + routing | `bin/attractor`, `src/Web/HttpServer.php`, `src/Web/Router.php` | Serve `/`, `/docs`, JSON API, and SSE endpoints |
-| API handlers (runs/events/human/artifacts) | `src/Web/Api/*` | Implement `/api/v1/pipelines*`, `/api/v1/events`, questions, archive/delete/cancel |
-| DOT handlers | `src/Web/Dot/*` | Validate/render + generate/fix/iterate (sync + streaming) |
-| Run state + persistence | `src/Pipeline/Runtime/*`, `src/Pipeline/RunStore/*` | Manifest/checkpoint/context loading, artifact enumeration, run status transitions |
-| SSE streaming | `src/Web/Sse/*` | Framing, subscriber registry, snapshot-first connect behavior |
+| HTTP entrypoint + routing | `public/index.php`, `src/App.php`, `src/Http/Router.php` | Serve `/`, `/docs`, JSON API, and SSE endpoints |
+| API handlers (runs/events/human/artifacts) | `src/App.php`, `src/Domain/PipelineService.php`, `src/Storage/RunStore.php` | Implement `/api/v1/pipelines*`, `/api/v1/events`, questions, archive/delete/cancel |
+| DOT handlers | `src/Domain/DotService.php` | Validate/render + generate/fix/iterate (sync + streaming) |
+| Run state + persistence | `src/Domain/PipelineService.php`, `src/Storage/RunStore.php` | Manifest/checkpoint/context loading, artifact enumeration, run status transitions |
+| SSE streaming | `src/Http/Sse.php`, `src/App.php` | Framing, snapshot-first connect behavior, incremental cursor (`sinceTs`) retrieval |
 | Dashboard static app | `web/index.html`, `web/app.js`, `web/styles.css` | Monitor/Create/Archived/Docs views and API integration |
 | API + contract docs | `docs/api/openapi-v1.yaml`, `docs/api/web-dashboard.md` | Authoritative endpoint contracts and request/response shapes |
 | Verification harness | `.scratch/tests/SPRINT-002/*`, `.scratch/verification/SPRINT-002/*` | Guardrail checks, API probes, SSE probes, UI evidence artifacts |

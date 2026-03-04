@@ -23,6 +23,7 @@
 
         <h2>SSE Contract</h2>
         <p>Each SSE response is <code>text/event-stream</code> and sends newline-delimited <code>data: {json}</code> frames.</p>
+        <p>For incremental polling, both event endpoints accept optional <code>?sinceTs=&lt;epoch_ms&gt;</code> and return only newer events.</p>
         <pre class="log">data: {"type":"Snapshot","payload":{...}}
 
 data: {"runId":"run-...","type":"StageCompleted","payload":{...}}</pre>

@@ -95,6 +95,7 @@ paths:
       summary: Per-run SSE stream
       parameters:
         - $ref: '#/components/parameters/RunId'
+        - $ref: '#/components/parameters/SinceTs'
       responses:
         '200':
           description: SSE stream
@@ -105,6 +106,8 @@ paths:
   /api/v1/events:
     get:
       summary: Global SSE stream
+      parameters:
+        - $ref: '#/components/parameters/SinceTs'
       responses:
         '200':
           description: SSE stream
@@ -401,6 +404,14 @@ components:
       name: id
       required: true
       schema: { type: string }
+    SinceTs:
+      in: query
+      name: sinceTs
+      required: false
+      description: Optional event cursor in epoch milliseconds; server returns only events with tsMs greater than this cursor.
+      schema:
+        type: integer
+        minimum: 0
   responses:
     ErrorEnvelope:
       description: Structured error payload

@@ -15,6 +15,8 @@ All non-2xx API responses return:
 - Content type: `text/event-stream`
 - Frame shape: `data: {json}\n\n`
 - Ordering: first frame is always `Snapshot`, followed by event deltas.
+- Cursoring: both stream endpoints accept optional `sinceTs` (epoch milliseconds) and return only events with `tsMs > sinceTs`.
+- Polling model: the built-in dashboard polls run/global streams with `sinceTs` for incremental updates while keeping snapshot-first reconnect semantics.
 
 Per-run snapshot payload:
 - Full run detail object for requested run id.
