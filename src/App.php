@@ -40,6 +40,10 @@ final class App
             $this->serveStatic('/docs.html');
         }
 
+        if ($request->path === '/favicon.ico') {
+            Response::noContent();
+        }
+
         $this->routeApi($request);
 
         Response::json(404, ['error' => 'route not found', 'code' => 'NOT_FOUND']);

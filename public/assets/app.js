@@ -59,10 +59,25 @@ async function initMonitor() {
       runList.appendChild(li);
     }
 
-    if (!selectedRunId && data.items?.length) {
-      selectedRunId = data.items[0].id;
-      await renderRun(selectedRunId);
+    if (!data.items?.length) {
+      selectedRunId = null;
+      title.textContent = 'Run Details';
+      status.textContent = '';
+      stages.innerHTML = '';
+      logs.textContent = '';
+      artifacts.innerHTML = '';
+      graph.textContent = '';
+      question.textContent = '';
+      actions.innerHTML = '';
+      return;
     }
+
+    const runIds = new Set((data.items || []).map((item) => item.id));
+    if (!selectedRunId || !runIds.has(selectedRunId)) {
+      selectedRunId = data.items[0].id;
+    }
+
+    await renderRun(selectedRunId);
   }
 
   async function renderRun(id) {

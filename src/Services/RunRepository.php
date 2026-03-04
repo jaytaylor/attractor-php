@@ -8,6 +8,17 @@ use App\Support\Time;
 
 final class RunRepository
 {
+    /**
+     * @var array<string,list<string>>
+     */
+    private const ALLOWED_TRANSITIONS = [
+        'queued' => ['running', 'cancelled'],
+        'running' => ['completed', 'failed', 'cancelled'],
+        'completed' => [],
+        'failed' => [],
+        'cancelled' => [],
+    ];
+
     public function __construct(
         private readonly string $projectRoot,
         private readonly DotService $dotService,
@@ -270,6 +281,9 @@ final class RunRepository
         if ($run === null) {
             return ['ok' => false, 'error' => 'run not found', 'code' => 'NOT_FOUND'];
         }
+        if ((string) ($run['status'] ?? '') !== 'running') {
+            return ['ok' => false, 'error' => 'run is not awaiting answers', 'code' => 'INVALID_STATE'];
+        }
 
         $questionPath = $this->runPath($id) . '/question.json';
         $question = $this->loadJson($questionPath);
@@ -293,7 +307,11 @@ final class RunRepository
         }
 
         unlink($questionPath);
-        $run['status'] = $answer === 'A' ? 'completed' : 'failed';
+        $targetStatus = $answer === 'A' ? 'completed' : 'failed';
+        if (!$this->canTransition((string) ($run['status'] ?? ''), $targetStatus)) {
+            return ['ok' => false, 'error' => 'invalid status transition', 'code' => 'INVALID_STATE'];
+        }
+        $run['status'] = $targetStatus;
         $run['finishedAtMs'] = Time::nowMs();
 
         $stages = is_array($run['stages'] ?? null) ? $run['stages'] : [];
@@ -342,7 +360,8 @@ final class RunRepository
             return ['ok' => false, 'error' => 'run not found', 'code' => 'NOT_FOUND'];
         }
 
-        if ((string) $run['status'] !== 'running') {
+        $status = (string) ($run['status'] ?? '');
+        if (!$this->canTransition($status, 'cancelled')) {
             return ['ok' => false, 'error' => 'run is not running', 'code' => 'INVALID_STATE'];
         }
 
@@ -361,8 +380,8 @@ final class RunRepository
             return ['ok' => false, 'error' => 'run not found', 'code' => 'NOT_FOUND'];
         }
 
-        if ((string) $run['status'] === 'running') {
-            return ['ok' => false, 'error' => 'cannot delete running run', 'code' => 'INVALID_STATE'];
+        if (!$this->isTerminalStatus((string) ($run['status'] ?? ''))) {
+            return ['ok' => false, 'error' => 'cannot delete non-terminal run', 'code' => 'INVALID_STATE'];
         }
 
         $this->deleteDir($this->runPath($id));
@@ -376,8 +395,8 @@ final class RunRepository
             return ['ok' => false, 'error' => 'run not found', 'code' => 'NOT_FOUND'];
         }
 
-        if ((string) $run['status'] === 'running') {
-            return ['ok' => false, 'error' => 'run is running', 'code' => 'INVALID_STATE'];
+        if (!$this->isTerminalStatus((string) ($run['status'] ?? ''))) {
+            return ['ok' => false, 'error' => 'run is not terminal', 'code' => 'INVALID_STATE'];
         }
 
         $run['archived'] = $archived;
@@ -580,6 +599,17 @@ final class RunRepository
             }
         }
         rmdir($path);
+    }
+
+    private function canTransition(string $from, string $to): bool
+    {
+        $allowed = self::ALLOWED_TRANSITIONS[$from] ?? [];
+        return in_array($to, $allowed, true);
+    }
+
+    private function isTerminalStatus(string $status): bool
+    {
+        return in_array($status, ['completed', 'failed', 'cancelled'], true);
     }
 
     private function isTextFile(string $path): bool
