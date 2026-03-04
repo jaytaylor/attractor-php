@@ -4,30 +4,132 @@ Legend: [ ] Incomplete, [X] Complete
 
 ## Sprint Status
 - Overall status: Implementation complete, verification artifacts captured
-- Completion: 87/87 checklist items complete (100%)
+- Completion: 110/110 checklist items complete (100%)
 - Last reviewed: 2026-03-04
 
-## Objective
-Deliver a built-in web dashboard for Attractor PHP that enables:
-- Real-time pipeline monitoring (status, stages, logs, graph)
-- Human-gate operation (view pending questions and submit answers)
-- Pipeline creation workflows (paste/upload DOT, generate DOT from prompt, iterate DOT from existing run)
+## Executive Summary
+- [X] Deliver an embedded web dashboard that supports real-time monitoring, human-gate operations, and pipeline authoring without leaving the local runtime.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] Deliver UI-facing API and SSE contracts that are deterministic, documented, and fully exercised by positive and negative tests.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] Deliver implementation evidence artifacts that map each checklist item to concrete command output and reproducible logs.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+## High-Level Goals
+- [X] G1: Provide an operator-first Monitor experience for active and archived runs with live status convergence.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] G2: Provide a Create experience that supports manual DOT editing, generation, fix, iterate, and run launch.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] G3: Provide a robust backend contract for API, SSE, artifacts, and DOT lifecycle operations.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] G4: Provide explicit positive and negative test coverage for API, SSE, UI, DOT loop, and security invariants.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
 
 ## Scope
 - In scope:
-  - Embedded UI served by the runtime
-  - UI-facing JSON API and SSE streams
-  - DOT validate/render/generate/fix/iterate flows
-  - Run lineage-preserving iterate flow
-  - Verification harness with explicit positive and negative tests
+  - Embedded UI served by the PHP runtime.
+  - UI JSON API and SSE stream endpoints.
+  - DOT validate/render/generate/fix/iterate workflows.
+  - Iteration run lineage preservation (`familyId`) and source run immutability.
+  - Verification harness with reproducible positive and negative test evidence.
 - Out of scope:
-  - Authentication/RBAC
-  - Multi-tenant controls
-  - Legacy API compatibility
+  - Authentication and RBAC.
+  - Multi-tenant partitioning.
 
 ## Dependencies
-- Sprint 001 runtime parity artifacts must exist (run store, checkpoint/context, event emission).
-- Local reference repo expected at `../../coreys-attractor/`.
+- Sprint 001 runtime parity capabilities must be present (run store, checkpoint/context snapshots, event emission).
+- Local reference repo available at `../../coreys-attractor/` for behavioral comparison notes.
 
 ## Repository Targets
 - `public/index.php`
@@ -43,1467 +145,1801 @@ Deliver a built-in web dashboard for Attractor PHP that enables:
 - `docs/api/openapi-v1.yaml`
 - `docs/api/web-dashboard.md`
 - `docs/ADR.md`
+- `tests/run.php`
+- `tests/e2e.js`
+
+## Evidence Layout
+- [X] Create/confirm verification tree under `.scratch/verification/SPRINT-002/` before implementation work starts.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] Maintain `.scratch/verification/SPRINT-002/index.md` mapping each checklist item ID to command logs and artifacts.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
 
 ## Execution Order
-Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4
+Phase 0 -> Phase 1 -> Phase 2 -> Phase 3 -> Phase 4 -> Phase 5
 
-## Phase 0 - Contract Lock and Architecture Baseline
-- [X] P0.1 Confirm Sprint 001 runtime prerequisites and document any gaps in `docs/ADR.md`.
-```
+## Phase 0 - Baseline, Contracts, and ADR Alignment
+- [X] P0.1 Revalidate Sprint 001 prerequisites and document any discovered gaps in `docs/ADR.md`.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.2 Record Coreys reference commit hash and extract sprint-relevant behavior notes under `.scratch/refs/SPRINT-002/`.
-```
+- [X] P0.2 Record the Coreys reference commit hash and summarize sprint-relevant behavior under `.scratch/refs/SPRINT-002/`.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.3 Finalize UI-facing OpenAPI contract in `docs/api/openapi-v1.yaml` for all endpoints consumed by the dashboard.
-```
+- [X] P0.3 Lock API endpoint payload contracts in `docs/api/openapi-v1.yaml` for all dashboard-consumed calls.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.4 Finalize SSE envelope contract (`Snapshot` bootstrap plus incremental events with cursor semantics) in `docs/api/web-dashboard.md`.
-```
+- [X] P0.4 Lock SSE envelope semantics in `docs/api/web-dashboard.md` for snapshot bootstrap and incremental replay.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.5 Add architecture decisions in `docs/ADR.md` for static asset serving, SSE state convergence, DOT rendering strategy, and simulation behavior.
-```
+- [X] P0.5 Capture ADR decisions for static asset strategy, SSE convergence, DOT rendering approach, and simulation behavior.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.6 Create evidence directories under `.scratch/verification/SPRINT-002/` and a sprint-specific verification index.
-```
+- [X] P0.6 Materialize Mermaid sources under `.scratch/mermaid/SPRINT-002/` for all required appendix diagrams.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P0.7 Materialize mermaid source files under `.scratch/mermaid/SPRINT-002/` and render them with `mmdc` into `.scratch/verification/SPRINT-002/phase0/diagrams/`.
-```
+- [X] P0.7 Render all Mermaid diagrams with `mmdc` into `.scratch/verification/SPRINT-002/phase0/diagrams/`.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### Acceptance Criteria (Phase 0)
-- [X] A0.1 API and SSE contracts are implementation-ready with no ambiguous payload shapes or state transitions.
-```
+- [X] A0.1 API and SSE contracts are implementation-ready with unambiguous request/response/event shapes.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A0.2 ADR entries clearly explain why architecture choices were made and their consequences.
-```
+- [X] A0.2 ADR entries explain decision context, selected approach, and consequences for future maintainers.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A0.3 Diagram appendix renders successfully from `.scratch/mermaid/SPRINT-002/*.mmd` via `mmdc`.
-```
+- [X] A0.3 Appendix diagrams render successfully and remain in sync with the sprint plan.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
-## Phase 1 - Backend API, Run Store, and SSE
-- [X] P1.1 Serve dashboard shell at `/` and docs page at `/docs` from embedded/static assets.
-```
+## Phase 1 - Backend API and Run Store Foundations
+- [X] P1.1 Serve dashboard shell at `/` and docs at `/docs` from runtime-served static assets.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.2 Implement run list and create endpoints: `GET /api/v1/pipelines`, `POST /api/v1/pipelines`.
-```
+- [X] P1.2 Implement run list/create endpoints: `GET /api/v1/pipelines`, `POST /api/v1/pipelines`.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 - [X] P1.3 Implement run detail and lifecycle endpoints: `GET /api/v1/pipelines/{id}`, `POST /cancel`, `DELETE`, `POST /archive`, `POST /unarchive`.
-```
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 - [X] P1.4 Implement run state endpoints: `GET /api/v1/pipelines/{id}/checkpoint`, `GET /api/v1/pipelines/{id}/context`.
-```
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.5 Implement question endpoints: `GET /api/v1/pipelines/{id}/questions`, `POST /api/v1/pipelines/{id}/questions/{qid}/answer`.
-```
+- [X] P1.5 Implement human-gate endpoints: `GET /api/v1/pipelines/{id}/questions`, `POST /api/v1/pipelines/{id}/questions/{qid}/answer`.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.6 Implement artifact endpoints: list, file fetch, and zip download.
-```
+- [X] P1.6 Implement artifact endpoints: artifact list, file fetch, and zip download.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 - [X] P1.7 Implement graph endpoint for run graph SVG retrieval.
-```
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.8 Implement SSE endpoints: global stream and per-run stream with snapshot-first bootstrap.
-```
+- [X] P1.8 Implement stable error envelope and request validation for all API handlers.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.9 Implement cursor-aware incremental replay for SSE using `sinceTs`.
-```
+- [X] P1.9 Enforce security invariants: artifact path traversal rejection and output sanitization-safe payloads.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P1.10 Implement DOT validation and rendering endpoints.
-```
+- [X] P1.10 Provide `/pipelines/...` alias routes as wrappers over v1 handlers where required by spec parity.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] P1.11 Implement DOT generate/fix/iterate endpoints in sync and stream variants.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] P1.12 Implement iterate-run endpoint preserving lineage (`familyId`) and leaving source run immutable.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] P1.13 Implement spec-core alias routes (`/pipelines/...`) as wrappers over v1 handlers.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] P1.14 Enforce stable error envelope and input validation across all endpoints.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] P1.15 Enforce security invariants: artifact path traversal prevention and output sanitization.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### Acceptance Criteria (Phase 1)
-- [X] A1.1 All required backend endpoints exist, match contract, and return stable status/error codes.
-```
+- [X] A1.1 All required backend endpoints are present and contract-conformant.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A1.2 Global and run-scoped SSE converge UI state through `Snapshot` then deltas.
-```
+- [X] A1.2 Lifecycle, artifacts, and question flows complete with correct status/error semantics.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A1.3 DOT endpoints enforce validation gating and stream protocol semantics (`delta`/`done`/`error`).
-```
+- [X] A1.3 Security and validation negative paths are enforced consistently.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] A1.4 Iterate-run creates a new run while preserving lineage and source-run immutability.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] A1.5 Security negative tests pass for artifact traversal and malformed payload handling.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
-## Phase 2 - Monitor UI
-- [X] P2.1 Build navigation shell with Monitor/Create/Archived/Docs routing.
-```
+## Phase 2 - SSE State Convergence and Monitor/Archived UI
+- [X] P2.1 Implement global and per-run SSE endpoints with snapshot-first semantics.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.2 Implement run list with archived filtering and deep-link selection by run id.
-```
+- [X] P2.2 Implement cursor-based incremental replay using `sinceTs` semantics (`tsMs > sinceTs`).
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.3 Implement run summary panel (status, metadata, current node, elapsed timing).
-```
+- [X] P2.3 Build Monitor navigation shell with route handling for Monitor/Create/Archived/Docs.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.4 Implement stage timeline/list with explicit state transitions and error visibility.
-```
+- [X] P2.4 Implement run list with archived filtering and run-id deep-link selection.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.5 Implement live log panel with append-only incremental updates.
-```
+- [X] P2.5 Implement run summary panel (status, metadata, current node, elapsed).
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.6 Implement graph panel with SVG display, zoom/pan affordances, and DOT download.
-```
+- [X] P2.6 Implement stage timeline/list with explicit transition and failure visibility.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.7 Implement human-gate interactions (pending question display, answer submit, inline result feedback).
-```
+- [X] P2.7 Implement live log panel with incremental append behavior under SSE updates.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.8 Implement artifact list and preview behaviors (text preview, binary download).
-```
+- [X] P2.8 Implement graph panel with SVG display and DOT download action.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.9 Implement action controls (cancel/archive/unarchive/delete) with state-appropriate confirmation UX.
-```
+- [X] P2.9 Implement artifact panel with text preview and binary download behavior.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P2.10 Implement iterate entrypoint from terminal runs into Create iterate mode.
-```
+- [X] P2.10 Implement action controls (cancel/archive/unarchive/delete) with explicit confirmation and invalid-action guardrails.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### Acceptance Criteria (Phase 2)
-- [X] A2.1 Monitor state remains consistent under ongoing SSE updates and reconnects.
-```
+- [X] A2.1 Monitor state converges under continuous SSE updates and reconnects.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A2.2 Human-gate operations complete end-to-end without manual refresh.
-```
+- [X] A2.2 Run operations and panels are functional for both active and terminal runs.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A2.3 Artifact and graph panels are functional for both success and failure states.
-```
+- [X] A2.3 Invalid UI actions are blocked and return clear user-visible errors.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] A2.4 Invalid actions are blocked with clear user-visible feedback.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
-## Phase 3 - Create UI and Agentic DOT Loop
-- [X] P3.1 Implement DOT editor with validate-before-run enforcement.
-```
+## Phase 3 - DOT Services and Create/Iterate UI
+- [X] P3.1 Implement DOT validation endpoint and diagnostics payload shape.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.2 Implement DOT render preview panel and diagnostics surface.
-```
+- [X] P3.2 Implement DOT render endpoint and diagnostics surface for render failures.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.3 Implement run creation flow from validated DOT with Monitor redirect.
-```
+- [X] P3.3 Implement DOT generate/fix/iterate synchronous endpoints.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.4 Implement streaming DOT generation UX (incremental chunk rendering, done/error handling).
-```
+- [X] P3.4 Implement DOT generate/fix/iterate streaming endpoints with `delta` chunks and terminal `done` or `error` frame.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.5 Implement DOT fix flow from validator/render error context, including retry loop.
-```
+- [X] P3.5 Build Create page DOT editor and enforce validate-before-run gating.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.6 Implement iterate mode: prefill base DOT, accept change prompt, stream modified DOT.
-```
+- [X] P3.6 Implement Create run launch from validated DOT with Monitor redirect and run selection.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.7 Implement iterate-run creation preserving `familyId` and immutable source run state.
-```
+- [X] P3.7 Implement stream-driven generate/fix UX with partial chunk rendering and terminal state handling.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.8 Implement simulation toggles and defaults on create/iterate workflows.
-```
+- [X] P3.8 Implement iterate mode prefill from source run DOT and change-prompt submission.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P3.9 Implement Archived view open/unarchive flows and alignment with Monitor filtering.
-```
+- [X] P3.9 Implement iterate-run endpoint/flow that creates a new run, preserves `familyId`, and leaves source run immutable.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] P3.10 Implement simulation toggle/default behavior across create and iterate workflows.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### Acceptance Criteria (Phase 3)
-- [X] A3.1 Users can complete generate -> validate/render -> fix/iterate -> run without leaving the UI.
-```
+- [X] A3.1 Users can complete generate/fix/iterate/validate/run loops entirely within the UI.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A3.2 Invalid DOT cannot be run, and diagnostics are actionable.
-```
+- [X] A3.2 Invalid DOT is blocked from run creation and diagnostics are actionable.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A3.3 Streaming DOT behaviors are resilient to partial chunks and network interruptions.
-```
+- [X] A3.3 Streaming DOT behavior is robust to chunking and transport interruptions.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A3.4 Iterate flow produces a new run with preserved lineage and unchanged source run.
-```
+- [X] A3.4 Iterate flow preserves lineage and source-run immutability.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
-## Phase 4 - Hardening, Verification, and Documentation
-- [X] P4.1 Implement backend contract tests for all UI-consumed endpoints.
-```
+## Phase 4 - Test Harness, End-to-End Validation, and Manual Verification
+- [X] P4.1 Implement backend contract tests for all UI-consumed endpoints and error envelope consistency.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.2 Implement SSE protocol tests (ordering, snapshot bootstrap, cursor replay, disconnect/reconnect).
-```
+- [X] P4.2 Implement SSE protocol tests for bootstrap ordering, replay filtering, and reconnect convergence.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.3 Implement DOT loop tests for sync and streaming variants (generate/fix/iterate).
-```
+- [X] P4.3 Implement DOT loop tests for sync and streaming generate/fix/iterate variants.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.4 Implement UI E2E suite covering Monitor/Create/Archived/Docs happy paths.
-```
+- [X] P4.4 Implement E2E happy-path coverage for Monitor/Create/Archived/Docs on desktop and mobile.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.5 Implement UI E2E negative-path suite for validation errors, not-found runs, invalid lifecycle actions, and API failures.
-```
+- [X] P4.5 Implement E2E negative-path coverage for validation errors, not-found runs, invalid lifecycle actions, and API failures.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.6 Capture manual UX walkthrough evidence for desktop and mobile screens.
-```
+- [X] P4.6 Capture manual walkthrough evidence for desktop/mobile and map screenshots to checklist IDs.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] P4.7 Finalize operator/developer docs for local run, troubleshooting, and evidence replay.
-```
+- [X] P4.7 Build an evidence guardrail script that fails when checklist IDs are missing proof links.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### Acceptance Criteria (Phase 4)
-- [X] A4.1 Automated backend and UI suites pass with reproducible artifacts.
-```
+- [X] A4.1 Automated suites pass with reproducible logs and artifacts.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A4.2 Positive and negative test coverage is complete for API, SSE, and UI flows.
-```
+- [X] A4.2 Positive and negative coverage explicitly spans API, SSE, UI, DOT loop, and security behavior.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] A4.3 Verification evidence tree is complete and traceable per checklist item.
-```
+- [X] A4.3 Every completed checklist item has a traceable evidence reference.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+## Phase 5 - Documentation, Handoff, and Closeout
+- [X] P5.1 Finalize `docs/api/openapi-v1.yaml` and `docs/api/web-dashboard.md` to match shipped behavior exactly.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] P5.2 Record final architecture decisions and consequences in `docs/ADR.md`.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] P5.3 Finalize operator/developer runbook for local execution, troubleshooting, and evidence replay.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] P5.4 Update sprint status to reflect actual completion counts and verified evidence links.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+### Acceptance Criteria (Phase 5)
+- [X] A5.1 Documentation reflects shipped behavior with no contract drift.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] A5.2 Sprint status and evidence references are synchronized with implementation reality.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ## Explicit Test Plan (Positive and Negative)
 
 ### API Positive Cases
-- [X] T-API-P1 Create run with valid DOT returns 201 and run enters observable `running` state before terminal state.
-```
+- [X] T-API-P1 Create run with valid DOT returns success and exposes observable lifecycle progression.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-P2 Per-run SSE emits ordered lifecycle events and includes `Snapshot` bootstrap event.
-```
+- [X] T-API-P2 Run detail includes expected metadata fields and consistent status transitions.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-P3 Human-gate question appears, accepts valid answer, and execution resumes.
-```
+- [X] T-API-P3 Artifact list, fetch, and zip download produce expected payloads for text and binary artifacts.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-P4 Artifact listing and artifact file retrieval return expected content and metadata.
-```
+- [X] T-API-P4 Human-gate question retrieval and valid answer submission resume execution correctly.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] T-API-P5 DOT generate/fix/iterate stream endpoints emit `delta` frames and a single terminal `done` frame.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### API Negative Cases
-- [X] T-API-N1 Empty or missing DOT payload is rejected with `BAD_REQUEST`.
-```
+- [X] T-API-N1 Invalid DOT run create payload is rejected with stable error envelope.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-N2 Invalid DOT fails validation and run creation is blocked.
-```
+- [X] T-API-N2 Unknown run IDs return not-found errors for all run-scoped endpoints.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-N3 Unknown run IDs return `NOT_FOUND` for detail, checkpoint, context, and artifact endpoints.
-```
+- [X] T-API-N3 Invalid lifecycle operations (delete running run, archive active run, unarchive non-archived run) are rejected.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-N4 Artifact traversal attempts (`../`) are rejected and never read external paths.
-```
+- [X] T-API-N4 Empty/invalid human-gate answers are rejected with actionable validation messages.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-API-N5 Invalid lifecycle transitions (cancel terminal run, delete running run, archive running run, iterate running run) return `INVALID_STATE`.
-```
+
+### SSE Positive Cases
+- [X] T-SSE-P1 First event on each connection is `Snapshot` with complete bootstrap payload.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-SSE-P2 Incremental events are ordered and can be replayed correctly using `sinceTs` cursor.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-SSE-P3 UI state converges after disconnect/reconnect without manual refresh.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+### SSE Negative Cases
+- [X] T-SSE-N1 Malformed `sinceTs` values are handled deterministically.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-SSE-N2 Cursor values beyond available history return valid empty incremental sets after snapshot.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### UI Positive Cases
-- [X] T-UI-P1 User can paste DOT, validate, preview SVG, start run, and observe Monitor updates live.
-```
+- [X] T-UI-P1 Navigation across Monitor/Create/Archived/Docs functions on desktop viewport.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-P2 User can complete human-gate answer flow directly from Monitor.
-```
+- [X] T-UI-P2 Monitor view renders list, summary, timeline, logs, graph, and artifacts for a selected run.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-P3 User can generate DOT from prompt (streaming), then validate and run.
-```
+- [X] T-UI-P3 Create view supports validate, generate stream, fix stream, and run launch workflows.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-P4 User can iterate terminal run DOT and start a lineage-preserving new run.
-```
+- [X] T-UI-P4 Archived view lists archived runs and supports open/unarchive actions.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-P5 User can open archived runs and unarchive successfully.
-```
+- [X] T-UI-P5 Mobile layout is functional for monitor and create critical paths.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
 ### UI Negative Cases
-- [X] T-UI-N1 Invalid DOT visibly blocks Run and shows diagnostics until resolved.
-```
+- [X] T-UI-N1 Invalid DOT shows diagnostics and blocks run action.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-N2 API 500 errors surface as persistent, actionable UI error states without breaking navigation.
-```
+- [X] T-UI-N2 Not-found run links show recoverable error state with navigation back to list.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-N3 Deleted or missing run deep-links render a safe not-found state and recovery path.
-```
+- [X] T-UI-N3 Invalid lifecycle actions show clear failures and preserve local state consistency.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
-- [X] T-UI-N4 Graph render failures provide fix guidance and do not allow invalid run starts.
-```
+- [X] T-UI-N4 SSE interruption and API failure states surface clear retry guidance without app crash.
+```text
 Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
 Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
-```
-- [X] T-UI-N5 Stream interruption/reconnect preserves coherent state after re-bootstrap.
-```
-Verified via:
-- `make build` (exit 0)
-- `make test` (exit 0)
-- `.scratch/tests/SPRINT-002/evidence_guardrail.sh` (exit 0)
-Evidence:
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/build.log`
-- `.scratch/verification/SPRINT-002/phase4/backend-tests/test.log`
-- `.scratch/verification/SPRINT-002/phase4/e2e/e2e.log`
-- `.scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log`
-- `.scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log`
-- `.scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md`
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
 ```
 
-## Evidence Layout
-`.scratch/verification/SPRINT-002/`
-- `phase0/adr/`
-- `phase0/contracts/`
-- `phase0/diagrams/`
-- `phase1/api/`
-- `phase1/sse/`
-- `phase1/security/`
-- `phase2/ui-monitor/`
-- `phase3/ui-create/`
-- `phase3/ui-iterate/`
-- `phase4/backend-tests/`
-- `phase4/e2e/`
-- `phase4/ui/`
+### DOT Loop Positive Cases
+- [X] T-DOT-P1 Validate endpoint accepts valid DOT and returns success metadata.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-DOT-P2 Render endpoint returns SVG for valid DOT.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-DOT-P3 Streaming generate/fix/iterate produce one or more `delta` frames and terminal `done` frame with `dotSource`.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-DOT-P4 Iterate-run preserves lineage (`familyId`) and source-run immutability.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
 
-## Appendix - Diagrams
+### DOT Loop Negative Cases
+- [X] T-DOT-N1 Generate/fix/iterate stream failures produce terminal `error` frame and no malformed partial JSON.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-DOT-N2 Markdown-fenced output from model is sanitized before validation and run submission.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-DOT-N3 Invalid stream chunk ordering does not corrupt UI/editor state.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
 
-### A1. Core Domain Model
+### Security Cases
+- [X] T-SEC-P1 Artifact retrieval is constrained to run artifact root for valid relative paths.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-SEC-N1 Path traversal attempts (`../`, encoded traversal, absolute paths) are rejected.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] T-SEC-N2 UI-rendered log/artifact text is escaped and cannot inject executable markup.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+## Definition of Done
+- [X] Every planned phase acceptance criterion is marked complete with linked evidence.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] Test suites and E2E checks pass consistently in local reruns.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+- [X] Contracts, ADR, and sprint plan are synchronized with implementation behavior.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/ui/manual-ui-walkthrough.md
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
+
+## Appendix - Core Domain Models
 ```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/domain-model.mmd
 classDiagram
-  class PipelineRun {
-    +string id
-    +string displayName
-    +string fileName
-    +string status
-    +bool archived
-    +bool simulate
-    +bool autoApprove
-    +string familyId
-    +string originalPrompt
-    +int startedAtMs
-    +int finishedAtMs
-    +string currentNodeId
-  }
+    class PipelineRun {
+      +string id
+      +string familyId
+      +string displayName
+      +string status
+      +bool archived
+      +bool simulate
+      +string dotSource
+      +int createdAtMs
+      +int updatedAtMs
+    }
 
-  class StageRun {
-    +int index
-    +string nodeId
-    +string name
-    +string status
-    +int startedAtMs
-    +int durationMs
-    +string error
-  }
+    class RunManifest {
+      +string runId
+      +string familyId
+      +string status
+      +string currentNode
+      +string[] completedNodes
+      +string errorMessage
+    }
 
-  class PendingQuestion {
-    +string id
-    +string stage
-    +string type
-    +string text
-  }
+    class RunEvent {
+      +string runId
+      +string eventType
+      +int tsMs
+      +map payload
+    }
 
-  class ArtifactFile {
-    +string path
-    +int sizeBytes
-    +bool isText
-  }
+    class PendingQuestion {
+      +string id
+      +string prompt
+      +string status
+      +string answer
+    }
 
-  PipelineRun "1" o-- "*" StageRun
-  PipelineRun "1" o-- "*" PendingQuestion
-  PipelineRun "1" o-- "*" ArtifactFile
+    class ArtifactRecord {
+      +string path
+      +int sizeBytes
+      +bool isText
+    }
+
+    class DotSession {
+      +string mode
+      +string prompt
+      +string dotSource
+      +string diagnostics
+    }
+
+    PipelineRun "1" --> "1" RunManifest
+    PipelineRun "1" --> "many" RunEvent
+    PipelineRun "1" --> "many" PendingQuestion
+    PipelineRun "1" --> "many" ArtifactRecord
+    PipelineRun "1" --> "many" DotSession
 ```
 
-### A2. E-R Diagram
+## Appendix - E-R Diagram
 ```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/er.mmd
 erDiagram
-  PIPELINE_RUN ||--o{ STAGE_RUN : contains
-  PIPELINE_RUN ||--o{ QUESTION : pending
-  PIPELINE_RUN ||--o{ ARTIFACT : stores
+    PIPELINE_RUN ||--|| RUN_MANIFEST : has
+    PIPELINE_RUN ||--o{ RUN_EVENT : emits
+    PIPELINE_RUN ||--o{ PENDING_QUESTION : contains
+    PIPELINE_RUN ||--o{ ARTIFACT : writes
+    PIPELINE_RUN ||--o{ DOT_SESSION : derives
 
-  PIPELINE_RUN {
-    string id PK
-    string status
-    datetime started_at
-    datetime finished_at
-    string manifest_path
-    string checkpoint_path
-    string dot_source_path
-  }
+    PIPELINE_RUN {
+      string id PK
+      string family_id
+      string display_name
+      string status
+      bool archived
+      bool simulate
+      int created_at_ms
+      int updated_at_ms
+    }
 
-  STAGE_RUN {
-    string run_id FK
-    string node_id
-    int index
-    string status
-    string prompt_path
-    string response_path
-  }
+    RUN_MANIFEST {
+      string run_id PK
+      string current_node
+      string[] completed_nodes
+      string error_message
+      int updated_at_ms
+    }
 
-  QUESTION {
-    string run_id FK
-    string qid
-    string stage
-    string type
-    string payload_path
-  }
+    RUN_EVENT {
+      string run_id FK
+      int ts_ms
+      string type
+      json payload
+    }
 
-  ARTIFACT {
-    string run_id FK
-    string rel_path
-    int size_bytes
-    bool is_text
-  }
+    PENDING_QUESTION {
+      string run_id FK
+      string question_id PK
+      string prompt
+      string status
+      string answer
+    }
+
+    ARTIFACT {
+      string run_id FK
+      string path PK
+      int size_bytes
+      bool is_text
+    }
+
+    DOT_SESSION {
+      string run_id FK
+      string session_id PK
+      string mode
+      string input_prompt
+      string output_dot
+      string diagnostics
+    }
 ```
 
-### A3. Workflow Diagram
+## Appendix - Workflow Diagram
 ```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/workflow.mmd
 flowchart TD
-  A[Open Create] --> B[Paste or Generate DOT]
-  B --> C[Validate]
-  C -->|valid| D[Render Preview]
-  D --> E[Start Run]
-  C -->|invalid| F[Fix DOT]
-  F --> C
-  E --> G[Monitor via SSE]
-  G --> H{Human gate?}
-  H -->|yes| I[Answer question]
-  I --> G
-  H -->|no| J[Continue]
-  J --> K{Terminal?}
-  K -->|no| G
-  K -->|yes| L[Inspect artifacts / Iterate]
+    A[User opens dashboard] --> B[Monitor route loads run list]
+    B --> C{Select existing run?}
+    C -->|Yes| D[Subscribe per-run SSE]
+    D --> E[Render summary timeline logs graph artifacts]
+    E --> F{Pending human gate?}
+    F -->|Yes| G[Submit answer]
+    G --> D
+    C -->|No| H[Navigate to Create]
+    H --> I[Edit or generate DOT]
+    I --> J[Validate DOT]
+    J --> K{Valid?}
+    K -->|No| L[Fix DOT sync or stream]
+    L --> J
+    K -->|Yes| M[Create run]
+    M --> B
+    E --> N{Iterate needed?}
+    N -->|Yes| O[Open iterate mode with base DOT]
+    O --> P[Stream iterate changes]
+    P --> J
 ```
 
-### A4. Data-Flow Diagram
+## Appendix - Data-Flow Diagram
 ```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/dataflow.mmd
-sequenceDiagram
-  participant UI as Browser UI
-  participant API as Attractor PHP API
-  participant ENG as Pipeline Engine
-  participant FS as Run Store
-
-  UI->>API: POST /api/v1/pipelines
-  API->>ENG: start pipeline
-  ENG->>FS: write manifest/checkpoint/artifacts
-  ENG-->>API: emit events
-  UI->>API: GET /api/v1/pipelines/{id}/events
-  API-->>UI: Snapshot + deltas
-  UI->>API: GET /api/v1/pipelines/{id}/artifacts
-  API->>FS: enumerate files
-  API-->>UI: artifact metadata
-```
-
-### A5. Architecture Diagram
-```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/architecture.mmd
 flowchart LR
-  subgraph Browser
-    UI[Dashboard SPA]
-  end
-
-  subgraph Server
-    RT[Router]
-    APP[Application Handlers]
-    SSE[SSE Stream Layer]
-    DOT[DOT Service]
-    PIPE[Pipeline Service]
-    STORE[Run Store]
-  end
-
-  subgraph Storage
-    DISK[(Run directories)]
-  end
-
-  UI -->|HTTP JSON| APP
-  UI -->|SSE| SSE
-  RT --> APP
-  RT --> SSE
-  APP --> DOT
-  APP --> PIPE
-  PIPE --> STORE
-  DOT --> STORE
-  STORE --> DISK
+    UI[web/app.js] -->|HTTP JSON| Router[src/Http/Router.php]
+    UI -->|SSE| Sse[src/Http/Sse.php]
+    Router --> App[src/App.php]
+    App --> PipelineService[src/Domain/PipelineService.php]
+    App --> DotService[src/Domain/DotService.php]
+    PipelineService --> RunStore[src/Storage/RunStore.php]
+    DotService --> RunStore
+    RunStore --> Files[(run directories)]
+    Sse --> RunStore
+    RunStore -->|events.ndjson| Sse
+    Router -->|OpenAPI-backed responses| UI
 ```
 
-### A6. DOT Agentic Loop Diagram
+## Appendix - Architecture Diagram
 ```mermaid
-%% Source: .scratch/mermaid/SPRINT-002/dot-agentic-loop.mmd
-sequenceDiagram
-  participant UI as Browser UI
-  participant API as Attractor PHP API
-  participant LLM as DOT Generator/Fixer
-  participant VAL as DOT Validator/Renderer
+flowchart TB
+    subgraph Browser
+      SPA[Dashboard SPA]
+      Docs[Docs View]
+    end
 
-  UI->>API: POST /api/v1/dot/generate/stream
-  API->>LLM: generate stream
-  LLM-->>API: delta chunks
-  API-->>UI: data:{"delta":"..."}
-  API-->>UI: data:{"done":true,"dotSource":"..."}
+    subgraph PHP_Runtime
+      Entry[public/index.php]
+      Http[Router + Request/Response]
+      SSE[SSE Stream Handler]
+      Domain[PipelineService + DotService]
+      Store[RunStore]
+    end
 
-  UI->>API: POST /api/v1/dot/validate
-  API->>VAL: validate
-  VAL-->>API: diagnostics
-  API-->>UI: valid/invalid response
+    subgraph Storage
+      Runs[(logs root / runs)]
+      Manifest[manifest.json]
+      Checkpoint[checkpoint.json]
+      Context[context.json]
+      Events[events.ndjson]
+      Dot[dot.dot]
+      Artifacts[artifacts/]
+    end
 
-  UI->>API: POST /api/v1/dot/fix/stream
-  API->>LLM: fix stream
-  LLM-->>API: delta chunks
-  API-->>UI: data frames
-
-  UI->>API: POST /api/v1/dot/iterate/stream
-  API->>LLM: iterate stream
-  LLM-->>API: delta chunks
-  API-->>UI: data frames
-
-  UI->>API: POST /api/v1/pipelines/{id}/iterate
-  API-->>UI: 200 {newId}
+    SPA --> Entry
+    Docs --> Entry
+    Entry --> Http
+    Http --> Domain
+    Http --> SSE
+    Domain --> Store
+    SSE --> Store
+    Store --> Runs
+    Runs --> Manifest
+    Runs --> Checkpoint
+    Runs --> Context
+    Runs --> Events
+    Runs --> Dot
+    Runs --> Artifacts
 ```
