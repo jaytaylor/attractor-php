@@ -226,6 +226,11 @@ async function initCreate() {
     };
   }
 
+  async function renderPreviewFromDot() {
+    const res = await api('/api/v1/dot/render', { method: 'POST', body: JSON.stringify({ dotSource: dot.value }) });
+    preview.innerHTML = res.svg;
+  }
+
   document.getElementById('btn-generate').addEventListener('click', async () => {
     try {
       await streamDot(
@@ -233,6 +238,7 @@ async function initCreate() {
         dotOptionsPayload({ prompt: prompt.value || 'Build a pipeline' }),
         dot,
       );
+      await renderPreviewFromDot();
       validation.textContent = 'Generated DOT stream completed.';
       btnRun.disabled = true;
     } catch (e) {
@@ -247,6 +253,7 @@ async function initCreate() {
         dotOptionsPayload({ dotSource: dot.value, error: 'fix it' }),
         dot,
       );
+      await renderPreviewFromDot();
       validation.textContent = 'Fix stream completed.';
       btnRun.disabled = true;
     } catch (e) {
@@ -261,6 +268,7 @@ async function initCreate() {
         dotOptionsPayload({ baseDot: dot.value, changes: changes.value || 'Add iteration node' }),
         dot,
       );
+      await renderPreviewFromDot();
       validation.textContent = 'Iterate stream completed.';
       btnRun.disabled = true;
     } catch (e) {
@@ -281,11 +289,15 @@ async function initCreate() {
 
   document.getElementById('btn-preview').addEventListener('click', async () => {
     try {
-      const res = await api('/api/v1/dot/render', { method: 'POST', body: JSON.stringify({ dotSource: dot.value }) });
-      preview.innerHTML = res.svg;
+      await renderPreviewFromDot();
     } catch (e) {
       preview.textContent = e.message;
     }
+  });
+
+  // Keep preview useful even before explicit interactions.
+  renderPreviewFromDot().catch((e) => {
+    preview.textContent = e.message;
   });
 
   btnRun.addEventListener('click', async () => {
