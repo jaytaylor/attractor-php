@@ -2,6 +2,8 @@ Legend: [ ] Incomplete, [X] Complete
 
 # Sprint #002 - Attractor PHP: Web Dashboard UI (Coreys-Attractor-Inspired)
 
+_Evidence for every completed checklist item must include the exact verification command (wrapped with backticks), its exit code, and paths to produced artifacts (logs, fixtures, screenshots, `.scratch` transcripts) directly beneath the item at the time it is marked complete._
+
 Evidence rule:
 - Mark an item `[X]` only once it includes the exact verification command(s) (wrapped in backticks), exit code(s), and paths to produced artifacts (logs, fixtures, screenshots, `.scratch` transcripts) in the placeholder block directly beneath the item.
 - Store evidence under `.scratch/verification/SPRINT-002/...` and link those paths in the placeholder block.
@@ -19,6 +21,7 @@ Attractor’s NLSpec makes the engine headless and UI-driven by events. It allow
 
 ## Dependencies
 - This sprint assumes the Attractor engine and core run directory artifacts exist (see Sprint 001’s objective: full NLSpec parity). If that foundation is missing, Phase 1 must include the minimum scaffolding to run pipelines and emit events.
+- This sprint assumes the local Corey’s Attractor reference repo exists at `../../coreys-attractor/` (relative to this document). If it is missing, Phase 0 must include fetching it and recording the pinned commit hash in the evidence log so code references remain stable.
 
 ## Current State Snapshot (2026-03-03)
 - This repo is currently NLSpecs + docs only (no PHP runtime implementation, no HTTP server, no UI assets).
@@ -265,6 +268,7 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
   phase0/
     adr/
     agentic-loops/
+    guardrails/
     openapi/
     sse-contract/
     diagrams/
@@ -287,6 +291,14 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
     docs/
 ```
 
+## Execution Guardrails (Do Not Skip)
+- Place every scratch probe, helper, and evidence artifact under `.scratch/` and capture each verification command transcript (including exit code) under `.scratch/verification/SPRINT-002/...`.
+- For mermaid diagrams: keep sources under `.scratch/mermaid/SPRINT-002/*.mmd`, include `%% Source: ...` in every mermaid block in this sprint doc, and store rendered outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`.
+- Add an evidence guardrail script under `.scratch/tests/SPRINT-002/` that fails if:
+  - Any checklist item is marked `[X]` but still contains `{placeholder ...}` text beneath it.
+  - Any referenced evidence path under `.scratch/verification/SPRINT-002/...` is missing.
+- For UI phases, attach screenshots for desktop + mobile and include at least one negative-case screenshot (e.g. validation failure) under `.scratch/verification/SPRINT-002/...`.
+
 ## Deliverables
 ### Phase 0 - Contracts, IA, and Decision Log
 - [ ] **P0.0 - Evidence scaffolding: create `.scratch/verification/SPRINT-002/` tree + an index README**
@@ -299,9 +311,11 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] **P0.4 - Define UI information architecture and view-to-endpoint mapping**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.5 - Agentic loop reference extraction (Coreys Attractor): DOT generate/fix/iterate + iterate-run loop (notes in `../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`)**
+- [ ] **P0.5 - Agentic loop reference extraction (Coreys Attractor): DOT generate/fix/iterate + iterate-run loop (notes in `../../.scratch/refs/SPRINT-002/coreys-attractor-agentic-loops.md`; include pinned `coreys-attractor` commit hash in evidence)**
 ```{placeholder for verification justification/reasoning and evidence log}```
-- [ ] **P0.6 - Mermaid appendix diagrams render via `mmdc` (outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`)**
+- [ ] **P0.6 - Mermaid appendix diagrams render via `mmdc` (sources under `.scratch/mermaid/SPRINT-002/*.mmd`; outputs under `.scratch/verification/SPRINT-002/phase0/diagrams/`; each mermaid block includes `%% Source: ...`)**
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] **P0.7 - Evidence guardrail script: fail if `[X]` items still contain `{placeholder ...}` or reference missing evidence files**
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 #### Acceptance Criteria (Phase 0)
@@ -314,6 +328,8 @@ Plan for evidence artifacts (logs, screenshots, transcripts) to land under `.scr
 - [ ] SSE contract describes ordering expectations, replay/initial snapshot behavior, and disconnect semantics
 ```{placeholder for verification justification/reasoning and evidence log}```
 - [ ] Appendix diagrams exist and `mmdc` can render them without errors (artifacts under `.scratch/verification/SPRINT-002/phase0/diagrams/`)
+```{placeholder for verification justification/reasoning and evidence log}```
+- [ ] Evidence guardrail script passes in a “happy” scenario and fails loudly when placeholders or broken evidence references are introduced
 ```{placeholder for verification justification/reasoning and evidence log}```
 
 ---
@@ -729,10 +745,11 @@ Negative cases:
 
 ---
 
-## Appendix (Mermaid Diagrams)
+## Appendix – Diagrams (rendered with mmdc)
 
 ### A1. Core Domain Model (UI + API)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/domain-model.mmd
 classDiagram
   class PipelineRun {
     +string id
@@ -780,6 +797,7 @@ classDiagram
 
 ### A2. E-R Diagram (Durable Run Store on Disk)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/er.mmd
 erDiagram
   PIPELINE_RUN ||--o{ STAGE_RUN : contains
   PIPELINE_RUN ||--o{ QUESTION : pending
@@ -824,6 +842,7 @@ erDiagram
 
 ### A3. Workflow (Create -> Run -> Human Gate -> Complete)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/workflow.mmd
 flowchart TD
   A[User opens Create view] --> B[Paste DOT or Generate DOT]
   B --> C[Validate DOT]
@@ -842,6 +861,7 @@ flowchart TD
 
 ### A4. Data Flow (SSE + HTTP)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/dataflow.mmd
 sequenceDiagram
   participant U as Browser UI
   participant S as Attractor PHP Server
@@ -862,6 +882,7 @@ sequenceDiagram
 
 ### A5. Architecture (Runtime + UI)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/architecture.mmd
 flowchart LR
   subgraph Browser
     UI[Dashboard SPA]
@@ -891,6 +912,7 @@ flowchart LR
 
 ### A6. DOT Agentic Loop (Generate / Validate / Fix / Iterate)
 ```mermaid
+%% Source: .scratch/mermaid/SPRINT-002/dot-agentic-loop.mmd
 sequenceDiagram
   participant U as Browser UI
   participant S as Attractor PHP Server
