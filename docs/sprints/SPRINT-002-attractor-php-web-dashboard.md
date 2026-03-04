@@ -4,8 +4,26 @@ Legend: [ ] Incomplete, [X] Complete
 
 ## Sprint Status
 - Overall status: Implementation complete, verification artifacts captured
-- Completion: 110/110 checklist items complete (100%)
+- Completion: 111/111 checklist items complete (100%)
 - Last reviewed: 2026-03-04
+
+## Verification Ledger (2026-03-04)
+- [X] L0.1 Record the exact command runs used to verify completion and guard against regressions.
+```text
+Verified via:
+- timeout 180 make build (exit 0)
+- timeout 180 make test (exit 0)
+- timeout 135 mmdc --version (exit 0)
+- timeout 135 mmdc -i .scratch/mermaid/SPRINT-002/architecture.mmd -o .scratch/verification/SPRINT-002/phase0/diagrams/architecture.svg (exit 0)
+- timeout 135 .scratch/tests/SPRINT-002/evidence_guardrail.sh (exit 0)
+Evidence:
+- .scratch/verification/SPRINT-002/phase4/backend-tests/build.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test.log
+- .scratch/verification/SPRINT-002/phase4/backend-tests/test-summary.txt
+- .scratch/verification/SPRINT-002/phase4/e2e/e2e.log
+- .scratch/verification/SPRINT-002/phase4/docs/evidence-guardrail.log
+- .scratch/verification/SPRINT-002/phase0/diagrams/mmdc-render.log
+```
 
 ## Executive Summary
 - [X] Deliver an embedded web dashboard that supports real-time monitoring, human-gate operations, and pipeline authoring without leaving the local runtime.
