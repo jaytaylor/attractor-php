@@ -310,6 +310,10 @@ li.artifact {
   margin-top: 10px;
 }
 
+.backend-activity-panel {
+  margin-top: 10px;
+}
+
 .status-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -366,6 +370,57 @@ li.artifact {
 .status-pill.busy {
   background: #dbeafe;
   color: #1d4ed8;
+}
+
+.activity-list {
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  max-height: 172px;
+  overflow: auto;
+}
+
+.activity-item {
+  display: grid;
+  grid-template-columns: 88px 1fr;
+  gap: 8px;
+  border-radius: 10px;
+  padding: 7px 8px;
+  border: 1px solid var(--border);
+  background: #f8fbff;
+  font-family: "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+}
+
+.activity-time {
+  color: var(--subtle);
+}
+
+.activity-item.success {
+  border-color: #86efac;
+  background: #f0fdf4;
+}
+
+.activity-item.info {
+  border-color: #bfdbfe;
+  background: #eff6ff;
+}
+
+.activity-item.busy {
+  border-color: #93c5fd;
+  background: #dbeafe;
+}
+
+.activity-item.warn {
+  border-color: #fdba74;
+  background: #fff7ed;
+}
+
+.activity-item.error {
+  border-color: #fca5a5;
+  background: #fef2f2;
 }
 
 .diagnostics.success {

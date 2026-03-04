@@ -102,6 +102,7 @@ async function main() {
     const page = await context.newPage();
 
     const consoleErrors = [];
+    const responseErrors = [];
     page.on('console', (msg) => {
       if (msg.type() === 'error') {
         consoleErrors.push(msg.text());
@@ -109,6 +110,17 @@ async function main() {
     });
     page.on('pageerror', (error) => {
       consoleErrors.push(String(error && error.message ? error.message : error));
+    });
+    page.on('response', (response) => {
+      const status = response.status();
+      if (status < 400) {
+        return;
+      }
+      const url = response.url();
+      if (!url.startsWith(baseUrl)) {
+        return;
+      }
+      responseErrors.push(`${status} ${url}`);
     });
 
     await page.goto(`${baseUrl}/`, { waitUntil: 'networkidle' });
@@ -167,14 +179,15 @@ async function main() {
           baseUrl,
           screenshots: fs.readdirSync(screenshotDir).sort(),
           consoleErrors,
+          responseErrors,
         },
         null,
         2
       )
     );
 
-    if (consoleErrors.length > 0) {
-      throw new Error(`console/page errors detected: ${consoleErrors.join(' | ')}`);
+    if (consoleErrors.length > 0 || responseErrors.length > 0) {
+      throw new Error(`console/page errors detected: ${consoleErrors.join(' | ')} responseErrors=${responseErrors.join(' | ')}`);
     }
     log('prompt-dot ux audit complete');
   } finally {

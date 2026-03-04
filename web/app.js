@@ -17,6 +17,7 @@
       dotValid: null,
       previewReady: false,
       action: 'Ready',
+      backendActivity: [],
     },
   };
 
@@ -45,6 +46,33 @@
   const setCreateAction = (label, tone = 'idle') => {
     state.create.action = label;
     setStatus('status-action', label, tone);
+  };
+
+  const pushBackendActivity = (message, tone = 'info') => {
+    const timestamp = new Date().toLocaleTimeString('en-US', { hour12: false });
+    state.create.backendActivity.unshift({ timestamp, message, tone });
+    if (state.create.backendActivity.length > 18) {
+      state.create.backendActivity = state.create.backendActivity.slice(0, 18);
+    }
+
+    const list = el('backend-activity');
+    if (!list) {
+      return;
+    }
+    list.innerHTML = '';
+    for (const item of state.create.backendActivity) {
+      const node = document.createElement('li');
+      node.className = `activity-item ${item.tone}`;
+      const timeNode = document.createElement('span');
+      timeNode.className = 'activity-time';
+      timeNode.textContent = item.timestamp;
+      const messageNode = document.createElement('span');
+      messageNode.className = 'activity-message';
+      messageNode.textContent = item.message;
+      node.appendChild(timeNode);
+      node.appendChild(messageNode);
+      list.appendChild(node);
+    }
   };
 
   const syncPromptStatus = () => {
@@ -148,7 +176,7 @@
     return events;
   };
 
-  const postStream = async (path, body, onDelta) => {
+  const postStream = async (path, body, onDelta, onEvent) => {
     const response = await fetch(path, {
       method: 'POST',
       headers: { 'content-type': 'application/json' },
@@ -156,6 +184,9 @@
     });
 
     if (!response.ok) {
+      if (typeof onEvent === 'function') {
+        onEvent({ type: 'http_error', status: response.status });
+      }
       throw new Error(`HTTP ${response.status}`);
     }
 
@@ -165,15 +196,27 @@
     for (const event of events) {
       if (event.delta) {
         onDelta(event.delta);
+        if (typeof onEvent === 'function') {
+          onEvent({ type: 'delta', size: String(event.delta).length });
+        }
       }
       if (event.done) {
         done = event;
+        if (typeof onEvent === 'function') {
+          onEvent({ type: 'done', dotSource: event.dotSource || '' });
+        }
       }
       if (event.error) {
+        if (typeof onEvent === 'function') {
+          onEvent({ type: 'error', message: event.error });
+        }
         throw new Error(event.error);
       }
     }
     if (!done) {
+      if (typeof onEvent === 'function') {
+        onEvent({ type: 'protocol_error', message: 'stream completed without done frame' });
+      }
       throw new Error('stream completed without done frame');
     }
     return done.dotSource;
@@ -461,10 +504,13 @@
     }
   };
 
-  const runValidate = async ({ updateAction = true } = {}) => {
+  const runValidate = async ({ updateAction = true, trackBackend = true } = {}) => {
     const dotSource = el('dot-editor').value;
     if (updateAction) {
       setCreateAction('Validating DOT', 'busy');
+    }
+    if (trackBackend) {
+      pushBackendActivity(`POST /api/v1/dot/validate (${dotSource.length} chars)`, 'busy');
     }
     try {
       const result = await api('POST', '/api/v1/dot/validate', { dotSource });
@@ -473,6 +519,9 @@
         el('run-dot').disabled = false;
         state.lastDotError = '';
         setDotValidityStatus(true);
+        if (trackBackend) {
+          pushBackendActivity('Validation passed on backend.', 'success');
+        }
         if (updateAction) {
           setCreateAction('Validation passed', 'success');
         }
@@ -483,6 +532,9 @@
         state.lastDotError = msg;
         setDotValidityStatus(false);
         clearPreview('Preview hidden because DOT is invalid.');
+        if (trackBackend) {
+          pushBackendActivity(`Validation failed: ${result.diagnostics.length} diagnostic(s).`, 'error');
+        }
         if (updateAction) {
           setCreateAction('Validation failed', 'error');
         }
@@ -493,6 +545,9 @@
       state.lastDotError = error.message;
       setDotValidityStatus(false);
       clearPreview('Preview hidden due to validation request failure.');
+      if (trackBackend) {
+        pushBackendActivity(`Validation request failed: ${error.message}`, 'error');
+      }
       if (updateAction) {
         setCreateAction('Validation failed', 'error');
       }
@@ -500,18 +555,30 @@
   };
 
   const runPreview = async () => {
+    if (state.create.dotValid !== true) {
+      await runValidate({ updateAction: false, trackBackend: true });
+    }
+    if (state.create.dotValid !== true) {
+      setCreateAction('Preview blocked: invalid DOT', 'error');
+      pushBackendActivity('Preview blocked because DOT is invalid.', 'warn');
+      return;
+    }
+
     setButtonBusy('preview-dot', true, 'Preview', 'Rendering...');
     setCreateAction('Rendering preview', 'busy');
+    pushBackendActivity('POST /api/v1/dot/render started.', 'busy');
     try {
       const result = await api('POST', '/api/v1/dot/render', { dotSource: el('dot-editor').value });
       el('dot-preview').innerHTML = result.svg;
       setPreviewStatus(true);
       setCreateAction('Preview rendered', 'success');
+      pushBackendActivity('Render complete; SVG preview returned.', 'success');
     } catch (error) {
       state.lastDotError = error.message;
       setDiagnostics(error.message, 'error');
       setPreviewStatus(false);
       setCreateAction('Preview failed', 'error');
+      pushBackendActivity(`Render failed: ${error.message}`, 'error');
       flash(error.message);
     } finally {
       setButtonBusy('preview-dot', false, 'Preview', 'Rendering...');
@@ -521,7 +588,7 @@
   const runCreate = async () => {
     setButtonBusy('run-dot', true, 'Run', 'Creating...');
     setCreateAction('Creating run', 'busy');
-    await runValidate();
+    await runValidate({ updateAction: true, trackBackend: true });
     if (el('run-dot').disabled) {
       flash('DOT must validate before run');
       setCreateAction('Run blocked: invalid DOT', 'error');
@@ -539,14 +606,17 @@
     };
 
     try {
+      pushBackendActivity('POST /api/v1/pipelines started.', 'busy');
       const response = await api('POST', '/api/v1/pipelines', payload);
       flash(`Run started: ${response.id}`);
       setCreateAction('Run created', 'success');
+      pushBackendActivity(`Run created: ${response.id}`, 'success');
       setView('monitor');
       await refreshRuns({ reloadSelected: false });
       await selectRun(response.id);
     } catch (error) {
       setCreateAction('Run failed', 'error');
+      pushBackendActivity(`Run creation failed: ${error.message}`, 'error');
       throw error;
     } finally {
       setButtonBusy('run-dot', false, 'Run', 'Creating...');
@@ -565,15 +635,36 @@
     setButtonBusy('generate-dot', true, 'Generate (stream)', 'Generating...');
     setCreateAction('Generating DOT', 'busy');
     setPreviewStatus(false);
+    const provider = String(el('llm-provider').value || 'default').trim() || 'default';
+    const model = String(el('llm-model').value || '').trim() || 'default-model';
+    pushBackendActivity(`POST /api/v1/dot/generate/stream (${provider}/${model})`, 'busy');
     try {
       el('dot-editor').value = '';
-      const doneDot = await postStream('/api/v1/dot/generate/stream', { prompt, ...llmPayload() }, (delta) => {
-        el('dot-editor').value += delta;
-      });
+      let chunks = 0;
+      const doneDot = await postStream(
+        '/api/v1/dot/generate/stream',
+        { prompt, ...llmPayload() },
+        (delta) => {
+          el('dot-editor').value += delta;
+        },
+        (event) => {
+          if (event.type === 'delta') {
+            chunks += 1;
+            if (chunks === 1) {
+              pushBackendActivity('Backend started streaming DOT chunks.', 'busy');
+            }
+          } else if (event.type === 'done') {
+            pushBackendActivity(`Generation completed (${chunks} chunks, ${String(event.dotSource || '').length} chars).`, 'success');
+          } else if (event.type === 'error' || event.type === 'http_error' || event.type === 'protocol_error') {
+            pushBackendActivity(`Generation stream error: ${event.message || event.status || 'unknown error'}`, 'error');
+          }
+        }
+      );
       await applyDotResult(doneDot);
       setCreateAction('Generation complete', 'success');
     } catch (error) {
       setCreateAction('Generation failed', 'error');
+      pushBackendActivity(`Generation failed: ${error.message}`, 'error');
       throw error;
     } finally {
       setButtonBusy('generate-dot', false, 'Generate (stream)', 'Generating...');
@@ -587,15 +678,31 @@
     setButtonBusy('fix-dot', true, 'Fix DOT', 'Fixing...');
     setCreateAction('Fixing DOT', 'busy');
     setPreviewStatus(false);
+    pushBackendActivity('POST /api/v1/dot/fix/stream started.', 'busy');
     try {
       el('dot-editor').value = '';
-      const doneDot = await postStream('/api/v1/dot/fix/stream', { dotSource, error, ...llmPayload() }, (delta) => {
-        el('dot-editor').value += delta;
-      });
+      let chunks = 0;
+      const doneDot = await postStream(
+        '/api/v1/dot/fix/stream',
+        { dotSource, error, ...llmPayload() },
+        (delta) => {
+          el('dot-editor').value += delta;
+        },
+        (event) => {
+          if (event.type === 'delta') {
+            chunks += 1;
+          } else if (event.type === 'done') {
+            pushBackendActivity(`Fix completed (${chunks} chunks).`, 'success');
+          } else if (event.type === 'error' || event.type === 'http_error' || event.type === 'protocol_error') {
+            pushBackendActivity(`Fix stream error: ${event.message || event.status || 'unknown error'}`, 'error');
+          }
+        }
+      );
       await applyDotResult(doneDot);
       setCreateAction('Fix complete', 'success');
     } catch (error) {
       setCreateAction('Fix failed', 'error');
+      pushBackendActivity(`Fix failed: ${error.message}`, 'error');
       throw error;
     } finally {
       setButtonBusy('fix-dot', false, 'Fix DOT', 'Fixing...');
@@ -614,11 +721,26 @@
     setCreateAction('Iterating DOT', 'busy');
     setPreviewStatus(false);
     const baseDot = el('dot-editor').value;
+    pushBackendActivity('POST /api/v1/dot/iterate/stream started.', 'busy');
     try {
       el('dot-editor').value = '';
-      const doneDot = await postStream('/api/v1/dot/iterate/stream', { baseDot, changes, ...llmPayload() }, (delta) => {
-        el('dot-editor').value += delta;
-      });
+      let chunks = 0;
+      const doneDot = await postStream(
+        '/api/v1/dot/iterate/stream',
+        { baseDot, changes, ...llmPayload() },
+        (delta) => {
+          el('dot-editor').value += delta;
+        },
+        (event) => {
+          if (event.type === 'delta') {
+            chunks += 1;
+          } else if (event.type === 'done') {
+            pushBackendActivity(`Iterate completed (${chunks} chunks).`, 'success');
+          } else if (event.type === 'error' || event.type === 'http_error' || event.type === 'protocol_error') {
+            pushBackendActivity(`Iterate stream error: ${event.message || event.status || 'unknown error'}`, 'error');
+          }
+        }
+      );
       await applyDotResult(doneDot);
       setCreateAction('Iteration complete', 'success');
 
@@ -627,6 +749,7 @@
           dotSource: doneDot,
           originalPrompt: changes,
         });
+        pushBackendActivity(`Lineage iterate run created: ${created.newId}`, 'success');
         flash(`Iterated run created: ${created.newId}`);
         setView('monitor');
         await refreshRuns({ reloadSelected: false });
@@ -636,6 +759,7 @@
       }
     } catch (error) {
       setCreateAction('Iteration failed', 'error');
+      pushBackendActivity(`Iteration failed: ${error.message}`, 'error');
       throw error;
     } finally {
       setButtonBusy('iterate-dot', false, 'Iterate (stream)', 'Iterating...');
@@ -795,7 +919,15 @@
     });
 
     const debouncedValidate = debounce(() => {
-      void runValidate({ updateAction: false });
+      const candidate = el('dot-editor').value.trim();
+      if (candidate === '') {
+        el('run-dot').disabled = true;
+        state.lastDotError = 'DOT source is required';
+        setDotValidityStatus(null);
+        setDiagnostics('Validation pending.', 'info');
+        return;
+      }
+      void runValidate({ updateAction: false, trackBackend: false });
     }, 350);
 
     el('generate-prompt').addEventListener('input', () => {
@@ -816,6 +948,7 @@
     clearPreview();
     setCreateAction('Ready', 'idle');
     setDiagnostics('Validation pending.', 'info');
+    pushBackendActivity('Dashboard ready. Awaiting create workflow requests.', 'info');
     const hash = window.location.hash || '#monitor';
     const route = hash.replace(/^#/, '');
     if (route.startsWith('monitor/')) {
