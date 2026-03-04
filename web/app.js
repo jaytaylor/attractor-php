@@ -6,6 +6,10 @@
     selectedRun: null,
     iterateSourceRun: null,
     lastDotError: '',
+    runEventCursor: {},
+    runEventLines: {},
+    pollTimer: null,
+    pollInFlight: false,
   };
 
   const el = (id) => document.getElementById(id);
@@ -25,8 +29,12 @@
     document.querySelectorAll('.view').forEach((node) => {
       node.classList.toggle('active', node.id === `view-${view}`);
     });
+
     if (view === 'archived') {
-      refreshArchived();
+      void refreshArchived();
+    }
+    if (view === 'monitor') {
+      void refreshRuns({ reloadSelected: true });
     }
   };
 
@@ -109,12 +117,62 @@
     return `<span style="display:inline-block;width:10px;height:10px;border-radius:999px;background:${color};margin-right:6px;"></span>${status}`;
   };
 
-  const refreshRuns = async () => {
+  const eventLine = (event) => {
+    const type = event.type || 'Event';
+    const payload = JSON.stringify(event.payload || {});
+    return `[${type}] ${payload}`;
+  };
+
+  const applyRunEvents = (runId, events, reset = false) => {
+    if (reset || !Array.isArray(state.runEventLines[runId])) {
+      state.runEventLines[runId] = [];
+      state.runEventCursor[runId] = 0;
+    }
+
+    let cursor = state.runEventCursor[runId] || 0;
+    for (const event of events) {
+      const ts = Number(event.tsMs || 0);
+      if (ts > cursor) {
+        cursor = ts;
+      }
+      if (event.type === 'Snapshot') {
+        continue;
+      }
+      state.runEventLines[runId].push(eventLine(event));
+    }
+
+    if (state.runEventLines[runId].length > 500) {
+      state.runEventLines[runId] = state.runEventLines[runId].slice(-500);
+    }
+    state.runEventCursor[runId] = cursor;
+  };
+
+  const syncRunEvents = async (runId, reset = false) => {
+    const sinceTs = reset ? 0 : (state.runEventCursor[runId] || 0);
+    const raw = await fetch(`/api/v1/pipelines/${encodeURIComponent(runId)}/events?sinceTs=${sinceTs}`).then((r) => r.text());
+    const events = consumeSseFrames(raw);
+    applyRunEvents(runId, events, reset);
+  };
+
+  const refreshRuns = async ({ reloadSelected = true } = {}) => {
     state.runs = await api('GET', '/api/v1/pipelines');
     renderRunList();
-    if (state.selectedRunId) {
-      await selectRun(state.selectedRunId);
+
+    if (!reloadSelected || !state.selectedRunId) {
+      return;
     }
+
+    if (!state.runs.some((run) => run.id === state.selectedRunId)) {
+      state.selectedRunId = null;
+      state.selectedRun = null;
+      el('run-detail').classList.add('hidden');
+      el('run-detail-empty').classList.remove('hidden');
+      return;
+    }
+
+    state.selectedRun = await api('GET', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}`);
+    await syncRunEvents(state.selectedRunId, false);
+    await renderRunDetail();
   };
 
   const renderRunList = () => {
@@ -124,7 +182,9 @@
       const item = document.createElement('li');
       item.className = `run-item ${run.id === state.selectedRunId ? 'active' : ''}`;
       item.innerHTML = `<strong>${run.displayName || run.id}</strong><br><span class="small">${runBadge(run.status)}</span><br><span class="small">${run.currentNodeId || 'n/a'}</span>`;
-      item.addEventListener('click', () => selectRun(run.id));
+      item.addEventListener('click', () => {
+        void selectRun(run.id);
+      });
       list.appendChild(item);
     }
   };
@@ -132,6 +192,7 @@
   const selectRun = async (runId) => {
     state.selectedRunId = runId;
     state.selectedRun = await api('GET', `/api/v1/pipelines/${encodeURIComponent(runId)}`);
+    await syncRunEvents(runId, true);
     renderRunList();
     await renderRunDetail();
   };
@@ -149,7 +210,7 @@
 
     const stages = el('stage-list');
     stages.innerHTML = '';
-    for (const stage of (run.stages || [])) {
+    for (const stage of run.stages || []) {
       const li = document.createElement('li');
       li.className = 'stage';
       li.textContent = `${stage.index}. ${stage.name || stage.nodeId} -> ${stage.status}`;
@@ -157,13 +218,14 @@
     }
 
     el('cancel-run').disabled = run.status !== 'running';
-    el('archive-run').disabled = ['running'].includes(run.status) || run.archived;
-    el('unarchive-run').disabled = ['running'].includes(run.status) || !run.archived;
+    el('archive-run').disabled = run.status === 'running' || run.archived;
+    el('unarchive-run').disabled = run.status === 'running' || !run.archived;
     el('delete-run').disabled = run.status === 'running';
     el('iterate-run').disabled = run.status === 'running';
 
     const log = el('live-log');
-    log.textContent = (run.logs || []).join('\n');
+    const lines = state.runEventLines[run.id] || [];
+    log.textContent = lines.length > 0 ? lines.join('\n') : 'No events yet.';
 
     const graph = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/graph`).then((r) => r.text());
     el('graph-svg').innerHTML = graph;
@@ -176,10 +238,14 @@
       li.className = 'artifact';
       li.textContent = `${item.path} (${item.sizeBytes} bytes)`;
       li.addEventListener('click', async () => {
-        const resp = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/artifacts/${item.path}`);
-        const text = await resp.text();
-        const preview = text.length > 5000 ? text.slice(0, 5000) + '\n...[truncated]' : text;
-        el('artifact-preview').textContent = preview;
+        try {
+          const resp = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/artifacts/${item.path}`);
+          const text = await resp.text();
+          const preview = text.length > 5000 ? `${text.slice(0, 5000)}\n...[truncated]` : text;
+          el('artifact-preview').textContent = preview;
+        } catch (error) {
+          flash(error.message || 'artifact preview failed');
+        }
       });
       artifactList.appendChild(li);
     }
@@ -199,18 +265,10 @@
             await selectRun(run.id);
             flash('Answer submitted');
           } catch (error) {
-            flash(error.message);
+            flash(error.message || 'answer failed');
           }
         });
       });
-    }
-
-    try {
-      const raw = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/events`).then((r) => r.text());
-      const events = consumeSseFrames(raw);
-      log.textContent = events.map((e) => `[${e.type}] ${JSON.stringify(e.payload || {})}`).join('\n');
-    } catch {
-      // no-op
     }
   };
 
@@ -224,14 +282,22 @@
       item.className = 'run-item';
       item.innerHTML = `<strong>${run.displayName || run.id}</strong><br><span class="small">${run.status}</span><br><button class="btn unarchive" data-id="${run.id}">Unarchive</button> <button class="btn open" data-id="${run.id}">Open</button>`;
       item.querySelector('.unarchive').addEventListener('click', async () => {
-        await api('POST', `/api/v1/pipelines/${encodeURIComponent(run.id)}/unarchive`);
-        await refreshArchived();
-        await refreshRuns();
+        try {
+          await api('POST', `/api/v1/pipelines/${encodeURIComponent(run.id)}/unarchive`);
+          await refreshArchived();
+          await refreshRuns({ reloadSelected: true });
+        } catch (error) {
+          flash(error.message || 'unarchive failed');
+        }
       });
       item.querySelector('.open').addEventListener('click', async () => {
-        setView('monitor');
-        await refreshRuns();
-        await selectRun(run.id);
+        try {
+          setView('monitor');
+          await refreshRuns({ reloadSelected: false });
+          await selectRun(run.id);
+        } catch (error) {
+          flash(error.message || 'open run failed');
+        }
       });
       list.appendChild(item);
     }
@@ -288,7 +354,7 @@
     const response = await api('POST', '/api/v1/pipelines', payload);
     flash(`Run started: ${response.id}`);
     setView('monitor');
-    await refreshRuns();
+    await refreshRuns({ reloadSelected: false });
     await selectRun(response.id);
   };
 
@@ -342,47 +408,86 @@
       });
       flash(`Iterated run created: ${created.newId}`);
       setView('monitor');
-      await refreshRuns();
+      await refreshRuns({ reloadSelected: false });
       await selectRun(created.newId);
       state.iterateSourceRun = null;
       el('iterate-source').textContent = '';
     }
   };
 
+  const pollTick = async () => {
+    if (state.pollInFlight) {
+      return;
+    }
+    if (state.view !== 'monitor' && state.view !== 'archived') {
+      return;
+    }
+
+    state.pollInFlight = true;
+    try {
+      if (state.view === 'monitor') {
+        await refreshRuns({ reloadSelected: true });
+      } else if (state.view === 'archived') {
+        await refreshArchived();
+      }
+    } catch (error) {
+      flash(error.message || 'refresh failed');
+    } finally {
+      state.pollInFlight = false;
+    }
+  };
+
+  const startPolling = () => {
+    if (state.pollTimer !== null) {
+      return;
+    }
+    state.pollTimer = window.setInterval(() => {
+      void pollTick();
+    }, 1200);
+  };
+
   const attachActions = () => {
     document.querySelectorAll('.tab').forEach((tab) => tab.addEventListener('click', () => setView(tab.dataset.view)));
-    el('refresh-runs').addEventListener('click', refreshRuns);
-    el('refresh-archived').addEventListener('click', refreshArchived);
-
-    el('cancel-run').addEventListener('click', async () => {
-      if (!state.selectedRunId) return;
-      await api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/cancel`);
-      await selectRun(state.selectedRunId);
+    el('refresh-runs').addEventListener('click', () => {
+      void refreshRuns({ reloadSelected: true }).catch((error) => flash(error.message || 'refresh failed'));
+    });
+    el('refresh-archived').addEventListener('click', () => {
+      void refreshArchived().catch((error) => flash(error.message || 'refresh failed'));
     });
 
-    el('archive-run').addEventListener('click', async () => {
+    el('cancel-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
-      await api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/archive`);
-      await refreshRuns();
-      await selectRun(state.selectedRunId);
+      void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/cancel`)
+        .then(() => selectRun(state.selectedRunId))
+        .catch((error) => flash(error.message || 'cancel failed'));
     });
 
-    el('unarchive-run').addEventListener('click', async () => {
+    el('archive-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
-      await api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/unarchive`);
-      await refreshRuns();
-      await selectRun(state.selectedRunId);
+      void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/archive`)
+        .then(() => refreshRuns({ reloadSelected: true }))
+        .catch((error) => flash(error.message || 'archive failed'));
     });
 
-    el('delete-run').addEventListener('click', async () => {
+    el('unarchive-run').addEventListener('click', () => {
+      if (!state.selectedRunId) return;
+      void api('POST', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}/unarchive`)
+        .then(() => refreshRuns({ reloadSelected: true }))
+        .catch((error) => flash(error.message || 'unarchive failed'));
+    });
+
+    el('delete-run').addEventListener('click', () => {
       if (!state.selectedRunId) return;
       if (!window.confirm('Delete this run?')) return;
-      await api('DELETE', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}`);
-      state.selectedRunId = null;
-      state.selectedRun = null;
-      await refreshRuns();
-      el('run-detail').classList.add('hidden');
-      el('run-detail-empty').classList.remove('hidden');
+      void api('DELETE', `/api/v1/pipelines/${encodeURIComponent(state.selectedRunId)}`)
+        .then(async () => {
+          state.selectedRunId = null;
+          state.selectedRun = null;
+          await refreshRuns({ reloadSelected: false });
+          el('run-detail').classList.add('hidden');
+          el('run-detail-empty').classList.remove('hidden');
+        })
+        .catch((error) => flash(error.message || 'delete failed'));
     });
 
     el('iterate-run').addEventListener('click', () => {
@@ -409,21 +514,34 @@
       window.open(`/api/v1/pipelines/${encodeURIComponent(state.selectedRun.id)}/artifacts.zip`, '_blank');
     });
 
-    el('validate-dot').addEventListener('click', runValidate);
-    el('preview-dot').addEventListener('click', runPreview);
-    el('run-dot').addEventListener('click', runCreate);
-    el('generate-dot').addEventListener('click', runGenerate);
-    el('fix-dot').addEventListener('click', runFix);
-    el('iterate-dot').addEventListener('click', runIterate);
+    el('validate-dot').addEventListener('click', () => {
+      void runValidate();
+    });
+    el('preview-dot').addEventListener('click', () => {
+      void runPreview();
+    });
+    el('run-dot').addEventListener('click', () => {
+      void runCreate().catch((error) => flash(error.message || 'run failed'));
+    });
+    el('generate-dot').addEventListener('click', () => {
+      void runGenerate().catch((error) => flash(error.message || 'generate failed'));
+    });
+    el('fix-dot').addEventListener('click', () => {
+      void runFix().catch((error) => flash(error.message || 'fix failed'));
+    });
+    el('iterate-dot').addEventListener('click', () => {
+      void runIterate().catch((error) => flash(error.message || 'iterate failed'));
+    });
   };
 
   const bootstrap = async () => {
     attachActions();
-    await refreshRuns();
+    await refreshRuns({ reloadSelected: false });
     if (window.location.hash.startsWith('#monitor/')) {
       const runId = window.location.hash.replace('#monitor/', '');
       await selectRun(runId);
     }
+    startPolling();
   };
 
   bootstrap().catch((error) => flash(error.message));
