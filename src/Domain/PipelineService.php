@@ -175,9 +175,20 @@ final class PipelineService
     {
         $this->tickRun($runId);
         $run = $this->store->getRun($runId);
-        if ((string) ($run['status'] ?? '') === 'running') {
-            throw new ApiError(409, 'INVALID_STATE', 'running run cannot be archived/unarchived');
+        $status = (string) ($run['status'] ?? '');
+        if (!$this->isTerminalStatus($status)) {
+            throw new ApiError(409, 'INVALID_STATE', 'only terminal runs can be archived/unarchived');
         }
+
+        $currentlyArchived = (bool) ($run['archived'] ?? false);
+        if ($archived && $currentlyArchived) {
+            throw new ApiError(409, 'INVALID_STATE', 'run is already archived');
+        }
+
+        if (!$archived && !$currentlyArchived) {
+            throw new ApiError(409, 'INVALID_STATE', 'run is not archived');
+        }
+
         $run['archived'] = $archived;
         $this->store->saveRun($runId, $run);
         return $run;
@@ -496,5 +507,10 @@ final class PipelineService
             }
         }
         rmdir($path);
+    }
+
+    private function isTerminalStatus(string $status): bool
+    {
+        return in_array($status, ['completed', 'failed', 'cancelled'], true);
     }
 }

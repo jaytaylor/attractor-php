@@ -324,6 +324,15 @@ $h->run('human gate question and answer flow', function () use ($h, $app): void 
 });
 
 $h->run('running status actions and state guards', function () use ($h, $app): void {
+    $waitingCreate = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph WH { start -> review_gate; review_gate -> exit; }',
+        'displayName' => 'Waiting Human',
+        'autoApprove' => false,
+    ]);
+    $waitingId = (string) ($waitingCreate['json']['id'] ?? '');
+    $archiveWaiting = callApi($app, 'POST', '/api/v1/pipelines/' . $waitingId . '/archive');
+    $h->assertSame(409, $archiveWaiting['status'], 'archive waiting_human should fail');
+
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph R { start -> STATUS_RUNNING; STATUS_RUNNING -> exit; }',
         'displayName' => 'Running Run',
@@ -348,6 +357,9 @@ $h->run('running status actions and state guards', function () use ($h, $app): v
     $archive = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/archive');
     $h->assertSame(200, $archive['status'], 'archive terminal should work');
 
+    $archiveAgain = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/archive');
+    $h->assertSame(409, $archiveAgain['status'], 'archive archived should fail');
+
     $listDefault = callApi($app, 'GET', '/api/v1/pipelines');
     $listedDefaultIds = array_map(static fn(array $r): string => (string) ($r['id'] ?? ''), $listDefault['json']);
     $h->assertTrue(!in_array($runId, $listedDefaultIds, true), 'archived run hidden by default list');
@@ -358,6 +370,9 @@ $h->run('running status actions and state guards', function () use ($h, $app): v
 
     $unarchive = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/unarchive');
     $h->assertSame(200, $unarchive['status'], 'unarchive should work');
+
+    $unarchiveAgain = callApi($app, 'POST', '/api/v1/pipelines/' . $runId . '/unarchive');
+    $h->assertSame(409, $unarchiveAgain['status'], 'unarchive non-archived should fail');
 
     $deleteFinal = callApi($app, 'DELETE', '/api/v1/pipelines/' . $runId);
     $h->assertSame(200, $deleteFinal['status'], 'delete terminal should work');
