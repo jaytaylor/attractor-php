@@ -482,10 +482,24 @@ final class PipelineService
             mkdir($dir, 0777, true);
         }
 
+        $run = $this->store->getRun($runId);
+        $prompt = trim((string) ($run['originalPrompt'] ?? ''));
+        if ($prompt === '') {
+            $prompt = 'No original prompt recorded for this run.';
+        }
+
+        $responseSummary = [
+            'runId' => $runId,
+            'status' => (string) ($run['status'] ?? ''),
+            'currentNodeId' => (string) ($run['currentNodeId'] ?? ''),
+            'completedNodes' => $this->completedNodes($run),
+            'finishedAtMs' => $run['finishedAtMs'] ?? null,
+        ];
+
         file_put_contents($dir . '/summary.txt', "run={$runId}\nmode={$mode}\n");
         file_put_contents($dir . '/events.log', implode("\n", array_map(static fn(array $e): string => json_encode($e) ?: '{}', $this->store->readEvents($runId))) . "\n");
-        file_put_contents($dir . '/prompt.txt', 'Synthetic prompt artifact');
-        file_put_contents($dir . '/response.txt', 'Synthetic response artifact');
+        file_put_contents($dir . '/prompt.txt', $prompt . "\n");
+        file_put_contents($dir . '/response.txt', (json_encode($responseSummary, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?: '{}') . "\n");
     }
 
     private function deleteDir(string $path): void

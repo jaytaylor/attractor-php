@@ -11,6 +11,7 @@ use AttractorPhp\Http\Request;
 use AttractorPhp\Http\Response;
 use AttractorPhp\Http\Router;
 use AttractorPhp\Http\Sse;
+use AttractorPhp\Llm\DotLlmService;
 use AttractorPhp\Storage\RunStore;
 
 final class App
@@ -20,6 +21,7 @@ final class App
     public function __construct(
         private readonly RunStore $store,
         private readonly DotService $dotService,
+        private readonly DotLlmService $dotLlmService,
         private readonly PipelineService $pipelineService,
         private readonly string $webDir
     ) {
@@ -33,8 +35,9 @@ final class App
         $effectiveLogsRoot = $logsRoot ?? (getenv('ATTRACTOR_LOGS_ROOT') ?: $root . '/.scratch/runs');
         $store = new RunStore($effectiveLogsRoot);
         $dot = new DotService();
+        $dotLlm = new DotLlmService($dot);
         $pipeline = new PipelineService($store, $dot);
-        return new self($store, $dot, $pipeline, $root . '/web');
+        return new self($store, $dot, $dotLlm, $pipeline, $root . '/web');
     }
 
     public function handle(Request $request): Response
@@ -62,6 +65,8 @@ final class App
         $this->router->add('GET', '/docs', fn() => $this->serveAsset('docs.html', 'text/html; charset=utf-8'));
         $this->router->add('GET', '/app.js', fn() => $this->serveAsset('app.js', 'text/javascript; charset=utf-8'));
         $this->router->add('GET', '/styles.css', fn() => $this->serveAsset('styles.css', 'text/css; charset=utf-8'));
+        $this->router->add('GET', '/favicon.svg', fn() => $this->serveAsset('favicon.svg', 'image/svg+xml'));
+        $this->router->add('GET', '/favicon.ico', fn() => new Response(204, ['content-type' => 'image/x-icon'], ''));
 
         $this->router->add('GET', '/api/v1/pipelines', fn(Request $req) => $this->listRuns($req));
         $this->router->add('POST', '/api/v1/pipelines', fn(Request $req) => $this->createRun($req));
@@ -255,20 +260,22 @@ final class App
 
     private function dotGenerate(Request $request): Response
     {
-        $prompt = trim((string) ($request->jsonBody()['prompt'] ?? ''));
+        $body = $request->jsonBody();
+        $prompt = trim((string) ($body['prompt'] ?? ''));
         if ($prompt === '') {
             throw new ApiError(400, 'BAD_REQUEST', 'prompt is required');
         }
-        return Response::json(['dotSource' => $this->dotService->generateFromPrompt($prompt)]);
+        return Response::json(['dotSource' => $this->dotLlmService->generateFromPrompt($prompt, $this->dotLlmOptions($body))]);
     }
 
     private function dotGenerateStream(Request $request): Response
     {
-        $prompt = trim((string) ($request->jsonBody()['prompt'] ?? ''));
+        $body = $request->jsonBody();
+        $prompt = trim((string) ($body['prompt'] ?? ''));
         if ($prompt === '') {
             return $this->streamError('prompt is required');
         }
-        $dot = $this->dotService->generateFromPrompt($prompt);
+        $dot = $this->dotLlmService->generateFromPrompt($prompt, $this->dotLlmOptions($body));
         return $this->streamDotResult($dot);
     }
 
@@ -281,7 +288,7 @@ final class App
             throw new ApiError(400, 'BAD_REQUEST', 'dotSource is required');
         }
 
-        return Response::json(['dotSource' => $this->dotService->fixDot($dotSource, $error)]);
+        return Response::json(['dotSource' => $this->dotLlmService->fixDot($dotSource, $error, $this->dotLlmOptions($body))]);
     }
 
     private function dotFixStream(Request $request): Response
@@ -293,7 +300,7 @@ final class App
             return $this->streamError('dotSource is required');
         }
 
-        return $this->streamDotResult($this->dotService->fixDot($dotSource, $error));
+        return $this->streamDotResult($this->dotLlmService->fixDot($dotSource, $error, $this->dotLlmOptions($body)));
     }
 
     private function dotIterate(Request $request): Response
@@ -305,7 +312,7 @@ final class App
             throw new ApiError(400, 'BAD_REQUEST', 'baseDot and changes are required');
         }
 
-        return Response::json(['dotSource' => $this->dotService->iterateDot($baseDot, $changes)]);
+        return Response::json(['dotSource' => $this->dotLlmService->iterateDot($baseDot, $changes, $this->dotLlmOptions($body))]);
     }
 
     private function dotIterateStream(Request $request): Response
@@ -317,7 +324,7 @@ final class App
             return $this->streamError('baseDot and changes are required');
         }
 
-        return $this->streamDotResult($this->dotService->iterateDot($baseDot, $changes));
+        return $this->streamDotResult($this->dotLlmService->iterateDot($baseDot, $changes, $this->dotLlmOptions($body)));
     }
 
     private function iterateRun(Request $request, string $id): Response
@@ -347,6 +354,35 @@ final class App
         $body = Sse::comment('keepalive');
         $body .= Sse::frame(['error' => $message]);
         return new Response(200, ['content-type' => 'text/event-stream; charset=utf-8'], $body);
+    }
+
+    /** @param array<string,mixed> $body
+      * @return array<string,mixed>
+      */
+    private function dotLlmOptions(array $body): array
+    {
+        $options = [];
+
+        $provider = strtolower(trim((string) ($body['provider'] ?? '')));
+        if ($provider !== '') {
+            $options['provider'] = $provider;
+        }
+
+        $model = trim((string) ($body['model'] ?? ''));
+        if ($model !== '') {
+            $options['model'] = $model;
+        }
+
+        $maxTokens = (int) ($body['maxTokens'] ?? 0);
+        if ($maxTokens > 0) {
+            $options['maxTokens'] = $maxTokens;
+        }
+
+        if (isset($body['temperature']) && is_numeric($body['temperature'])) {
+            $options['temperature'] = (float) $body['temperature'];
+        }
+
+        return $options;
     }
 
     private function error(int $status, string $code, string $message): Response

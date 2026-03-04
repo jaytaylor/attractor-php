@@ -309,6 +309,12 @@ paths:
               required: [prompt]
               properties:
                 prompt: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200': { description: Generated DOT }
   /api/v1/dot/generate/stream:
@@ -323,6 +329,12 @@ paths:
               required: [prompt]
               properties:
                 prompt: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200':
           description: SSE stream with delta frames and a single terminal done or error frame
@@ -342,6 +354,12 @@ paths:
               properties:
                 dotSource: { type: string }
                 error: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200': { description: Fixed DOT }
   /api/v1/dot/fix/stream:
@@ -357,6 +375,12 @@ paths:
               properties:
                 dotSource: { type: string }
                 error: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200':
           description: SSE stream with delta frames and a single terminal done or error frame
@@ -376,6 +400,12 @@ paths:
               properties:
                 baseDot: { type: string }
                 changes: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200': { description: Iterated DOT }
   /api/v1/dot/iterate/stream:
@@ -391,6 +421,12 @@ paths:
               properties:
                 baseDot: { type: string }
                 changes: { type: string }
+                provider:
+                  type: string
+                  enum: [openai, anthropic]
+                model: { type: string }
+                maxTokens: { type: integer, minimum: 1 }
+                temperature: { type: number }
       responses:
         '200':
           description: SSE stream with delta frames and a single terminal done or error frame

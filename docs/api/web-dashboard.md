@@ -38,6 +38,12 @@ Global snapshot payload:
 - `POST /api/v1/dot/fix/stream`
 - `POST /api/v1/dot/iterate/stream`
 
+Optional LLM request fields (all DOT sync + stream endpoints):
+- `provider`: `openai` or `anthropic` (defaults to `ATTRACTOR_DOT_PROVIDER` or `openai`)
+- `model`: provider-specific model override
+- `maxTokens`: positive integer output budget
+- `temperature`: provider sampling control
+
 Each emits:
 - Zero or more `{"delta":"..."}` frames
 - Exactly one terminal `{"done":true,"dotSource":"..."}` frame on success

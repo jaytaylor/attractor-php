@@ -40,68 +40,47 @@ final class DotService
     public function render(string $dotSource): string
     {
         $clean = $this->stripMarkdownFences($dotSource);
-        $escaped = htmlspecialchars($clean, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+        $descriptors = [
+            0 => ['pipe', 'r'],
+            1 => ['pipe', 'w'],
+            2 => ['pipe', 'w'],
+        ];
+        $process = @proc_open('dot -Tsvg', $descriptors, $pipes);
+        if (!is_resource($process)) {
+            return $this->renderErrorSvg('Graphviz "dot" command is unavailable.');
+        }
+
+        fwrite($pipes[0], $clean);
+        fclose($pipes[0]);
+
+        $stdout = stream_get_contents($pipes[1]) ?: '';
+        fclose($pipes[1]);
+        $stderr = stream_get_contents($pipes[2]) ?: '';
+        fclose($pipes[2]);
+
+        $exitCode = proc_close($process);
+        if ($exitCode === 0 && str_contains($stdout, '<svg')) {
+            return $stdout;
+        }
+
+        $message = trim($stderr);
+        if ($message === '') {
+            $message = 'dot failed to render the graph.';
+        }
+        return $this->renderErrorSvg('Graphviz render error: ' . $message);
+    }
+
+    private function renderErrorSvg(string $message): string
+    {
+        $escaped = htmlspecialchars($message, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
         return <<<SVG
-<svg xmlns="http://www.w3.org/2000/svg" width="1100" height="700" viewBox="0 0 1100 700" role="img" aria-label="Rendered DOT preview">
-  <rect x="0" y="0" width="1100" height="700" fill="#0b1220" />
-  <rect x="20" y="20" width="1060" height="660" fill="#111a2d" stroke="#4b5d85" stroke-width="2" rx="12" />
-  <text x="42" y="64" fill="#8ad4ff" font-family="monospace" font-size="18">DOT Preview (server-rendered)</text>
-  <foreignObject x="42" y="90" width="1018" height="560">
-    <div xmlns="http://www.w3.org/1999/xhtml" style="font-family:monospace;color:#dbe7ff;white-space:pre-wrap;font-size:14px;line-height:1.35;">{$escaped}</div>
-  </foreignObject>
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="220" viewBox="0 0 1000 220" role="img" aria-label="Graph preview error">
+  <rect x="0" y="0" width="1000" height="220" fill="#1f2937" />
+  <rect x="20" y="20" width="960" height="180" fill="#111827" stroke="#ef4444" stroke-width="2" rx="8" />
+  <text x="40" y="62" fill="#fca5a5" font-family="monospace" font-size="20">Graph Preview Unavailable</text>
+  <text x="40" y="100" fill="#e5e7eb" font-family="monospace" font-size="15">{$escaped}</text>
 </svg>
 SVG;
-    }
-
-    public function generateFromPrompt(string $prompt): string
-    {
-        $name = preg_replace('/[^A-Za-z0-9]+/', '_', strtolower(trim($prompt)));
-        $name = $name === '' ? 'pipeline' : trim((string) $name, '_');
-        return "digraph {$name} {\n  start -> plan;\n  plan -> implement;\n  implement -> test;\n  test -> exit;\n}\n";
-    }
-
-    public function fixDot(string $dotSource, string $error): string
-    {
-        $clean = $this->stripMarkdownFences($dotSource);
-        $clean = preg_replace('/->\s*;/', '-> fixed_node;', $clean) ?? $clean;
-        $clean = str_replace('-> }', '-> fixed_node }', $clean);
-
-        $validated = $this->validate($clean);
-        if (!$validated['valid']) {
-            return "digraph fixed_pipeline {\n  start -> analyze;\n  analyze -> fixed_node;\n  fixed_node -> exit;\n}\n";
-        }
-
-        if ($error !== '' && !str_contains($clean, 'fixed_node')) {
-            $clean = preg_replace('/\}\s*$/', "  fixed_node -> exit;\n}\n", $clean) ?? $clean;
-        }
-
-        return $clean;
-    }
-
-    public function iterateDot(string $baseDot, string $changes): string
-    {
-        $clean = $this->stripMarkdownFences($baseDot);
-        $slug = preg_replace('/[^A-Za-z0-9_]/', '_', strtoupper($changes));
-        $slug = trim((string) $slug, '_');
-        if ($slug === '') {
-            $slug = 'ITERATION';
-        }
-        $newNode = 'change_' . strtolower(substr($slug, 0, 24));
-
-        if (!preg_match('/\bexit\b/', $clean)) {
-            $clean = preg_replace('/\}\s*$/', "  {$newNode} -> done;\n}\n", $clean) ?? $clean;
-            return $clean;
-        }
-
-        if (preg_match('/([A-Za-z0-9_]+)\s*->\s*exit\s*;/', $clean, $matches) === 1) {
-            $source = $matches[1];
-            $replacement = "{$source} -> {$newNode};\n  {$newNode} -> exit;";
-            $clean = preg_replace('/' . preg_quote($matches[0], '/') . '/', $replacement, $clean, 1) ?? $clean;
-        } else {
-            $clean = preg_replace('/\}\s*$/', "  {$newNode} -> exit;\n}\n", $clean) ?? $clean;
-        }
-
-        return $clean;
     }
 
     /** @return list<string> */

@@ -126,6 +126,27 @@ function waitForRunStatus(App $app, string $runId, array $terminalStatuses, int 
     return callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
 }
 
+function waitForHttpReady(string $url, int $timeoutMs = 8000): void
+{
+    $deadline = (int) floor(microtime(true) * 1000) + $timeoutMs;
+    do {
+        $context = stream_context_create([
+            'http' => [
+                'method' => 'GET',
+                'timeout' => 1,
+                'ignore_errors' => true,
+            ],
+        ]);
+        $response = @file_get_contents($url, false, $context);
+        if ($response !== false) {
+            return;
+        }
+        usleep(100_000);
+    } while ((int) floor(microtime(true) * 1000) < $deadline);
+
+    throw new RuntimeException('mock LLM server did not start: ' . $url);
+}
+
 $logsRoot = dirname(__DIR__) . '/.scratch/tests/SPRINT-002/runs';
 if (is_dir($logsRoot)) {
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($logsRoot, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
@@ -139,6 +160,46 @@ if (is_dir($logsRoot)) {
     rmdir($logsRoot);
 }
 mkdir($logsRoot, 0777, true);
+
+$mockPort = 19082;
+$mockRouter = dirname(__DIR__) . '/tests/fixtures/llm_mock_router.php';
+$mockLog = dirname(__DIR__) . '/.scratch/tests/SPRINT-002/mock-llm.ndjson';
+if (!is_dir(dirname($mockLog))) {
+    mkdir(dirname($mockLog), 0777, true);
+}
+file_put_contents($mockLog, '');
+
+$mockDescriptors = [
+    0 => ['pipe', 'r'],
+    1 => ['file', dirname(__DIR__) . '/.scratch/tests/SPRINT-002/mock-llm.stdout.log', 'a'],
+    2 => ['file', dirname(__DIR__) . '/.scratch/tests/SPRINT-002/mock-llm.stderr.log', 'a'],
+];
+$mockEnv = getenv();
+if (!is_array($mockEnv)) {
+    $mockEnv = [];
+}
+$mockEnv['ATTRACTOR_MOCK_LLM_LOG'] = $mockLog;
+$mockCmd = sprintf('php -S 127.0.0.1:%d %s', $mockPort, escapeshellarg($mockRouter));
+$mockProc = proc_open($mockCmd, $mockDescriptors, $mockPipes, dirname(__DIR__), $mockEnv);
+if (!is_resource($mockProc)) {
+    throw new RuntimeException('failed to start mock LLM server');
+}
+register_shutdown_function(static function () use (&$mockProc): void {
+    if (is_resource($mockProc)) {
+        proc_terminate($mockProc);
+        proc_close($mockProc);
+        $mockProc = null;
+    }
+});
+waitForHttpReady('http://127.0.0.1:' . $mockPort . '/health');
+
+putenv('OPENAI_API_KEY=test-openai-key');
+putenv('OPENAI_BASE_URL=http://127.0.0.1:' . $mockPort . '/openai/v1');
+putenv('ATTRACTOR_OPENAI_MODEL=test-openai-model');
+putenv('ANTHROPIC_API_KEY=test-anthropic-key');
+putenv('ANTHROPIC_BASE_URL=http://127.0.0.1:' . $mockPort . '/anthropic/v1');
+putenv('ATTRACTOR_ANTHROPIC_MODEL=test-anthropic-model');
+putenv('ATTRACTOR_DOT_PROVIDER=openai');
 
 $app = App::createDefault($logsRoot);
 $h = new Harness();
@@ -174,6 +235,10 @@ $h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): vo
     $h->assertSame(200, $generate['status'], 'generate should work');
     $h->assertContains('digraph', (string) ($generate['json']['dotSource'] ?? ''), 'dot content expected');
 
+    $anthropicGenerate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'Create approval pipeline', 'provider' => 'anthropic']);
+    $h->assertSame(200, $anthropicGenerate['status'], 'anthropic generate should work');
+    $h->assertContains('digraph', (string) ($anthropicGenerate['json']['dotSource'] ?? ''), 'anthropic dot content expected');
+
     $generateMissing = callApi($app, 'POST', '/api/v1/dot/generate', []);
     $h->assertSame(400, $generateMissing['status'], 'missing prompt should fail');
 
@@ -192,10 +257,29 @@ $h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): vo
 
     $iterate = callApi($app, 'POST', '/api/v1/dot/iterate', ['baseDot' => 'digraph P { start -> exit; }', 'changes' => 'add approval gate']);
     $h->assertSame(200, $iterate['status'], 'iterate should work');
-    $h->assertContains('change_', (string) ($iterate['json']['dotSource'] ?? ''), 'iterated node expected');
+    $h->assertContains('digraph', (string) ($iterate['json']['dotSource'] ?? ''), 'iterated dot expected');
 
     $iterateMissing = callApi($app, 'POST', '/api/v1/dot/iterate', ['baseDot' => 'digraph P { start -> exit; }']);
     $h->assertSame(400, $iterateMissing['status'], 'iterate missing changes');
+});
+
+$h->run('llm provider traffic observed for both adapters', function () use ($h): void {
+    $mockLog = dirname(__DIR__) . '/.scratch/tests/SPRINT-002/mock-llm.ndjson';
+    $lines = file($mockLog, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES) ?: [];
+    $providers = [];
+    foreach ($lines as $line) {
+        $decoded = json_decode($line, true);
+        if (!is_array($decoded)) {
+            continue;
+        }
+        $provider = (string) ($decoded['provider'] ?? '');
+        if ($provider !== '') {
+            $providers[$provider] = true;
+        }
+    }
+
+    $h->assertTrue(isset($providers['openai']), 'openai provider should receive traffic');
+    $h->assertTrue(isset($providers['anthropic']), 'anthropic provider should receive traffic');
 });
 
 $h->run('dot stream endpoints emit terminal error frame for malformed payloads', function () use ($h, $app): void {
@@ -506,4 +590,10 @@ if (!is_dir($artifactDir)) {
     mkdir($artifactDir, 0777, true);
 }
 file_put_contents($artifactDir . '/test-summary.txt', 'exit=' . $exit . "\n");
+
+if (is_resource($mockProc)) {
+    proc_terminate($mockProc);
+    proc_close($mockProc);
+}
+
 exit($exit);

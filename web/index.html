@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Attractor PHP Dashboard</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
     <link rel="stylesheet" href="/styles.css">
   </head>
   <body>
@@ -96,6 +97,13 @@
           <div class="panel-head">
             <h2>Create / Iterate Pipeline</h2>
             <div class="actions">
+              <label for="llm-provider" class="small">provider</label>
+              <select id="llm-provider" class="input">
+                <option value="">default</option>
+                <option value="openai">openai</option>
+                <option value="anthropic">anthropic</option>
+              </select>
+              <input id="llm-model" class="input" type="text" placeholder="model override">
               <label><input type="checkbox" id="simulate" checked> simulate</label>
               <label><input type="checkbox" id="auto-approve"> autoApprove</label>
             </div>
@@ -164,6 +172,7 @@
             <li><code>POST /api/v1/dot/generate/stream</code> streaming DOT generation</li>
             <li><code>POST /api/v1/dot/fix/stream</code> streaming DOT fix</li>
             <li><code>POST /api/v1/dot/iterate/stream</code> streaming DOT iterate</li>
+            <li><code>provider</code> and <code>model</code> fields can target OpenAI or Anthropic adapters</li>
           </ul>
         </article>
       </section>

@@ -32,6 +32,14 @@
   - UI can append streaming chunks and validate before run.
   - CI/test flows remain deterministic without external LLM calls.
 
+## ADR-2026-03-04-008: Real Provider Adapters for DOT Authoring
+- Status: Accepted
+- Context: DOT generation, repair, and iteration flows must use real provider APIs rather than deterministic in-process stubs.
+- Decision: Route DOT authoring operations through provider-backed adapters (OpenAI Responses API and Anthropic Messages API) with configurable base URLs, API keys, and model overrides.
+- Consequences:
+  - Runtime behavior now reflects real upstream LLM API semantics and failures.
+  - Tests use provider-compatible local mock endpoints to validate end-to-end request/response contract without requiring external secrets.
+
 ## ADR-2026-03-04-005: Run Directory as Source of Truth
 - Status: Accepted
 - Context: NLSpec aligns around durable run artifacts and resumable state snapshots.

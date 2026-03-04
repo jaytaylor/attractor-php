@@ -109,6 +109,19 @@
     return done.dotSource;
   };
 
+  const llmPayload = () => {
+    const payload = {};
+    const provider = String(el('llm-provider').value || '').trim();
+    const model = String(el('llm-model').value || '').trim();
+    if (provider) {
+      payload.provider = provider;
+    }
+    if (model) {
+      payload.model = model;
+    }
+    return payload;
+  };
+
   const runBadge = (status) => {
     const colors = {
       running: '#2a9d8f',
@@ -427,7 +440,7 @@
       return;
     }
     el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/generate/stream', { prompt }, (delta) => {
+    const doneDot = await postStream('/api/v1/dot/generate/stream', { prompt, ...llmPayload() }, (delta) => {
       el('dot-editor').value += delta;
     });
     el('dot-editor').value = doneDot;
@@ -439,7 +452,7 @@
     const dotSource = el('dot-editor').value;
     const error = state.lastDotError || 'invalid DOT';
     el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/fix/stream', { dotSource, error }, (delta) => {
+    const doneDot = await postStream('/api/v1/dot/fix/stream', { dotSource, error, ...llmPayload() }, (delta) => {
       el('dot-editor').value += delta;
     });
     el('dot-editor').value = doneDot;
@@ -456,7 +469,7 @@
 
     const baseDot = el('dot-editor').value;
     el('dot-editor').value = '';
-    const doneDot = await postStream('/api/v1/dot/iterate/stream', { baseDot, changes }, (delta) => {
+    const doneDot = await postStream('/api/v1/dot/iterate/stream', { baseDot, changes, ...llmPayload() }, (delta) => {
       el('dot-editor').value += delta;
     });
     el('dot-editor').value = doneDot;
