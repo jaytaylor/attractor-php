@@ -67,4 +67,14 @@ final class Request
         $normalized = strtolower((string) $value);
         return in_array($normalized, ['1', 'true', 'yes', 'on'], true);
     }
+
+    public function queryInt(string $key, int $default = 0): int
+    {
+        $value = $this->query[$key] ?? null;
+        if ($value === null || $value === '') {
+            return $default;
+        }
+
+        return (int) $value;
+    }
 }

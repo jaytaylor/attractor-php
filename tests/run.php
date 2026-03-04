@@ -108,6 +108,24 @@ function parseSse(string $raw): array
     return $events;
 }
 
+/** @param list<string> $terminalStatuses
+  * @return array{status:int,headers:array<string,string>,body:string,json:array<string,mixed>|list<mixed>|null}
+  */
+function waitForRunStatus(App $app, string $runId, array $terminalStatuses, int $timeoutMs = 2500): array
+{
+    $deadline = (int) floor(microtime(true) * 1000) + $timeoutMs;
+    do {
+        $run = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+        $status = (string) ($run['json']['status'] ?? '');
+        if (in_array($status, $terminalStatuses, true)) {
+            return $run;
+        }
+        usleep(50_000);
+    } while ((int) floor(microtime(true) * 1000) < $deadline);
+
+    return callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+}
+
 $logsRoot = dirname(__DIR__) . '/.scratch/tests/SPRINT-002/runs';
 if (is_dir($logsRoot)) {
     $it = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($logsRoot, FilesystemIterator::SKIP_DOTS), RecursiveIteratorIterator::CHILD_FIRST);
@@ -203,12 +221,29 @@ $h->run('pipeline create/get/list', function () use ($h, $app): void {
     $h->assertSame(400, $badCreate['status'], 'empty dot should fail');
 });
 
+$h->run('non-sim run progresses to completion over time', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph N { start -> plan; plan -> implement; implement -> test; test -> exit; }',
+        'displayName' => 'Async Progression',
+        'simulate' => false,
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+    $h->assertTrue($runId !== '', 'run id expected');
+
+    $initial = callApi($app, 'GET', '/api/v1/pipelines/' . $runId);
+    $h->assertSame('running', (string) ($initial['json']['status'] ?? ''), 'run should start as running');
+
+    $terminal = waitForRunStatus($app, $runId, ['completed']);
+    $h->assertSame('completed', (string) ($terminal['json']['status'] ?? ''), 'non-sim run should complete after progression');
+});
+
 $h->run('run artifacts/graph/checkpoint/context', function () use ($h, $app): void {
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph G { start -> implement; implement -> exit; }',
         'displayName' => 'Artifacts Run',
     ]);
     $runId = (string) ($create['json']['id'] ?? '');
+    waitForRunStatus($app, $runId, ['completed']);
 
     $graph = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/graph');
     $h->assertSame(200, $graph['status'], 'graph should work');
@@ -337,6 +372,7 @@ $h->run('iterate run lineage preserved', function () use ($h, $app): void {
         'displayName' => 'Iter Source',
     ]);
     $sourceId = (string) ($create['json']['id'] ?? '');
+    waitForRunStatus($app, $sourceId, ['completed']);
 
     $source = callApi($app, 'GET', '/api/v1/pipelines/' . $sourceId);
     $sourceFamily = (string) ($source['json']['familyId'] ?? '');

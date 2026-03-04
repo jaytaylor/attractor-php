@@ -134,7 +134,7 @@ final class RunStore
     }
 
     /** @return list<array<string,mixed>> */
-    public function readEvents(string $runId): array
+    public function readEvents(string $runId, int $sinceTs = 0): array
     {
         $path = $this->runDir($runId) . '/events.ndjson';
         if (!is_file($path)) {
@@ -146,6 +146,9 @@ final class RunStore
         foreach ($lines as $line) {
             $decoded = json_decode($line, true);
             if (is_array($decoded)) {
+                if ((int) ($decoded['tsMs'] ?? 0) <= $sinceTs) {
+                    continue;
+                }
                 $events[] = $decoded;
             }
         }
@@ -153,11 +156,11 @@ final class RunStore
     }
 
     /** @return list<array<string,mixed>> */
-    public function readGlobalEvents(): array
+    public function readGlobalEvents(int $sinceTs = 0): array
     {
         $events = [];
         foreach ($this->listRuns(true) as $run) {
-            $events = array_merge($events, $this->readEvents((string) $run['id']));
+            $events = array_merge($events, $this->readEvents((string) $run['id'], $sinceTs));
         }
 
         usort($events, static fn(array $a, array $b): int => ((int) ($a['tsMs'] ?? 0)) <=> ((int) ($b['tsMs'] ?? 0)));

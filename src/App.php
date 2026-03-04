@@ -65,21 +65,21 @@ final class App
 
         $this->router->add('GET', '/api/v1/pipelines', fn(Request $req) => $this->listRuns($req));
         $this->router->add('POST', '/api/v1/pipelines', fn(Request $req) => $this->createRun($req));
-        $this->router->add('GET', '/api/v1/pipelines/{id}', fn(Request $req, array $p) => Response::json($this->store->getRun($p['id'])));
+        $this->router->add('GET', '/api/v1/pipelines/{id}', fn(Request $req, array $p) => Response::json($this->pipelineService->getRun($p['id'])));
         $this->router->add('POST', '/api/v1/pipelines/{id}/cancel', fn(Request $req, array $p) => Response::json($this->pipelineService->cancel($p['id'])));
         $this->router->add('DELETE', '/api/v1/pipelines/{id}', fn(Request $req, array $p) => $this->deleteRun($p['id']));
         $this->router->add('POST', '/api/v1/pipelines/{id}/archive', fn(Request $req, array $p) => Response::json($this->pipelineService->setArchived($p['id'], true)));
         $this->router->add('POST', '/api/v1/pipelines/{id}/unarchive', fn(Request $req, array $p) => Response::json($this->pipelineService->setArchived($p['id'], false)));
-        $this->router->add('GET', '/api/v1/pipelines/{id}/events', fn(Request $req, array $p) => $this->runEventsStream($p['id']));
-        $this->router->add('GET', '/api/v1/events', fn() => $this->globalEventsStream());
-        $this->router->add('GET', '/api/v1/pipelines/{id}/questions', fn(Request $req, array $p) => Response::json($this->store->getQuestions($p['id'])));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/events', fn(Request $req, array $p) => $this->runEventsStream($req, $p['id']));
+        $this->router->add('GET', '/api/v1/events', fn(Request $req) => $this->globalEventsStream($req));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/questions', fn(Request $req, array $p) => $this->questionsForRun($p['id']));
         $this->router->add('POST', '/api/v1/pipelines/{id}/questions/{qid}/answer', fn(Request $req, array $p) => $this->answerQuestion($req, $p));
         $this->router->add('GET', '/api/v1/pipelines/{id}/graph', fn(Request $req, array $p) => $this->graphForRun($p['id']));
-        $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts', fn(Request $req, array $p) => Response::json($this->store->listArtifacts($p['id'])));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts', fn(Request $req, array $p) => $this->listArtifacts($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts.zip', fn(Request $req, array $p) => $this->downloadArtifactsZip($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts/{path}', fn(Request $req, array $p) => $this->artifactFile($p['id'], $p['path']));
-        $this->router->add('GET', '/api/v1/pipelines/{id}/checkpoint', fn(Request $req, array $p) => Response::json($this->store->readCheckpoint($p['id'])));
-        $this->router->add('GET', '/api/v1/pipelines/{id}/context', fn(Request $req, array $p) => Response::json($this->store->readContext($p['id'])));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/checkpoint', fn(Request $req, array $p) => $this->checkpointForRun($p['id']));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/context', fn(Request $req, array $p) => $this->contextForRun($p['id']));
         $this->router->add('POST', '/api/v1/pipelines/{id}/iterate', fn(Request $req, array $p) => $this->iterateRun($req, $p['id']));
 
         $this->router->add('POST', '/api/v1/dot/validate', fn(Request $req) => $this->dotValidate($req));
@@ -92,14 +92,14 @@ final class App
         $this->router->add('POST', '/api/v1/dot/iterate/stream', fn(Request $req) => $this->dotIterateStream($req));
 
         $this->router->add('POST', '/pipelines', fn(Request $req) => $this->createRun($req));
-        $this->router->add('GET', '/pipelines/{id}', fn(Request $req, array $p) => Response::json($this->store->getRun($p['id'])));
-        $this->router->add('GET', '/pipelines/{id}/events', fn(Request $req, array $p) => $this->runEventsStream($p['id']));
+        $this->router->add('GET', '/pipelines/{id}', fn(Request $req, array $p) => Response::json($this->pipelineService->getRun($p['id'])));
+        $this->router->add('GET', '/pipelines/{id}/events', fn(Request $req, array $p) => $this->runEventsStream($req, $p['id']));
         $this->router->add('POST', '/pipelines/{id}/cancel', fn(Request $req, array $p) => Response::json($this->pipelineService->cancel($p['id'])));
         $this->router->add('GET', '/pipelines/{id}/graph', fn(Request $req, array $p) => $this->graphForRun($p['id']));
-        $this->router->add('GET', '/pipelines/{id}/questions', fn(Request $req, array $p) => Response::json($this->store->getQuestions($p['id'])));
+        $this->router->add('GET', '/pipelines/{id}/questions', fn(Request $req, array $p) => $this->questionsForRun($p['id']));
         $this->router->add('POST', '/pipelines/{id}/questions/{qid}/answer', fn(Request $req, array $p) => $this->answerQuestion($req, $p));
-        $this->router->add('GET', '/pipelines/{id}/checkpoint', fn(Request $req, array $p) => Response::json($this->store->readCheckpoint($p['id'])));
-        $this->router->add('GET', '/pipelines/{id}/context', fn(Request $req, array $p) => Response::json($this->store->readContext($p['id'])));
+        $this->router->add('GET', '/pipelines/{id}/checkpoint', fn(Request $req, array $p) => $this->checkpointForRun($p['id']));
+        $this->router->add('GET', '/pipelines/{id}/context', fn(Request $req, array $p) => $this->contextForRun($p['id']));
     }
 
     private function serveAsset(string $fileName, string $type): Response
@@ -115,7 +115,7 @@ final class App
     private function listRuns(Request $request): Response
     {
         $includeArchived = $request->queryBool('includeArchived', false);
-        return Response::json($this->store->listRuns($includeArchived));
+        return Response::json($this->pipelineService->listRuns($includeArchived));
     }
 
     private function createRun(Request $request): Response
@@ -147,8 +147,33 @@ final class App
         return new Response(200, ['content-type' => 'image/svg+xml; charset=utf-8'], $this->pipelineService->graphSvg($runId));
     }
 
+    private function questionsForRun(string $runId): Response
+    {
+        $this->pipelineService->tickRun($runId);
+        return Response::json($this->store->getQuestions($runId));
+    }
+
+    private function listArtifacts(string $runId): Response
+    {
+        $this->pipelineService->tickRun($runId);
+        return Response::json($this->store->listArtifacts($runId));
+    }
+
+    private function checkpointForRun(string $runId): Response
+    {
+        $this->pipelineService->tickRun($runId);
+        return Response::json($this->store->readCheckpoint($runId));
+    }
+
+    private function contextForRun(string $runId): Response
+    {
+        $this->pipelineService->tickRun($runId);
+        return Response::json($this->store->readContext($runId));
+    }
+
     private function artifactFile(string $runId, string $relativePath): Response
     {
+        $this->pipelineService->tickRun($runId);
         $artifact = $this->store->readArtifact($runId, $relativePath);
         $mime = $artifact['isText'] ? 'text/plain; charset=utf-8' : 'application/octet-stream';
         return new Response(200, ['content-type' => $mime], $artifact['content']);
@@ -156,6 +181,7 @@ final class App
 
     private function downloadArtifactsZip(string $runId): Response
     {
+        $this->pipelineService->tickRun($runId);
         $zipPath = $this->store->createArtifactsZip($runId);
         $contents = file_get_contents($zipPath);
         if ($contents === false) {
@@ -168,23 +194,27 @@ final class App
         ], $contents);
     }
 
-    private function runEventsStream(string $runId): Response
+    private function runEventsStream(Request $request, string $runId): Response
     {
+        $this->pipelineService->tickRun($runId);
         $run = $this->store->getRun($runId);
+        $sinceTs = max(0, $request->queryInt('sinceTs', 0));
         $body = Sse::frame([
             'runId' => $runId,
             'tsMs' => (int) floor(microtime(true) * 1000),
             'type' => 'Snapshot',
             'payload' => $run,
         ]);
-        foreach ($this->store->readEvents($runId) as $event) {
+        foreach ($this->store->readEvents($runId, $sinceTs) as $event) {
             $body .= Sse::frame($event);
         }
         return new Response(200, ['content-type' => 'text/event-stream; charset=utf-8'], $body);
     }
 
-    private function globalEventsStream(): Response
+    private function globalEventsStream(Request $request): Response
     {
+        $this->pipelineService->tickAll();
+        $sinceTs = max(0, $request->queryInt('sinceTs', 0));
         $snapshot = [
             'runId' => null,
             'tsMs' => (int) floor(microtime(true) * 1000),
@@ -192,7 +222,7 @@ final class App
             'payload' => $this->store->listRuns(true),
         ];
         $body = Sse::frame($snapshot);
-        foreach ($this->store->readGlobalEvents() as $event) {
+        foreach ($this->store->readGlobalEvents($sinceTs) as $event) {
             $body .= Sse::frame($event);
         }
         return new Response(200, ['content-type' => 'text/event-stream; charset=utf-8'], $body);
