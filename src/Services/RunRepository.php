@@ -19,6 +19,11 @@ final class RunRepository
         'cancelled' => [],
     ];
 
+    /**
+     * @var list<string>
+     */
+    private const TERMINAL_STATUSES = ['completed', 'failed', 'cancelled'];
+
     public function __construct(
         private readonly string $projectRoot,
         private readonly DotService $dotService,
@@ -83,9 +88,15 @@ final class RunRepository
         $dotSource = (string) ($payload['dotSource'] ?? '');
         $displayName = trim((string) ($payload['displayName'] ?? ''));
         $fileName = trim((string) ($payload['fileName'] ?? 'pipeline.dot'));
-        $simulate = (bool) ($payload['simulate'] ?? false);
-        $autoApprove = array_key_exists('autoApprove', $payload) ? (bool) $payload['autoApprove'] : true;
         $originalPrompt = trim((string) ($payload['originalPrompt'] ?? ''));
+
+        $provider = trim(strtolower((string) ($payload['provider'] ?? '')));
+        if ($provider === '') {
+            $provider = $this->defaultProvider();
+        }
+        $model = trim((string) ($payload['model'] ?? ''));
+
+        $graph = $this->parseGraph($dotSource);
 
         $id = $this->newRunId();
         $runPath = $this->runPath($id);
@@ -102,11 +113,11 @@ final class RunRepository
 
         $nowMs = Time::nowMs();
         $stages = [];
-        foreach ($this->dotService->extractStages($dotSource) as $index => $nodeId) {
+        foreach ($graph['stageOrder'] as $index => $nodeId) {
             $stages[] = [
                 'index' => $index,
                 'nodeId' => $nodeId,
-                'name' => ucfirst($nodeId),
+                'name' => $this->stageName($nodeId, $graph),
                 'status' => 'pending',
                 'startedAtMs' => null,
                 'durationMs' => null,
@@ -114,111 +125,197 @@ final class RunRepository
                 'hasLog' => true,
             ];
             $stageDir = $runPath . '/' . $nodeId;
-            mkdir($stageDir, 0777, true);
-            file_put_contents($stageDir . '/prompt.md', "# Prompt\n\nGenerated prompt for stage {$nodeId}.\n");
-            file_put_contents($stageDir . '/response.md', "# Response\n\nGenerated response for stage {$nodeId}.\n");
-            file_put_contents($stageDir . '/status.json', (string) json_encode(['status' => 'pending'], JSON_PRETTY_PRINT));
-        }
-
-        $status = 'running';
-        $currentNodeId = $stages[0]['nodeId'] ?? 'start';
-        $finishedAtMs = null;
-        $pendingQuestion = null;
-
-        if ($autoApprove) {
-            foreach ($stages as $i => $stage) {
-                $stages[$i]['status'] = 'completed';
-                $stages[$i]['startedAtMs'] = $nowMs;
-                $stages[$i]['durationMs'] = 100;
-                file_put_contents($runPath . '/' . $stage['nodeId'] . '/status.json', (string) json_encode(['status' => 'completed'], JSON_PRETTY_PRINT));
+            if (!is_dir($stageDir)) {
+                mkdir($stageDir, 0777, true);
             }
-            $status = 'completed';
-            $finishedAtMs = $nowMs;
-            $currentNodeId = $stages[count($stages) - 1]['nodeId'] ?? $currentNodeId;
-        } else {
-            if ($stages !== []) {
-                $stages[0]['status'] = 'completed';
-                $stages[0]['startedAtMs'] = $nowMs;
-                $stages[0]['durationMs'] = 100;
-                file_put_contents($runPath . '/' . $stages[0]['nodeId'] . '/status.json', (string) json_encode(['status' => 'completed'], JSON_PRETTY_PRINT));
-            }
-
-            if (count($stages) > 1) {
-                $stages[1]['status'] = 'waiting_human';
-                $stages[1]['startedAtMs'] = $nowMs;
-                $currentNodeId = $stages[1]['nodeId'];
-                file_put_contents($runPath . '/' . $stages[1]['nodeId'] . '/status.json', (string) json_encode(['status' => 'waiting_human'], JSON_PRETTY_PRINT));
-                $pendingQuestion = [
-                    'id' => 'q-1',
-                    'stage' => $stages[1]['nodeId'],
-                    'type' => 'MULTIPLE_CHOICE',
-                    'text' => 'Approve continuation for this run?',
-                    'options' => [
-                        ['key' => 'A', 'label' => 'Approve'],
-                        ['key' => 'F', 'label' => 'Request Fix'],
-                    ],
-                ];
-                file_put_contents($runPath . '/question.json', (string) json_encode($pendingQuestion, JSON_PRETTY_PRINT));
-            }
+            file_put_contents($stageDir . '/status.json', (string) json_encode(['status' => 'pending'], JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         }
 
         $manifest = [
             'id' => $id,
             'displayName' => $displayName !== '' ? $displayName : 'Run ' . substr($id, -6),
             'fileName' => $fileName,
-            'status' => $status,
+            'status' => 'queued',
             'archived' => false,
-            'simulate' => $simulate,
-            'autoApprove' => $autoApprove,
             'familyId' => $familyId,
+            'provider' => $provider,
+            'model' => $model,
             'originalPrompt' => $originalPrompt,
             'startedAtMs' => $nowMs,
-            'finishedAtMs' => $finishedAtMs,
-            'currentNodeId' => $currentNodeId,
+            'finishedAtMs' => null,
+            'currentNodeId' => $graph['startNodeId'],
             'stages' => $stages,
             'logs' => [],
             'dotSource' => $dotSource,
         ];
 
-        $checkpoint = [
-            'current_node' => $manifest['currentNodeId'],
-            'completed_nodes' => array_values(array_map(
-                static fn (array $stage): string => (string) $stage['nodeId'],
-                array_values(array_filter($stages, static fn (array $stage): bool => (string) $stage['status'] === 'completed')),
-            )),
-            'timestamp' => gmdate('c'),
-        ];
-
         $context = [
             'graph.goal' => $originalPrompt,
             'run.id' => $id,
-            'run.simulate' => $simulate,
+            'run.provider' => $provider,
+            'run.model' => $model,
         ];
 
         file_put_contents($runPath . '/manifest.json', (string) json_encode($manifest, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
-        file_put_contents($runPath . '/checkpoint.json', (string) json_encode($checkpoint, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         file_put_contents($runPath . '/context.json', (string) json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
         file_put_contents($runPath . '/pipeline.dot', $dotSource);
-        file_put_contents($runPath . '/artifacts/summary.txt', "Run {$id} status {$status}\n");
+        $this->saveCheckpoint($id, $manifest);
 
-        $this->appendEvent($id, 'PipelineStarted', ['status' => 'running']);
-        foreach ($stages as $stage) {
-            $this->appendEvent($id, 'StageStarted', ['nodeId' => $stage['nodeId']]);
-            if ($stage['status'] === 'completed') {
-                $this->appendEvent($id, 'StageCompleted', ['nodeId' => $stage['nodeId'], 'durationMs' => 100]);
-            }
-            if ($stage['status'] === 'waiting_human') {
-                $this->appendEvent($id, 'InterviewStarted', ['nodeId' => $stage['nodeId'], 'questionId' => 'q-1']);
-            }
-        }
-
-        if ($status === 'completed') {
-            $this->appendEvent($id, 'PipelineCompleted', ['status' => 'completed']);
-        }
-
-        $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $manifest['currentNodeId']]);
+        $this->appendEvent($id, 'PipelineQueued', ['status' => 'queued']);
+        $this->spawnWorker($id);
 
         return $manifest;
+    }
+
+    /**
+     * Real runtime worker loop for one run id.
+     */
+    public function processRun(string $id): void
+    {
+        $steps = 0;
+        while ($steps < 256) {
+            $run = $this->getRun($id);
+            if ($run === null) {
+                return;
+            }
+
+            $status = (string) ($run['status'] ?? '');
+            if ($status === '') {
+                $this->failRun($id, 'manifest status missing');
+                return;
+            }
+
+            if (in_array($status, self::TERMINAL_STATUSES, true)) {
+                return;
+            }
+
+            if ($status === 'queued') {
+                if (!$this->canTransition('queued', 'running')) {
+                    $this->failRun($id, 'invalid queued->running transition');
+                    return;
+                }
+                $run['status'] = 'running';
+                $this->saveRun($run);
+                $this->appendEvent($id, 'PipelineStarted', ['status' => 'running']);
+                $run = $this->getRun($id);
+                if ($run === null) {
+                    return;
+                }
+            }
+
+            $questionPath = $this->runPath($id) . '/question.json';
+            if (is_file($questionPath)) {
+                return;
+            }
+
+            $dotSource = (string) ($run['dotSource'] ?? '');
+            $graph = $this->parseGraph($dotSource);
+            $currentNodeId = trim((string) ($run['currentNodeId'] ?? ''));
+            if ($currentNodeId === '') {
+                $currentNodeId = $graph['startNodeId'];
+            }
+
+            $node = $graph['nodes'][$currentNodeId] ?? null;
+            if (!is_array($node)) {
+                $this->failRun($id, 'node not found: ' . $currentNodeId);
+                return;
+            }
+
+            $outgoing = $graph['outgoing'][$currentNodeId] ?? [];
+            if ($this->isTerminalNode($currentNodeId, $node, $outgoing)) {
+                $this->markStageCompletedControl($run, $currentNodeId, 'Reached terminal node.');
+                $run['status'] = 'completed';
+                $run['finishedAtMs'] = Time::nowMs();
+                $run['currentNodeId'] = $currentNodeId;
+                $this->saveRun($run);
+                $this->saveCheckpoint($id, $run);
+                $this->appendEvent($id, 'PipelineCompleted', ['status' => 'completed']);
+                $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $currentNodeId]);
+                return;
+            }
+
+            if ($this->isHumanGateNode($currentNodeId, $node)) {
+                $this->startHumanGate($run, $currentNodeId, $outgoing);
+                return;
+            }
+
+            $prompt = $this->buildStagePrompt($run, $currentNodeId, $node, $outgoing);
+            $startedAtMs = Time::nowMs();
+            $this->markStageStarted($run, $currentNodeId, $startedAtMs);
+            $this->writeStagePrompt($id, $currentNodeId, $prompt);
+            $this->saveRun($run);
+            $this->appendEvent($id, 'StageStarted', ['nodeId' => $currentNodeId]);
+
+            try {
+                if ($this->isControlNode($currentNodeId, $node)) {
+                    $completionText = 'Control node completed.';
+                    $providerUsed = 'engine';
+                    $modelUsed = 'engine';
+                } else {
+                    $completion = $this->dotService->completeText(
+                        systemPrompt: $this->stageSystemPrompt(),
+                        userPrompt: $prompt,
+                        options: [
+                            'provider' => (string) ($run['provider'] ?? ''),
+                            'model' => (string) ($run['model'] ?? ''),
+                        ],
+                    );
+                    $completionText = (string) ($completion['text'] ?? '');
+                    $providerUsed = (string) ($completion['provider'] ?? '');
+                    $modelUsed = (string) ($completion['model'] ?? '');
+                }
+            } catch (\Throwable $e) {
+                $durationMs = max(1, Time::nowMs() - $startedAtMs);
+                $this->markStageFailed($run, $currentNodeId, $durationMs, $e->getMessage());
+                $this->saveRun($run);
+                $this->writeStageResponse($id, $currentNodeId, "Runtime error: {$e->getMessage()}\n");
+                $this->appendEvent($id, 'StageFailed', ['nodeId' => $currentNodeId, 'error' => $e->getMessage()]);
+                $this->failRun($id, $e->getMessage());
+                return;
+            }
+
+            $durationMs = max(1, Time::nowMs() - $startedAtMs);
+            $this->markStageCompleted($run, $currentNodeId, $durationMs);
+            $this->writeStageResponse(
+                $id,
+                $currentNodeId,
+                $this->formatStageResponse($completionText, $providerUsed, $modelUsed),
+            );
+            $this->appendEvent($id, 'StageCompleted', ['nodeId' => $currentNodeId, 'durationMs' => $durationMs]);
+
+            $context = $this->context($id) ?? [];
+            $context['stage.' . $currentNodeId . '.response'] = $this->truncate($completionText, 4000);
+
+            $validationOutcome = null;
+            if ($this->isValidationNode($currentNodeId, $node)) {
+                $validation = $this->parseValidationOutcome($completionText);
+                $validationOutcome = $validation['outcome'];
+                $context['stage.' . $currentNodeId . '.validation_outcome'] = $validation['outcome'];
+                $context['stage.' . $currentNodeId . '.validation_reason'] = $validation['reason'];
+            }
+            file_put_contents($this->runPath($id) . '/context.json', (string) json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+
+            $nextNodeId = $this->selectNextNode($outgoing, $validationOutcome);
+            if ($nextNodeId === null) {
+                $run['status'] = 'completed';
+                $run['finishedAtMs'] = Time::nowMs();
+                $run['currentNodeId'] = $currentNodeId;
+                $this->saveRun($run);
+                $this->saveCheckpoint($id, $run);
+                $this->appendEvent($id, 'PipelineCompleted', ['status' => 'completed']);
+                $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $currentNodeId]);
+                return;
+            }
+
+            $run['currentNodeId'] = $nextNodeId;
+            $this->saveRun($run);
+            $this->saveCheckpoint($id, $run);
+            $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $nextNodeId]);
+
+            $steps++;
+        }
+
+        $this->failRun($id, 'maximum stage execution steps exceeded');
     }
 
     /**
@@ -295,61 +392,41 @@ final class RunRepository
             return ['ok' => false, 'error' => 'question not found', 'code' => 'NOT_FOUND'];
         }
 
-        $valid = false;
-        foreach (($question['options'] ?? []) as $opt) {
-            if (is_array($opt) && (string) ($opt['key'] ?? '') === $answer) {
-                $valid = true;
+        $selected = null;
+        foreach (($question['options'] ?? []) as $option) {
+            if (!is_array($option)) {
+                continue;
+            }
+            if ((string) ($option['key'] ?? '') === $answer) {
+                $selected = $option;
+                break;
             }
         }
-
-        if (!$valid) {
+        if (!is_array($selected)) {
             return ['ok' => false, 'error' => 'invalid answer', 'code' => 'BAD_REQUEST'];
         }
 
-        unlink($questionPath);
-        $targetStatus = $answer === 'A' ? 'completed' : 'failed';
-        if (!$this->canTransition((string) ($run['status'] ?? ''), $targetStatus)) {
-            return ['ok' => false, 'error' => 'invalid status transition', 'code' => 'INVALID_STATE'];
-        }
-        $run['status'] = $targetStatus;
-        $run['finishedAtMs'] = Time::nowMs();
-
-        $stages = is_array($run['stages'] ?? null) ? $run['stages'] : [];
-        foreach ($stages as $i => $stage) {
-            if (!is_array($stage)) {
-                continue;
-            }
-            if ((string) ($stage['status'] ?? '') === 'waiting_human') {
-                $stages[$i]['status'] = $answer === 'A' ? 'completed' : 'failed';
-                $stages[$i]['durationMs'] = 200;
-                file_put_contents($this->runPath($id) . '/' . $stage['nodeId'] . '/status.json', (string) json_encode(['status' => $stages[$i]['status']], JSON_PRETTY_PRINT));
-            } elseif ((string) ($stage['status'] ?? '') === 'pending') {
-                $stages[$i]['status'] = $answer === 'A' ? 'completed' : 'skipped';
-            }
+        if (is_file($questionPath)) {
+            unlink($questionPath);
         }
 
-        $run['stages'] = $stages;
-        $run['currentNodeId'] = (string) ($stages[count($stages) - 1]['nodeId'] ?? $run['currentNodeId']);
+        $stageNodeId = (string) ($question['stage'] ?? '');
+        if ($stageNodeId !== '') {
+            $this->setStageStatus($run, $stageNodeId, 'completed', null, 1, 1, '');
+            $this->writeStageStatus($id, $stageNodeId, 'completed', 1, '');
+        }
+
+        $nextNodeId = trim((string) ($selected['target'] ?? ''));
+        if ($nextNodeId === '') {
+            $nextNodeId = (string) ($run['currentNodeId'] ?? '');
+        }
+        $run['currentNodeId'] = $nextNodeId;
         $this->saveRun($run);
+        $this->saveCheckpoint($id, $run);
+        $this->appendEvent($id, 'InterviewCompleted', ['questionId' => $qid, 'answer' => $answer, 'nextNodeId' => $nextNodeId]);
+        $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $nextNodeId]);
 
-        $checkpoint = [
-            'current_node' => $run['currentNodeId'],
-            'completed_nodes' => array_values(array_map(
-                static fn (array $stage): string => (string) $stage['nodeId'],
-                array_values(array_filter($stages, static fn (array $stage): bool => (string) $stage['status'] === 'completed')),
-            )),
-            'timestamp' => gmdate('c'),
-        ];
-        file_put_contents($this->runPath($id) . '/checkpoint.json', (string) json_encode($checkpoint, JSON_PRETTY_PRINT));
-
-        $this->appendEvent($id, 'InterviewCompleted', ['questionId' => $qid, 'answer' => $answer]);
-        if ($run['status'] === 'completed') {
-            $this->appendEvent($id, 'PipelineCompleted', ['status' => 'completed']);
-        } else {
-            $this->appendEvent($id, 'PipelineFailed', ['status' => 'failed']);
-        }
-        $this->appendEvent($id, 'CheckpointSaved', ['nodeId' => $run['currentNodeId']]);
-
+        $this->spawnWorker($id);
         return ['ok' => true];
     }
 
@@ -368,6 +445,10 @@ final class RunRepository
         $run['status'] = 'cancelled';
         $run['finishedAtMs'] = Time::nowMs();
         $this->saveRun($run);
+        $questionPath = $this->runPath($id) . '/question.json';
+        if (is_file($questionPath)) {
+            unlink($questionPath);
+        }
         $this->appendEvent($id, 'PipelineFailed', ['status' => 'cancelled']);
 
         return ['ok' => true];
@@ -542,6 +623,628 @@ final class RunRepository
         return 'run-' . (string) Time::nowMs() . '-' . (string) random_int(1000, 9999);
     }
 
+    private function defaultProvider(): string
+    {
+        if (trim((string) getenv('OPENAI_API_KEY')) !== '') {
+            return 'openai';
+        }
+        if (trim((string) getenv('ANTHROPIC_API_KEY')) !== '') {
+            return 'anthropic';
+        }
+        if (trim((string) getenv('GEMINI_API_KEY')) !== '' || trim((string) getenv('GOOGLE_API_KEY')) !== '') {
+            return 'gemini';
+        }
+        return 'openai';
+    }
+
+    private function spawnWorker(string $runId): void
+    {
+        $workerScript = $this->projectRoot . '/bin/run-worker.php';
+        if (!is_file($workerScript)) {
+            return;
+        }
+
+        @mkdir($this->projectRoot . '/.scratch/runtime', 0777, true);
+        $logFile = $this->projectRoot . '/.scratch/runtime/worker.log';
+        $cmd = 'php ' . escapeshellarg($workerScript)
+            . ' ' . escapeshellarg($this->projectRoot)
+            . ' ' . escapeshellarg($runId)
+            . ' >> ' . escapeshellarg($logFile)
+            . ' 2>&1 &';
+
+        exec($cmd);
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function saveCheckpoint(string $runId, array $run): void
+    {
+        $stages = is_array($run['stages'] ?? null) ? $run['stages'] : [];
+        $completedNodes = [];
+        foreach ($stages as $stage) {
+            if (!is_array($stage)) {
+                continue;
+            }
+            if ((string) ($stage['status'] ?? '') === 'completed') {
+                $completedNodes[] = (string) ($stage['nodeId'] ?? '');
+            }
+        }
+
+        $checkpoint = [
+            'current_node' => (string) ($run['currentNodeId'] ?? ''),
+            'completed_nodes' => array_values(array_filter($completedNodes, static fn (string $v): bool => $v !== '')),
+            'timestamp' => gmdate('c'),
+        ];
+        file_put_contents($this->runPath($runId) . '/checkpoint.json', (string) json_encode($checkpoint, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     * @param array<string,mixed> $node
+     * @param list<array<string,mixed>> $outgoing
+     */
+    private function buildStagePrompt(array $run, string $nodeId, array $node, array $outgoing): string
+    {
+        $context = $this->context((string) ($run['id'] ?? '')) ?? [];
+        $label = trim((string) ($node['label'] ?? $nodeId));
+        $goal = trim((string) ($run['originalPrompt'] ?? ''));
+
+        $prompt = "Run ID: " . (string) ($run['id'] ?? '') . "\n"
+            . "Stage Node: {$nodeId}\n"
+            . "Stage Label: {$label}\n"
+            . "Workflow Goal: " . ($goal !== '' ? $goal : 'No explicit goal provided') . "\n"
+            . "Current Context JSON:\n" . json_encode($context, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES) . "\n";
+
+        if ($this->isValidationNode($nodeId, $node)) {
+            $prompt .= "\nYou are the validator stage. Analyze prior outputs and return STRICT JSON only with this schema:\n"
+                . "{\"outcome\":\"pass\"|\"fail\",\"reason\":\"short reason\",\"evidence\":[\"item\",\"item\"]}\n"
+                . "Use outcome=fail when requirements are missing, incorrect, or unverified.\n";
+        } else {
+            $prompt .= "\nProduce the best possible output for this stage in plain text. Be concrete and actionable.\n";
+        }
+
+        if ($outgoing !== []) {
+            $prompt .= "\nOutgoing routes:\n";
+            foreach ($outgoing as $edge) {
+                $labelText = trim((string) (($edge['attrs']['label'] ?? '') ?: ($edge['attrs']['condition'] ?? '')));
+                if ($labelText === '') {
+                    $labelText = '(default)';
+                }
+                $prompt .= '- ' . (string) ($edge['to'] ?? '') . ' [' . $labelText . "]\n";
+            }
+        }
+
+        return $prompt;
+    }
+
+    private function stageSystemPrompt(): string
+    {
+        return "You are Attractor runtime stage executor.\n"
+            . "Follow the stage prompt exactly.\n"
+            . "Do not return markdown code fences unless explicitly requested.\n"
+            . "When validating, return strict JSON as instructed.\n";
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function markStageStarted(array &$run, string $nodeId, int $startedAtMs): void
+    {
+        $this->setStageStatus($run, $nodeId, 'running', $startedAtMs, null, null, '');
+        $this->writeStageStatus((string) $run['id'], $nodeId, 'running', null, '');
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function markStageCompleted(array &$run, string $nodeId, int $durationMs): void
+    {
+        $this->setStageStatus($run, $nodeId, 'completed', null, $durationMs, $durationMs, '');
+        $this->writeStageStatus((string) $run['id'], $nodeId, 'completed', $durationMs, '');
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function markStageCompletedControl(array &$run, string $nodeId, string $message): void
+    {
+        $now = Time::nowMs();
+        $this->setStageStatus($run, $nodeId, 'completed', $now, 1, 1, '');
+        $this->writeStageStatus((string) $run['id'], $nodeId, 'completed', 1, '');
+        $this->writeStagePrompt((string) $run['id'], $nodeId, "Control stage {$nodeId}\n");
+        $this->writeStageResponse((string) $run['id'], $nodeId, $message . "\n");
+        $this->appendEvent((string) $run['id'], 'StageStarted', ['nodeId' => $nodeId]);
+        $this->appendEvent((string) $run['id'], 'StageCompleted', ['nodeId' => $nodeId, 'durationMs' => 1]);
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function markStageFailed(array &$run, string $nodeId, int $durationMs, string $error): void
+    {
+        $this->setStageStatus($run, $nodeId, 'failed', null, $durationMs, $durationMs, $error);
+        $this->writeStageStatus((string) $run['id'], $nodeId, 'failed', $durationMs, $error);
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     */
+    private function setStageStatus(
+        array &$run,
+        string $nodeId,
+        string $status,
+        ?int $startedAtMs,
+        ?int $durationMs,
+        ?int $durationForWrite,
+        string $error,
+    ): void {
+        $stages = is_array($run['stages'] ?? null) ? $run['stages'] : [];
+        foreach ($stages as $idx => $stage) {
+            if (!is_array($stage)) {
+                continue;
+            }
+            if ((string) ($stage['nodeId'] ?? '') !== $nodeId) {
+                continue;
+            }
+            $stages[$idx]['status'] = $status;
+            if ($startedAtMs !== null) {
+                $stages[$idx]['startedAtMs'] = $startedAtMs;
+            }
+            if ($durationMs !== null) {
+                $stages[$idx]['durationMs'] = $durationMs;
+            }
+            $stages[$idx]['error'] = $error;
+            $run['stages'] = $stages;
+            return;
+        }
+
+        $stages[] = [
+            'index' => count($stages),
+            'nodeId' => $nodeId,
+            'name' => $nodeId,
+            'status' => $status,
+            'startedAtMs' => $startedAtMs,
+            'durationMs' => $durationForWrite,
+            'error' => $error,
+            'hasLog' => true,
+        ];
+        $run['stages'] = $stages;
+    }
+
+    private function writeStagePrompt(string $runId, string $nodeId, string $prompt): void
+    {
+        $stageDir = $this->runPath($runId) . '/' . $nodeId;
+        if (!is_dir($stageDir)) {
+            mkdir($stageDir, 0777, true);
+        }
+        file_put_contents($stageDir . '/prompt.md', $prompt);
+    }
+
+    private function writeStageResponse(string $runId, string $nodeId, string $response): void
+    {
+        $stageDir = $this->runPath($runId) . '/' . $nodeId;
+        if (!is_dir($stageDir)) {
+            mkdir($stageDir, 0777, true);
+        }
+        file_put_contents($stageDir . '/response.md', $response);
+    }
+
+    private function writeStageStatus(string $runId, string $nodeId, string $status, ?int $durationMs, string $error): void
+    {
+        $stageDir = $this->runPath($runId) . '/' . $nodeId;
+        if (!is_dir($stageDir)) {
+            mkdir($stageDir, 0777, true);
+        }
+        $payload = ['status' => $status];
+        if ($durationMs !== null) {
+            $payload['durationMs'] = $durationMs;
+        }
+        if ($error !== '') {
+            $payload['error'] = $error;
+        }
+        file_put_contents($stageDir . '/status.json', (string) json_encode($payload, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    private function failRun(string $runId, string $error): void
+    {
+        $run = $this->getRun($runId);
+        if ($run === null) {
+            return;
+        }
+        if ((string) ($run['status'] ?? '') === 'cancelled') {
+            return;
+        }
+        if (!$this->canTransition((string) ($run['status'] ?? ''), 'failed')) {
+            return;
+        }
+        $run['status'] = 'failed';
+        $run['finishedAtMs'] = Time::nowMs();
+        $this->saveRun($run);
+        $this->saveCheckpoint($runId, $run);
+        $this->appendEvent($runId, 'PipelineFailed', ['status' => 'failed', 'error' => $error]);
+        $this->appendEvent($runId, 'CheckpointSaved', ['nodeId' => (string) ($run['currentNodeId'] ?? '')]);
+    }
+
+    /**
+     * @param array<string,mixed> $run
+     * @param list<array<string,mixed>> $outgoing
+     */
+    private function startHumanGate(array $run, string $nodeId, array $outgoing): void
+    {
+        $id = (string) ($run['id'] ?? '');
+        $startedAt = Time::nowMs();
+        $this->setStageStatus($run, $nodeId, 'waiting_human', $startedAt, null, null, '');
+        $this->saveRun($run);
+        $this->writeStagePrompt($id, $nodeId, "Human gate stage {$nodeId}. Awaiting operator answer.\n");
+        $this->writeStageStatus($id, $nodeId, 'waiting_human', null, '');
+        $this->appendEvent($id, 'StageStarted', ['nodeId' => $nodeId]);
+
+        $options = [];
+        foreach (array_values($outgoing) as $index => $edge) {
+            $key = chr(ord('A') + $index);
+            $label = trim((string) (($edge['attrs']['label'] ?? '') ?: 'Route to ' . (string) ($edge['to'] ?? '')));
+            $options[] = [
+                'key' => $key,
+                'label' => $label,
+                'target' => (string) ($edge['to'] ?? ''),
+            ];
+        }
+        if ($options === []) {
+            $this->failRun($id, 'human gate node has no outgoing edges');
+            return;
+        }
+
+        $questionId = 'q-' . (string) Time::nowMs();
+        $question = [
+            'id' => $questionId,
+            'stage' => $nodeId,
+            'type' => 'MULTIPLE_CHOICE',
+            'text' => 'Select next path for human gate stage ' . $nodeId,
+            'options' => $options,
+        ];
+        file_put_contents($this->runPath($id) . '/question.json', (string) json_encode($question, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+        $this->appendEvent($id, 'InterviewStarted', ['nodeId' => $nodeId, 'questionId' => $questionId]);
+    }
+
+    /**
+     * @param list<array<string,mixed>> $outgoing
+     */
+    private function selectNextNode(array $outgoing, ?string $validationOutcome): ?string
+    {
+        if ($outgoing === []) {
+            return null;
+        }
+
+        if ($validationOutcome === null) {
+            $next = trim((string) ($outgoing[0]['to'] ?? ''));
+            return $next !== '' ? $next : null;
+        }
+
+        $wantPass = $validationOutcome === 'pass';
+        foreach ($outgoing as $edge) {
+            $edgeText = strtolower(trim((string) (($edge['attrs']['label'] ?? '') . ' ' . ($edge['attrs']['condition'] ?? '') . ' ' . ($edge['to'] ?? ''))));
+            if ($wantPass && $this->containsAny($edgeText, ['pass', 'success', 'approve', 'yes', 'done'])) {
+                $next = trim((string) ($edge['to'] ?? ''));
+                if ($next !== '') {
+                    return $next;
+                }
+            }
+            if (!$wantPass && $this->containsAny($edgeText, ['fail', 'no', 'reject', 'retry', 'rework', 'fix', 'plan', 'implement'])) {
+                $next = trim((string) ($edge['to'] ?? ''));
+                if ($next !== '') {
+                    return $next;
+                }
+            }
+        }
+
+        $next = trim((string) ($outgoing[0]['to'] ?? ''));
+        return $next !== '' ? $next : null;
+    }
+
+    /**
+     * @return array{outcome:string,reason:string}
+     */
+    private function parseValidationOutcome(string $response): array
+    {
+        $trimmed = trim($response);
+        if ($trimmed === '') {
+            return ['outcome' => 'fail', 'reason' => 'empty validator response'];
+        }
+
+        $jsonCandidate = $trimmed;
+        if (preg_match('/\{.*\}/s', $trimmed, $match) === 1) {
+            $jsonCandidate = (string) ($match[0] ?? $trimmed);
+        }
+        $decoded = json_decode($jsonCandidate, true);
+        if (is_array($decoded)) {
+            $outcome = strtolower(trim((string) ($decoded['outcome'] ?? '')));
+            if (in_array($outcome, ['pass', 'fail'], true)) {
+                return [
+                    'outcome' => $outcome,
+                    'reason' => trim((string) ($decoded['reason'] ?? 'validator JSON response')),
+                ];
+            }
+        }
+
+        $lower = strtolower($trimmed);
+        if (str_contains($lower, '"outcome":"pass"') || preg_match('/\bpass\b/', $lower) === 1) {
+            return ['outcome' => 'pass', 'reason' => 'keyword pass detected'];
+        }
+        return ['outcome' => 'fail', 'reason' => 'keyword fail/default'];
+    }
+
+    private function formatStageResponse(string $response, string $provider, string $model): string
+    {
+        return "Provider: {$provider}\nModel: {$model}\n\n" . trim($response) . "\n";
+    }
+
+    /**
+     * @param array<string,mixed> $node
+     * @param list<array<string,mixed>> $outgoing
+     */
+    private function isTerminalNode(string $nodeId, array $node, array $outgoing): bool
+    {
+        $id = strtolower($nodeId);
+        if ($id === 'done') {
+            return true;
+        }
+        $shape = strtolower(trim((string) ($node['attrs']['shape'] ?? '')));
+        if ($shape === 'msquare') {
+            return true;
+        }
+        return $outgoing === [] && !$this->isHumanGateNode($nodeId, $node);
+    }
+
+    /**
+     * @param array<string,mixed> $node
+     */
+    private function isHumanGateNode(string $nodeId, array $node): bool
+    {
+        $id = strtolower($nodeId);
+        $type = strtolower(trim((string) ($node['attrs']['type'] ?? '')));
+        $shape = strtolower(trim((string) ($node['attrs']['shape'] ?? '')));
+        $label = strtolower(trim((string) ($node['label'] ?? '')));
+
+        if ($type === 'wait.human' || str_contains($type, 'human')) {
+            return true;
+        }
+        if ($shape === 'hexagon') {
+            return true;
+        }
+        return str_contains($id, 'gate') && str_contains($label, 'human');
+    }
+
+    /**
+     * @param array<string,mixed> $node
+     */
+    private function isValidationNode(string $nodeId, array $node): bool
+    {
+        $needle = strtolower($nodeId . ' ' . (string) ($node['label'] ?? '') . ' ' . (string) ($node['attrs']['type'] ?? ''));
+        return $this->containsAny($needle, ['validate', 'validation', 'verify', 'review', 'qa', 'check', 'test', 'audit']);
+    }
+
+    /**
+     * @param array<string,mixed> $node
+     */
+    private function isControlNode(string $nodeId, array $node): bool
+    {
+        $id = strtolower($nodeId);
+        if ($id === 'start' || $id === 'done') {
+            return true;
+        }
+        $type = strtolower(trim((string) ($node['attrs']['type'] ?? '')));
+        return $type === 'control';
+    }
+
+    private function containsAny(string $value, array $needles): bool
+    {
+        foreach ($needles as $needle) {
+            if ($needle !== '' && str_contains($value, $needle)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * @return array{
+     *   startNodeId:string,
+     *   nodes:array<string,array{id:string,label:string,attrs:array<string,string>}>,
+     *   edges:list<array{from:string,to:string,attrs:array<string,string>}>,
+     *   outgoing:array<string,list<array{from:string,to:string,attrs:array<string,string>}>>,
+     *   stageOrder:list<string>
+     * }
+     */
+    private function parseGraph(string $dot): array
+    {
+        $normalized = str_replace(["\r\n", "\r"], "\n", $dot);
+
+        /** @var array<string,array{id:string,label:string,attrs:array<string,string>}> $nodes */
+        $nodes = [];
+        $nodeOrder = [];
+
+        if (preg_match_all('/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*?)\]\s*;?\s*$/m', $normalized, $nodeMatches, PREG_SET_ORDER)) {
+            foreach ($nodeMatches as $match) {
+                $nodeId = (string) ($match[1] ?? '');
+                $attrText = (string) ($match[2] ?? '');
+                if ($nodeId === '') {
+                    continue;
+                }
+                $attrs = $this->parseAttrList($attrText);
+                $label = (string) ($attrs['label'] ?? $nodeId);
+                $nodes[$nodeId] = [
+                    'id' => $nodeId,
+                    'label' => $label,
+                    'attrs' => $attrs,
+                ];
+                if (!in_array($nodeId, $nodeOrder, true)) {
+                    $nodeOrder[] = $nodeId;
+                }
+            }
+        }
+
+        /** @var list<array{from:string,to:string,attrs:array<string,string>}> $edges */
+        $edges = [];
+        if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*->\s*([A-Za-z_][A-Za-z0-9_]*)(?:\s*\[(.*?)\])?\s*;?/m', $normalized, $edgeMatches, PREG_SET_ORDER)) {
+            foreach ($edgeMatches as $match) {
+                $from = (string) ($match[1] ?? '');
+                $to = (string) ($match[2] ?? '');
+                $attrText = (string) ($match[3] ?? '');
+                if ($from === '' || $to === '') {
+                    continue;
+                }
+
+                if (!isset($nodes[$from])) {
+                    $nodes[$from] = ['id' => $from, 'label' => $from, 'attrs' => []];
+                }
+                if (!isset($nodes[$to])) {
+                    $nodes[$to] = ['id' => $to, 'label' => $to, 'attrs' => []];
+                }
+                if (!in_array($from, $nodeOrder, true)) {
+                    $nodeOrder[] = $from;
+                }
+                if (!in_array($to, $nodeOrder, true)) {
+                    $nodeOrder[] = $to;
+                }
+
+                $edges[] = [
+                    'from' => $from,
+                    'to' => $to,
+                    'attrs' => $this->parseAttrList($attrText),
+                ];
+            }
+        }
+
+        if ($nodes === []) {
+            $nodes = [
+                'start' => ['id' => 'start', 'label' => 'start', 'attrs' => []],
+                'done' => ['id' => 'done', 'label' => 'done', 'attrs' => ['shape' => 'Msquare']],
+            ];
+            $edges = [['from' => 'start', 'to' => 'done', 'attrs' => []]];
+            $nodeOrder = ['start', 'done'];
+        }
+
+        $indegree = array_fill_keys(array_keys($nodes), 0);
+        $outgoing = [];
+        foreach ($edges as $edge) {
+            $to = $edge['to'];
+            $from = $edge['from'];
+            $indegree[$to] = (int) ($indegree[$to] ?? 0) + 1;
+            $outgoing[$from] ??= [];
+            $outgoing[$from][] = $edge;
+        }
+
+        $startNodeId = 'start';
+        if (!isset($nodes[$startNodeId])) {
+            $startNodeId = '';
+            foreach ($nodeOrder as $nodeId) {
+                if ((int) ($indegree[$nodeId] ?? 0) === 0) {
+                    $startNodeId = $nodeId;
+                    break;
+                }
+            }
+            if ($startNodeId === '') {
+                $startNodeId = $nodeOrder[0] ?? array_key_first($nodes) ?? 'start';
+            }
+        }
+
+        $stageOrder = $this->deriveStageOrder($startNodeId, $outgoing, $nodeOrder);
+        foreach ($nodeOrder as $nodeId) {
+            if (!in_array($nodeId, $stageOrder, true)) {
+                $stageOrder[] = $nodeId;
+            }
+        }
+
+        return [
+            'startNodeId' => $startNodeId,
+            'nodes' => $nodes,
+            'edges' => $edges,
+            'outgoing' => $outgoing,
+            'stageOrder' => $stageOrder,
+        ];
+    }
+
+    /**
+     * @param array<string,list<array{from:string,to:string,attrs:array<string,string>}>> $outgoing
+     * @param list<string> $fallbackOrder
+     * @return list<string>
+     */
+    private function deriveStageOrder(string $startNodeId, array $outgoing, array $fallbackOrder): array
+    {
+        $visited = [];
+        $order = [];
+        $stack = [$startNodeId];
+
+        while ($stack !== []) {
+            $nodeId = array_shift($stack);
+            if (!is_string($nodeId) || $nodeId === '' || isset($visited[$nodeId])) {
+                continue;
+            }
+            $visited[$nodeId] = true;
+            $order[] = $nodeId;
+
+            foreach (($outgoing[$nodeId] ?? []) as $edge) {
+                $to = (string) ($edge['to'] ?? '');
+                if ($to !== '' && !isset($visited[$to])) {
+                    $stack[] = $to;
+                }
+            }
+        }
+
+        if ($order === []) {
+            return $fallbackOrder;
+        }
+
+        return $order;
+    }
+
+    /**
+     * @return array<string,string>
+     */
+    private function parseAttrList(string $attrText): array
+    {
+        $attrs = [];
+        if (preg_match_all('/([A-Za-z_][A-Za-z0-9_.-]*)\s*=\s*("(?:[^"\\\\]|\\\\.)*"|[^,\\]]+)/', $attrText, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $key = trim((string) ($match[1] ?? ''));
+                $value = trim((string) ($match[2] ?? ''));
+                if ($key === '') {
+                    continue;
+                }
+                if (str_starts_with($value, '"') && str_ends_with($value, '"')) {
+                    $value = substr($value, 1, -1);
+                }
+                $attrs[$key] = stripcslashes($value);
+            }
+        }
+        return $attrs;
+    }
+
+    /**
+     * @param array<string,mixed> $graph
+     */
+    private function stageName(string $nodeId, array $graph): string
+    {
+        $node = $graph['nodes'][$nodeId] ?? null;
+        if (!is_array($node)) {
+            return ucfirst($nodeId);
+        }
+        $label = trim((string) ($node['label'] ?? ''));
+        if ($label !== '') {
+            return $label;
+        }
+        return ucfirst($nodeId);
+    }
+
+    private function truncate(string $value, int $limit): string
+    {
+        if (strlen($value) <= $limit) {
+            return $value;
+        }
+        return substr($value, 0, $limit) . '...';
+    }
+
     /**
      * @return array<string,mixed>|null
      */
@@ -609,7 +1312,7 @@ final class RunRepository
 
     private function isTerminalStatus(string $status): bool
     {
-        return in_array($status, ['completed', 'failed', 'cancelled'], true);
+        return in_array($status, self::TERMINAL_STATUSES, true);
     }
 
     private function isTextFile(string $path): bool

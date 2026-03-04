@@ -232,6 +232,14 @@ async function initMonitor() {
 
   refresh.addEventListener('click', () => loadRuns().catch((e) => alert(e.message)));
   await loadRuns();
+
+  const refreshTimer = setInterval(() => {
+    if (!document.getElementById('run-list')) {
+      clearInterval(refreshTimer);
+      return;
+    }
+    loadRuns().catch(() => {});
+  }, 3000);
 }
 
 async function streamDot(path, payload, outputEl) {
@@ -645,14 +653,13 @@ async function initCreate() {
   btnRun.addEventListener('click', async () => {
     await inBusyState('Creating run...', async () => {
       try {
-        const simulate = document.getElementById('simulate-toggle').checked;
-        const autoApprove = document.getElementById('auto-approve-toggle').checked;
+        const selectedModel = selectedModelValue();
         const created = await api('/api/v1/pipelines', {
           method: 'POST',
           body: JSON.stringify({
             dotSource: dot.value,
-            simulate,
-            autoApprove,
+            provider: provider.value,
+            model: selectedModel,
             originalPrompt: prompt.value || '',
             fileName: 'pipeline.dot',
           }),

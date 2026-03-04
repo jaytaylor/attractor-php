@@ -399,8 +399,8 @@ components:
         fileName: { type: string }
         status: { type: string }
         archived: { type: boolean }
-        simulate: { type: boolean }
-        autoApprove: { type: boolean }
+        provider: { type: string }
+        model: { type: string }
         familyId: { type: string }
         originalPrompt: { type: string }
         startedAtMs: { type: integer }
@@ -420,6 +420,6 @@ components:
         dotSource: { type: string }
         fileName: { type: string }
         displayName: { type: string }
-        simulate: { type: boolean, default: false }
-        autoApprove: { type: boolean, default: true }
+        provider: { type: string }
+        model: { type: string }
         originalPrompt: { type: string }

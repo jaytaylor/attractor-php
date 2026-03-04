@@ -218,8 +218,8 @@ final class App
                 'dotSource' => $dot,
                 'displayName' => (string) ($source['displayName'] ?? ''),
                 'fileName' => (string) ($source['fileName'] ?? 'pipeline.dot'),
-                'simulate' => (bool) ($source['simulate'] ?? false),
-                'autoApprove' => (bool) ($source['autoApprove'] ?? true),
+                'provider' => trim((string) ($request->jsonBody['provider'] ?? (string) ($source['provider'] ?? ''))),
+                'model' => trim((string) ($request->jsonBody['model'] ?? (string) ($source['model'] ?? ''))),
                 'originalPrompt' => (string) ($request->jsonBody['originalPrompt'] ?? ''),
             ];
             $newRun = $this->runs->createRun($payload, $m[1]);

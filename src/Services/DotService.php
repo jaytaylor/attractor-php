@@ -11,6 +11,15 @@ final class DotService
     private const PROVIDER_GEMINI = 'gemini';
     private const MODEL_CATALOG_TTL_SECONDS = 300;
     private const CUSTOM_MODEL_SENTINEL = '__custom__';
+    private const DOT_REFERENCE_EXAMPLE_FILES = [
+        'consensus_task_parity.dot',
+        'megaplan_quality.dot',
+        'semport.dot',
+        'vulnerability_analyzer.dot',
+        'consensus_task.dot',
+        'megaplan.dot',
+        'sprint_exec.dot',
+    ];
 
     /**
      * @var array<string,list<string>>
@@ -50,6 +59,7 @@ final class DotService
      * @var array<string,array{cachedAt:int,payload:array{provider:string,defaultModel:string,models:list<string>,source:string,warnings:list<string>}>>
      */
     private static array $modelCatalogCache = [];
+    private static ?string $dotSystemPromptCache = null;
 
     /**
      * @return array{valid:bool, diagnostics:list<array<string,mixed>>}
@@ -193,7 +203,11 @@ final class DotService
             throw new DotServiceException('prompt is required', 'BAD_REQUEST', 400);
         }
 
-        $operationPrompt = "Task: Generate a Graphviz DOT directed graph for this goal:\n{$prompt}";
+        $operationPrompt = "Task: Generate a Graphviz DOT directed graph for this goal:\n{$prompt}\n\n"
+            . "Attractor critical requirement:\n"
+            . "- Include explicit validation/checkpoint stages that verify output quality and requirement compliance.\n"
+            . "- Include at least one failure branch from a validation stage back to planning or implementation rework.\n"
+            . "- Include a success branch from validation toward completion.";
         return $this->runOperation('generate', $operationPrompt, $options);
     }
 
@@ -236,6 +250,26 @@ final class DotService
             . "Existing DOT:\n{$baseDot}";
 
         return $this->runOperation('iterate', $operationPrompt, $options);
+    }
+
+    /**
+     * Execute a general-purpose text completion against a provider/model.
+     *
+     * @param array{provider?:string,model?:string} $options
+     * @return array{provider:string,model:string,text:string}
+     */
+    public function completeText(string $systemPrompt, string $userPrompt, array $options = []): array
+    {
+        [$provider, $model] = $this->resolveProviderAndModel($options);
+        $text = trim($this->callProvider($provider, $model, $systemPrompt, $userPrompt));
+        if ($text === '') {
+            throw new DotServiceException('provider returned empty text output', 'UPSTREAM_INVALID_RESPONSE', 502);
+        }
+        return [
+            'provider' => $provider,
+            'model' => $model,
+            'text' => $text,
+        ];
     }
 
     /**
@@ -299,24 +333,44 @@ final class DotService
         $raw = $this->callProvider($provider, $model, $systemPrompt, $operationPrompt);
         $dot = $this->extractDotGraph($raw);
         $validation = $this->validate($dot);
-        if ($validation['valid']) {
+        $semanticDiagnostics = $operation === 'generate' ? $this->validateAttractorValidationSemantics($dot) : [];
+        if ($validation['valid'] && $semanticDiagnostics === []) {
             return $dot;
         }
+        if ($operation === 'generate' && $validation['valid'] && $semanticDiagnostics !== []) {
+            $enforced = $this->enforceGenerateValidationLoop($dot);
+            $enforcedValidation = $this->validate($enforced);
+            $enforcedSemanticDiagnostics = $this->validateAttractorValidationSemantics($enforced);
+            if ($enforcedValidation['valid'] && $enforcedSemanticDiagnostics === []) {
+                return $enforced;
+            }
+        }
+        $allDiagnostics = array_merge($validation['diagnostics'], $semanticDiagnostics);
 
-        $repairPrompt = "The previous response for {$operation} was invalid DOT.\n"
-            . 'Validation diagnostics: ' . $this->diagnosticsSummary($validation['diagnostics']) . "\n"
+        $repairPrompt = "The previous response for {$operation} failed DOT constraints.\n"
+            . 'Validation diagnostics: ' . $this->diagnosticsSummary($allDiagnostics) . "\n"
             . "Previous response:\n{$raw}\n"
             . "Return only corrected DOT.";
 
         $retryRaw = $this->callProvider($provider, $model, $systemPrompt, $repairPrompt);
         $retryDot = $this->extractDotGraph($retryRaw);
         $retryValidation = $this->validate($retryDot);
-        if ($retryValidation['valid']) {
+        $retrySemanticDiagnostics = $operation === 'generate' ? $this->validateAttractorValidationSemantics($retryDot) : [];
+        if ($retryValidation['valid'] && $retrySemanticDiagnostics === []) {
             return $retryDot;
         }
+        if ($operation === 'generate' && $retryValidation['valid'] && $retrySemanticDiagnostics !== []) {
+            $enforcedRetry = $this->enforceGenerateValidationLoop($retryDot);
+            $enforcedRetryValidation = $this->validate($enforcedRetry);
+            $enforcedRetrySemanticDiagnostics = $this->validateAttractorValidationSemantics($enforcedRetry);
+            if ($enforcedRetryValidation['valid'] && $enforcedRetrySemanticDiagnostics === []) {
+                return $enforcedRetry;
+            }
+        }
+        $retryAllDiagnostics = array_merge($retryValidation['diagnostics'], $retrySemanticDiagnostics);
 
         throw new DotServiceException(
-            'provider returned invalid DOT after retry: ' . $this->diagnosticsSummary($retryValidation['diagnostics']),
+            'provider returned invalid DOT after retry: ' . $this->diagnosticsSummary($retryAllDiagnostics),
             'INVALID_DOT',
             502,
         );
@@ -324,13 +378,247 @@ final class DotService
 
     private function dotSystemPrompt(): string
     {
-        return "You are a Graphviz DOT generation engine for software workflow pipelines.\n"
+        if (self::$dotSystemPromptCache !== null) {
+            return self::$dotSystemPromptCache;
+        }
+
+        $base = "You are a Graphviz DOT generation engine for software workflow pipelines.\n"
             . "Hard requirements:\n"
             . "- Return ONLY DOT source text for a directed graph starting with digraph.\n"
             . "- Do not include markdown, code fences, or commentary.\n"
             . "- The graph must include at least one edge.\n"
             . "- Ensure balanced braces and valid node IDs with letters, numbers, and underscores.\n"
-            . "- Include a terminal node named done with shape=Msquare unless an explicit terminal node is already defined.";
+            . "- Include a terminal node named done with shape=Msquare unless an explicit terminal node is already defined.\n"
+            . "- Model validation as a first-class stage in the workflow.\n"
+            . "- Add explicit pass/fail branching at validation nodes.\n"
+            . "- Ensure failed validation routes back to planning or implementation rework.\n\n"
+            . "Validation design conventions expected in generated graphs:\n"
+            . "- Planning/implementation nodes should produce candidate output.\n"
+            . "- Validation/check nodes verify candidate output against requirements.\n"
+            . "- Pass path advances toward completion.\n"
+            . "- Fail path loops to planner/implementor/rework and then back to validation.\n";
+
+        $examples = $this->dotReferenceExamplesSection();
+        self::$dotSystemPromptCache = $examples === '' ? $base : $base . "\n" . $examples;
+        return self::$dotSystemPromptCache;
+    }
+
+    /**
+     * @return list<array{severity:string,message:string}>
+     */
+    private function validateAttractorValidationSemantics(string $dot): array
+    {
+        $diagnostics = [];
+        $nodeLabels = [];
+        if (preg_match_all('/^\s*([A-Za-z_][A-Za-z0-9_]*)\s*\[(.*?)\]\s*;?\s*$/m', $dot, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $nodeId = strtolower((string) ($match[1] ?? ''));
+                $attrs = (string) ($match[2] ?? '');
+                $label = '';
+                if (preg_match('/\blabel\s*=\s*"([^"]+)"/i', $attrs, $labelMatch) === 1) {
+                    $label = strtolower(trim((string) ($labelMatch[1] ?? '')));
+                }
+                $nodeLabels[$nodeId] = $label;
+            }
+        }
+
+        $edges = [];
+        if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*->\s*([A-Za-z_][A-Za-z0-9_]*)/', $dot, $edgeMatches, PREG_SET_ORDER)) {
+            foreach ($edgeMatches as $edge) {
+                $from = strtolower((string) ($edge[1] ?? ''));
+                $to = strtolower((string) ($edge[2] ?? ''));
+                if ($from === '' || $to === '') {
+                    continue;
+                }
+                $edges[] = ['from' => $from, 'to' => $to];
+            }
+        }
+
+        $validationKeywords = ['validate', 'validation', 'verify', 'verification', 'review', 'qa', 'check', 'test', 'audit'];
+        $reworkKeywords = ['plan', 'planning', 'implement', 'implementation', 'build', 'code', 'develop', 'create', 'draft', 'design', 'rework', 'fix', 'repair', 'iterate'];
+        $successKeywords = ['done', 'complete', 'completed', 'deliver', 'publish', 'release', 'ship', 'deploy', 'approve', 'final'];
+
+        $validationNodes = [];
+        foreach ($edges as $edge) {
+            foreach (['from', 'to'] as $side) {
+                $nodeId = $edge[$side];
+                if ($this->containsKeyword($nodeId, $validationKeywords) || $this->containsKeyword($nodeLabels[$nodeId] ?? '', $validationKeywords)) {
+                    $validationNodes[$nodeId] = true;
+                }
+            }
+        }
+        foreach (array_keys($nodeLabels) as $nodeId) {
+            if ($this->containsKeyword($nodeId, $validationKeywords) || $this->containsKeyword($nodeLabels[$nodeId] ?? '', $validationKeywords)) {
+                $validationNodes[$nodeId] = true;
+            }
+        }
+
+        if ($validationNodes === []) {
+            $diagnostics[] = [
+                'severity' => 'error',
+                'message' => 'generate output must include explicit validation/checkpoint/test/review stage nodes',
+            ];
+            return $diagnostics;
+        }
+
+        $hasReworkKickback = false;
+        $hasSuccessPath = false;
+        foreach ($edges as $edge) {
+            if (!isset($validationNodes[$edge['from']])) {
+                continue;
+            }
+            $to = $edge['to'];
+            $toLabel = $nodeLabels[$to] ?? '';
+            if ($this->containsKeyword($to, $reworkKeywords) || $this->containsKeyword($toLabel, $reworkKeywords)) {
+                $hasReworkKickback = true;
+            }
+            if ($this->containsKeyword($to, $successKeywords) || $this->containsKeyword($toLabel, $successKeywords)) {
+                $hasSuccessPath = true;
+            }
+        }
+
+        if (!$hasReworkKickback) {
+            $diagnostics[] = [
+                'severity' => 'error',
+                'message' => 'validation stage must include a failure kickback path to planning or implementation rework',
+            ];
+        }
+        if (!$hasSuccessPath) {
+            $diagnostics[] = [
+                'severity' => 'error',
+                'message' => 'validation stage must include a success path toward completion/delivery',
+            ];
+        }
+
+        return $diagnostics;
+    }
+
+    private function containsKeyword(string $value, array $keywords): bool
+    {
+        $needle = strtolower($value);
+        foreach ($keywords as $keyword) {
+            if ($keyword !== '' && str_contains($needle, $keyword)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private function enforceGenerateValidationLoop(string $dot): string
+    {
+        $normalized = str_replace(["\r\n", "\r"], "\n", $dot);
+        $closePos = strrpos($normalized, '}');
+        if ($closePos === false) {
+            return $dot;
+        }
+
+        $prefix = rtrim(substr($normalized, 0, $closePos));
+        $suffix = substr($normalized, $closePos);
+
+        $existing = [];
+        if (preg_match_all('/\b([A-Za-z_][A-Za-z0-9_]*)\b/', $prefix, $tokenMatches)) {
+            foreach ($tokenMatches[1] as $token) {
+                $existing[strtolower((string) $token)] = true;
+            }
+        }
+
+        if (!preg_match('/\bdone\b/i', $prefix)) {
+            $prefix .= "\n  done [shape=Msquare];";
+            $existing['done'] = true;
+        }
+
+        $validationNode = $this->uniqueNodeId('validation_gate', $existing);
+        $plannerNode = $this->uniqueNodeId('planning_rework', $existing);
+        $implementNode = $this->uniqueNodeId('implement_rework', $existing);
+
+        $predecessors = [];
+        if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*->\s*done\b/i', $prefix, $predMatches, PREG_SET_ORDER)) {
+            foreach ($predMatches as $match) {
+                $from = strtolower((string) ($match[1] ?? ''));
+                if ($from !== '' && $from !== 'done') {
+                    $predecessors[$from] = true;
+                }
+            }
+        }
+
+        if ($predecessors === [] && preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*->\s*([A-Za-z_][A-Za-z0-9_]*)/i', $prefix, $edgeMatches, PREG_SET_ORDER)) {
+            $last = end($edgeMatches);
+            if (is_array($last)) {
+                $candidate = strtolower((string) ($last[2] ?? ''));
+                if ($candidate !== '' && $candidate !== 'done') {
+                    $predecessors[$candidate] = true;
+                }
+            }
+        }
+
+        if ($predecessors === []) {
+            $predecessors['start'] = true;
+        }
+
+        $appendLines = [];
+        $appendLines[] = "{$validationNode} [label=\"Validate requirements and quality\"];";
+        $appendLines[] = "{$plannerNode} [label=\"Plan rework\"];";
+        $appendLines[] = "{$implementNode} [label=\"Implement rework\"];";
+        foreach (array_keys($predecessors) as $fromNode) {
+            $appendLines[] = "{$fromNode} -> {$validationNode};";
+        }
+        $appendLines[] = "{$validationNode} -> done [label=\"pass\"];";
+        $appendLines[] = "{$validationNode} -> {$plannerNode} [label=\"fail\"];";
+        $appendLines[] = "{$plannerNode} -> {$implementNode};";
+        $appendLines[] = "{$implementNode} -> {$validationNode};";
+
+        return $prefix . "\n\n  " . implode("\n  ", $appendLines) . "\n" . $suffix;
+    }
+
+    /**
+     * @param array<string,bool> $existing
+     */
+    private function uniqueNodeId(string $baseId, array &$existing): string
+    {
+        $candidate = strtolower($baseId);
+        if (!isset($existing[$candidate])) {
+            $existing[$candidate] = true;
+            return $candidate;
+        }
+
+        $counter = 2;
+        while (isset($existing[$candidate . '_' . $counter])) {
+            $counter++;
+        }
+        $candidate = $candidate . '_' . $counter;
+        $existing[$candidate] = true;
+        return $candidate;
+    }
+
+    private function dotReferenceExamplesSection(): string
+    {
+        $projectRoot = dirname(__DIR__, 2);
+        $examplesDir = $projectRoot . '/resources/prompts/dot/examples';
+        $sections = [];
+
+        foreach (self::DOT_REFERENCE_EXAMPLE_FILES as $fileName) {
+            $path = $examplesDir . '/' . $fileName;
+            if (!is_file($path)) {
+                continue;
+            }
+            $content = file_get_contents($path);
+            if (!is_string($content)) {
+                continue;
+            }
+            $trimmed = trim(str_replace(["\r\n", "\r"], "\n", $content));
+            if ($trimmed === '') {
+                continue;
+            }
+            $sections[] = "Example: {$fileName}\n```dot\n{$trimmed}\n```";
+        }
+
+        if ($sections === []) {
+            return '';
+        }
+
+        return "Reference quality DOT examples (authoritative style guides):\n"
+            . "- Use these to match graph structure quality, validation rigor, and rework-loop modeling.\n"
+            . implode("\n\n", $sections);
     }
 
     /**
@@ -339,7 +627,13 @@ final class DotService
      */
     private function resolveProviderAndModel(array $options): array
     {
-        $provider = strtolower(trim((string) ($options['provider'] ?? (getenv('DOT_LLM_PROVIDER') ?: self::PROVIDER_OPENAI))));
+        $provider = strtolower(trim((string) ($options['provider'] ?? (getenv('DOT_LLM_PROVIDER') ?: ''))));
+        if ($provider === '') {
+            $provider = $this->firstConfiguredProvider();
+        }
+        if ($provider === '') {
+            $provider = self::PROVIDER_OPENAI;
+        }
         $validProviders = [self::PROVIDER_OPENAI, self::PROVIDER_ANTHROPIC, self::PROVIDER_GEMINI];
         if (!in_array($provider, $validProviders, true)) {
             throw new DotServiceException('provider must be one of: openai, anthropic, gemini', 'BAD_REQUEST', 400);
@@ -355,6 +649,20 @@ final class DotService
         }
 
         return [$provider, $model];
+    }
+
+    private function firstConfiguredProvider(): string
+    {
+        if (trim((string) getenv('OPENAI_API_KEY')) !== '') {
+            return self::PROVIDER_OPENAI;
+        }
+        if (trim((string) getenv('ANTHROPIC_API_KEY')) !== '') {
+            return self::PROVIDER_ANTHROPIC;
+        }
+        if (trim((string) getenv('GEMINI_API_KEY')) !== '' || trim((string) getenv('GOOGLE_API_KEY')) !== '') {
+            return self::PROVIDER_GEMINI;
+        }
+        return '';
     }
 
     private function defaultModelForProvider(string $provider): string
@@ -885,6 +1193,10 @@ final class DotService
             CURLOPT_CONNECTTIMEOUT => 20,
         ]);
 
+        // Provider inference can exceed PHP's default max_execution_time for complex prompts.
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
         $responseBody = curl_exec($ch);
         $curlError = curl_error($ch);
         $statusCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);
@@ -941,6 +1253,10 @@ final class DotService
             CURLOPT_CONNECTTIMEOUT => 20,
         ]);
 
+        // Provider inference can exceed PHP's default max_execution_time for complex prompts.
+        if (function_exists('set_time_limit')) {
+            @set_time_limit(0);
+        }
         $responseBody = curl_exec($ch);
         $curlError = curl_error($ch);
         $statusCode = (int) curl_getinfo($ch, CURLINFO_RESPONSE_CODE);

@@ -34,9 +34,7 @@ function assertTrue(bool $cond, string $message): void
  */
 function request(string $method, string $url, ?array $json = null): array
 {
-    $headers = [
-        'Content-Type: application/json',
-    ];
+    $headers = ['Content-Type: application/json'];
 
     $content = '';
     if ($json !== null) {
@@ -49,7 +47,7 @@ function request(string $method, string $url, ?array $json = null): array
             'header' => implode("\r\n", $headers),
             'content' => $content,
             'ignore_errors' => true,
-            'timeout' => 10,
+            'timeout' => 30,
         ],
     ]);
 
@@ -97,7 +95,7 @@ function providerForDotTests(): array
         return ['provider' => 'gemini', 'model' => trim((string) getenv('DOT_GEMINI_MODEL'))];
     }
 
-    fwrite(STDERR, "No provider API key configured for DOT endpoint tests\n");
+    fwrite(STDERR, "No provider API key configured for endpoint tests\n");
     exit(1);
 }
 
@@ -129,6 +127,46 @@ function extractDotFromSse(string $body): string
         }
     }
     return trim($dot);
+}
+
+/**
+ * @param list<string> $wanted
+ * @return array{status:int,body:string,json:array<string,mixed>|null,headers:list<string>}
+ */
+function waitForRunStatus(string $base, string $runId, array $wanted, int $timeoutSeconds = 60): array
+{
+    $deadline = microtime(true) + $timeoutSeconds;
+    while (microtime(true) < $deadline) {
+        $res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId));
+        if ($res['status'] === 200) {
+            $status = (string) ($res['json']['status'] ?? '');
+            if (in_array($status, $wanted, true)) {
+                return $res;
+            }
+        }
+        usleep(250000);
+    }
+
+    assertTrue(false, 'timed out waiting for run status in [' . implode(', ', $wanted) . '] for run ' . $runId);
+    return ['status' => 0, 'body' => '', 'json' => null, 'headers' => []];
+}
+
+/**
+ * @return array<string,mixed>
+ */
+function waitForQuestion(string $base, string $runId, int $timeoutSeconds = 60): array
+{
+    $deadline = microtime(true) + $timeoutSeconds;
+    while (microtime(true) < $deadline) {
+        $q = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/questions');
+        if ($q['status'] === 200 && isset($q['json']['items'][0]) && is_array($q['json']['items'][0])) {
+            return $q['json']['items'][0];
+        }
+        usleep(250000);
+    }
+
+    assertTrue(false, 'timed out waiting for pending question on run ' . $runId);
+    return [];
 }
 
 $root = dirname(__DIR__);
@@ -198,59 +236,8 @@ foreach (['openai', 'anthropic', 'gemini'] as $providerId) {
     }
 }
 
-$dot = "digraph Pipeline {\n  start -> review;\n  review -> done;\n  done [shape=Msquare];\n}";
-$res = request('POST', $base . '/api/v1/pipelines', [
-    'dotSource' => $dot,
-    'displayName' => 'AutoApprove Run',
-    'simulate' => true,
-    'autoApprove' => true,
-    'originalPrompt' => 'test auto approve',
-]);
-assertTrue($res['status'] === 201, 'create run should return 201');
-$runId = (string) ($res['json']['id'] ?? '');
-assertTrue($runId !== '', 'run id missing');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId));
-assertTrue($res['status'] === 200, 'get run should return 200');
-assertTrue(($res['json']['status'] ?? '') === 'completed', 'auto approve run should complete');
-
-$res = request('GET', $base . '/api/v1/pipelines');
-assertTrue($res['status'] === 200, 'list runs should return 200');
-$items = $res['json']['items'] ?? [];
-assertTrue(is_array($items) && count($items) >= 1, 'run list should include created run');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/events');
-assertTrue($res['status'] === 200, 'run events should return 200');
-assertTrue(str_contains($res['body'], 'Snapshot'), 'events should include snapshot');
-assertTrue(str_contains($res['body'], 'PipelineStarted'), 'events should include pipeline started');
-
-$res = request('GET', $base . '/api/v1/events');
-assertTrue($res['status'] === 200, 'global events should return 200');
-assertTrue(str_contains($res['body'], 'Snapshot'), 'global events should include snapshot');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts');
-assertTrue($res['status'] === 200, 'list artifacts should return 200');
-$artifacts = $res['json']['items'] ?? [];
-assertTrue(is_array($artifacts) && count($artifacts) > 0, 'artifacts should not be empty');
-$artifactPath = (string) ($artifacts[0]['path'] ?? '');
-assertTrue($artifactPath !== '', 'artifact path should exist');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/' . str_replace('%2F', '/', rawurlencode($artifactPath)));
-assertTrue($res['status'] === 200, 'artifact file should return 200');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/../README.md');
-assertTrue(in_array($res['status'], [400, 404], true), 'path traversal should be rejected');
-
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/checkpoint');
-assertTrue($res['status'] === 200, 'checkpoint should return 200');
-assertTrue(isset($res['json']['current_node']), 'checkpoint shape invalid');
-
-$res = request('GET', $base . '/pipelines/' . rawurlencode($runId) . '/context');
-assertTrue($res['status'] === 200, 'alias context should return 200');
-assertTrue(isset($res['json']['run.id']), 'context shape invalid');
-
 $res = request('POST', $base . '/api/v1/dot/generate/stream', appendProviderPayload([
-    'prompt' => 'Build release pipeline with plan build test deploy nodes',
+    'prompt' => 'Create a workflow to create a picture of a dog with planning, implementation, and validation.',
 ], $providerConfig));
 assertTrue($res['status'] === 200, 'generate stream should return 200');
 assertTrue(str_contains($res['body'], '"delta"'), 'generate stream should include delta');
@@ -264,7 +251,7 @@ assertTrue(($res['json']['valid'] ?? false) === true, 'generated dot should vali
 
 $res = request('POST', $base . '/api/v1/dot/fix/stream', appendProviderPayload([
     'dotSource' => '```dot
-a->b
+bad ->
 ```',
     'error' => 'parse',
 ], $providerConfig));
@@ -278,7 +265,7 @@ assertTrue(($res['json']['valid'] ?? false) === true, 'fixed dot should validate
 
 $res = request('POST', $base . '/api/v1/dot/iterate', appendProviderPayload([
     'baseDot' => $generatedDot,
-    'changes' => 'Add approval gate and connect it before done',
+    'changes' => 'Add a validation branch with a rework loop.',
 ], $providerConfig));
 assertTrue($res['status'] === 200, 'iterate endpoint should return 200');
 $newDot = (string) ($res['json']['dotSource'] ?? '');
@@ -287,10 +274,70 @@ $res = request('POST', $base . '/api/v1/dot/validate', ['dotSource' => $newDot])
 assertTrue($res['status'] === 200, 'validate iterated dot should return 200');
 assertTrue(($res['json']['valid'] ?? false) === true, 'iterated dot should validate');
 
-$res = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/iterate', [
-    'dotSource' => $newDot,
+$runtimeDot = "digraph Pipeline {\n  start -> work;\n  work -> done;\n  done [shape=Msquare];\n}";
+$res = request('POST', $base . '/api/v1/pipelines', appendProviderPayload([
+    'dotSource' => $runtimeDot,
+    'displayName' => 'Runtime Run',
+    'originalPrompt' => 'Create a picture of a dog',
+], $providerConfig));
+assertTrue($res['status'] === 201, 'create run should return 201');
+$runId = (string) ($res['json']['id'] ?? '');
+assertTrue($runId !== '', 'run id missing');
+
+$initial = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId));
+assertTrue($initial['status'] === 200, 'get run should return 200');
+assertTrue(in_array((string) ($initial['json']['status'] ?? ''), ['queued', 'running', 'completed'], true), 'new run should be queued/running/completed');
+
+$terminal = waitForRunStatus($base, $runId, ['completed', 'failed']);
+assertTrue(($terminal['json']['status'] ?? '') === 'completed', 'runtime run should complete');
+
+$res = request('GET', $base . '/api/v1/pipelines');
+assertTrue($res['status'] === 200, 'list runs should return 200');
+$items = $res['json']['items'] ?? [];
+assertTrue(is_array($items) && count($items) >= 1, 'run list should include created run');
+
+$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/events');
+assertTrue($res['status'] === 200, 'run events should return 200');
+assertTrue(str_contains($res['body'], 'PipelineQueued'), 'events should include pipeline queued');
+assertTrue(str_contains($res['body'], 'PipelineStarted'), 'events should include pipeline started');
+assertTrue(str_contains($res['body'], 'StageCompleted'), 'events should include stage completion');
+assertTrue(str_contains($res['body'], 'PipelineCompleted'), 'events should include pipeline completed');
+
+$res = request('GET', $base . '/api/v1/events');
+assertTrue($res['status'] === 200, 'global events should return 200');
+assertTrue(str_contains($res['body'], 'Snapshot'), 'global events should include snapshot');
+
+$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts');
+assertTrue($res['status'] === 200, 'list artifacts should return 200');
+$artifacts = $res['json']['items'] ?? [];
+assertTrue(is_array($artifacts) && count($artifacts) > 0, 'artifacts should not be empty');
+$artifactPaths = array_map(static fn (array $a): string => (string) ($a['path'] ?? ''), $artifacts);
+assertTrue(in_array('work/prompt.md', $artifactPaths, true), 'runtime artifacts should include work/prompt.md');
+assertTrue(in_array('work/response.md', $artifactPaths, true), 'runtime artifacts should include work/response.md');
+
+$promptRes = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/work/prompt.md');
+assertTrue($promptRes['status'] === 200, 'prompt artifact should return 200');
+assertTrue(!str_contains($promptRes['body'], 'Generated prompt for stage'), 'prompt artifact must not be stub placeholder');
+
+$responseRes = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/work/response.md');
+assertTrue($responseRes['status'] === 200, 'response artifact should return 200');
+assertTrue(!str_contains($responseRes['body'], 'Generated response for stage'), 'response artifact must not be stub placeholder');
+
+$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/../README.md');
+assertTrue(in_array($res['status'], [400, 404], true), 'path traversal should be rejected');
+
+$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/checkpoint');
+assertTrue($res['status'] === 200, 'checkpoint should return 200');
+assertTrue(isset($res['json']['current_node']), 'checkpoint shape invalid');
+
+$res = request('GET', $base . '/pipelines/' . rawurlencode($runId) . '/context');
+assertTrue($res['status'] === 200, 'alias context should return 200');
+assertTrue(isset($res['json']['run.id']), 'context shape invalid');
+
+$res = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/iterate', appendProviderPayload([
+    'dotSource' => $runtimeDot,
     'originalPrompt' => 'iterate this run',
-]);
+], $providerConfig));
 assertTrue($res['status'] === 200, 'iterate run should return 200');
 $iteratedRunId = (string) ($res['json']['newId'] ?? '');
 assertTrue($iteratedRunId !== '', 'iterate run should return new id');
@@ -298,6 +345,8 @@ assertTrue($iteratedRunId !== '', 'iterate run should return new id');
 $src = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId));
 $new = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($iteratedRunId));
 assertTrue(($src['json']['familyId'] ?? '') === ($new['json']['familyId'] ?? ''), 'iterate run should preserve familyId');
+$iteratedTerminal = waitForRunStatus($base, $iteratedRunId, ['completed', 'failed']);
+assertTrue(($iteratedTerminal['json']['status'] ?? '') === 'completed', 'iterated run should complete');
 
 $res = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/archive');
 assertTrue($res['status'] === 200, 'archive should return 200');
@@ -307,38 +356,40 @@ assertTrue(count($res['json']['items'] ?? []) >= 1, 'archived listing should inc
 $res = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/unarchive');
 assertTrue($res['status'] === 200, 'unarchive should return 200');
 
-$res = request('POST', $base . '/api/v1/pipelines', [
-    'dotSource' => $dot,
+$humanDot = "digraph Pipeline {\n  start -> gate;\n  gate [type=\"wait.human\", label=\"Human Gate\"];\n  gate -> done [label=\"Approve\"];\n  gate -> rework [label=\"Request Fix\"];\n  rework -> done;\n  done [shape=Msquare];\n}";
+$res = request('POST', $base . '/api/v1/pipelines', appendProviderPayload([
+    'dotSource' => $humanDot,
     'displayName' => 'Human Gate Run',
-    'simulate' => true,
-    'autoApprove' => false,
-]);
+], $providerConfig));
 assertTrue($res['status'] === 201, 'human gate run create should return 201');
 $humanRunId = (string) ($res['json']['id'] ?? '');
 
-$q = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($humanRunId) . '/questions');
-assertTrue($q['status'] === 200, 'questions endpoint should return 200');
-assertTrue(count($q['json']['items'] ?? []) === 1, 'human gate run should have pending question');
-$qid = (string) ($q['json']['items'][0]['id'] ?? '');
+$question = waitForQuestion($base, $humanRunId);
+$qid = (string) ($question['id'] ?? '');
+assertTrue($qid !== '', 'human gate question id should be present');
 
 $badAnswer = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($humanRunId) . '/questions/' . rawurlencode($qid) . '/answer', ['answer' => 'Z']);
 assertTrue($badAnswer['status'] === 400, 'invalid answer should return 400');
 
-$goodAnswer = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($humanRunId) . '/questions/' . rawurlencode($qid) . '/answer', ['answer' => 'A']);
+$approveKey = (string) (($question['options'][0]['key'] ?? 'A'));
+$goodAnswer = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($humanRunId) . '/questions/' . rawurlencode($qid) . '/answer', ['answer' => $approveKey]);
 assertTrue($goodAnswer['status'] === 200, 'valid answer should return 200');
 
-$res = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($humanRunId));
-assertTrue(($res['json']['status'] ?? '') === 'completed', 'approved run should complete');
+$humanTerminal = waitForRunStatus($base, $humanRunId, ['completed', 'failed']);
+assertTrue(($humanTerminal['json']['status'] ?? '') === 'completed', 'approved run should complete');
 
-$runningRun = request('POST', $base . '/api/v1/pipelines', [
-    'dotSource' => $dot,
+$cancelDot = "digraph Pipeline {\n  start -> gate;\n  gate [type=\"wait.human\", label=\"Cancel Gate\"];\n  gate -> done [label=\"Approve\"];\n  done [shape=Msquare];\n}";
+$runningRun = request('POST', $base . '/api/v1/pipelines', appendProviderPayload([
+    'dotSource' => $cancelDot,
     'displayName' => 'Running Run',
-    'autoApprove' => false,
-]);
+], $providerConfig));
 assertTrue($runningRun['status'] === 201, 'running run should be created');
 $runningId = (string) ($runningRun['json']['id'] ?? '');
+waitForQuestion($base, $runningId);
 $cancel = request('POST', $base . '/api/v1/pipelines/' . rawurlencode($runningId) . '/cancel');
 assertTrue($cancel['status'] === 200, 'cancel should return 200');
+$cancelled = waitForRunStatus($base, $runningId, ['cancelled']);
+assertTrue(($cancelled['json']['status'] ?? '') === 'cancelled', 'run should become cancelled');
 $deleteRunning = request('DELETE', $base . '/api/v1/pipelines/' . rawurlencode($runningId));
 assertTrue($deleteRunning['status'] === 200, 'delete cancelled run should return 200');
 

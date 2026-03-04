@@ -40,7 +40,7 @@
 
 ## ADR-005: Simulation-first execution path
 - Date: 2026-03-04
-- Status: Accepted
+- Status: Superseded by ADR-007
 - Context: Sprint testability requires deterministic runs with no external LLM keys/network.
 - Decision: `simulate` mode and default test pathways use deterministic stage/event/artifact production while preserving endpoint contracts.
 - Consequences:
@@ -56,3 +56,13 @@
   - Positive: Prompt behavior remains aligned with upstream OmniKit and easier to audit.
   - Positive: Prompt drift is detectable via provenance metadata and checksum manifest.
   - Tradeoff: Upstream prompt updates require explicit refresh and parity verification.
+
+## ADR-007: No-stub runtime execution path
+- Date: 2026-03-04
+- Status: Accepted
+- Context: Monitor runs were completing immediately due to synthetic stage/event generation, which violated runtime realism expectations.
+- Decision: Replace synthetic run completion with real asynchronous worker execution, real provider-backed stage prompts/responses, DOT-driven routing, and human-gate pause/resume semantics. Remove runtime simulation toggles from UI/API contracts.
+- Consequences:
+  - Positive: Monitor reflects true progress, latency, and failure behavior from real model execution.
+  - Positive: Stage artifacts and events are attributable to actual runtime work instead of placeholders.
+  - Tradeoff: Runtime now depends on provider credentials/network, so local verification must configure keys.

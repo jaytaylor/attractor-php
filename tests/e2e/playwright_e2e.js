@@ -6,7 +6,7 @@ function must(value, message) {
   return value;
 }
 
-async function waitForText(page, selector, expectedText, timeoutMs = 120000) {
+async function waitForText(page, selector, expectedText, timeoutMs = 300000) {
   await page.waitForFunction(
     ({ sel, text }) => {
       const node = document.querySelector(sel);
@@ -54,7 +54,7 @@ async function previewDot(page) {
 async function runGenerateFlow(page, provider, model) {
   await page.selectOption('#provider-select', provider);
   await setModel(page, model);
-  await page.fill('#prompt-input', `Build release workflow for ${provider} with lint test deploy stages.`);
+  await page.fill('#prompt-input', 'Create a picture of a dog');
   await page.click('#btn-generate');
   await waitForText(page, '#validation-panel', 'Generated DOT stream completed.');
 
@@ -93,22 +93,37 @@ async function runIterateFlow(page, provider, model) {
 }
 
 async function runCreateRunFlow(page) {
-  await page.check('#simulate-toggle');
-  await page.check('#auto-approve-toggle');
   await page.click('#btn-run');
 
   await page.waitForSelector('#run-list li button', { timeout: 45000 });
   const runCount = await page.locator('#run-list li button').count();
   must(runCount > 0, 'monitor should list at least one run after Run action');
+
+  await page.waitForFunction(() => {
+    const status = document.querySelector('#run-status');
+    if (!status || !status.textContent) return false;
+    return status.textContent.includes('Status: completed')
+      || status.textContent.includes('Status: failed')
+      || status.textContent.includes('Status: cancelled');
+  }, null, { timeout: 180000 });
+
+  const statusText = await page.locator('#run-status').textContent();
+  must((statusText || '').includes('Status: completed'), 'created run should complete');
 }
 
 async function main() {
   const baseUrl = process.env.BASE_URL || 'http://127.0.0.1:18084';
-  const providerConfigs = [
+  const allProviderConfigs = [
     { provider: 'openai', model: process.env.DOT_OPENAI_MODEL || '' },
     { provider: 'anthropic', model: process.env.DOT_ANTHROPIC_MODEL || '' },
     { provider: 'gemini', model: process.env.DOT_GEMINI_MODEL || '' },
   ];
+  const requestedProviders = (process.env.DOT_E2E_PROVIDERS || 'openai')
+    .split(',')
+    .map((value) => value.trim().toLowerCase())
+    .filter(Boolean);
+  const providerConfigs = allProviderConfigs.filter((cfg) => requestedProviders.includes(cfg.provider));
+  const effectiveProviderConfigs = providerConfigs.length > 0 ? providerConfigs : [allProviderConfigs[0]];
 
   const browser = await chromium.launch({ headless: true });
   const page = await browser.newPage();
@@ -119,12 +134,12 @@ async function main() {
     await page.click('button[data-view="create"]');
     await page.waitForSelector('#prompt-input', { timeout: 10000 });
 
-    for (const cfg of providerConfigs) {
+    for (const cfg of effectiveProviderConfigs) {
       await runGenerateFlow(page, cfg.provider, cfg.model);
     }
 
-    await runFixFlow(page, providerConfigs[0].provider, providerConfigs[0].model);
-    await runIterateFlow(page, providerConfigs[0].provider, providerConfigs[0].model);
+    await runFixFlow(page, effectiveProviderConfigs[0].provider, effectiveProviderConfigs[0].model);
+    await runIterateFlow(page, effectiveProviderConfigs[0].provider, effectiveProviderConfigs[0].model);
     await previewDot(page);
     await runCreateRunFlow(page);
 
