@@ -125,6 +125,18 @@ Streaming DOT SSE payload expectations (minimum):
 - `data: {"done":true,"dotSource":"...full dot..."}` (exactly once on success)
 - `data: {"error":"...message..."}` (0..1, terminal)
 
+Streaming transport expectations (minimum):
+- Response content-type is `text/event-stream` and frames use the SSE “`data:` + blank line” convention (even though the request method is `POST` and the client consumes the stream via `fetch()` rather than `EventSource`).
+- Clients must tolerate partial chunks and only parse complete newline-delimited `data:` frames (see Coreys Attractor Create view streaming loop in [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt)).
+
+Reference Crosswalk (Coreys Attractor → Attractor PHP)
+| Loop | Coreys Attractor (reference) | Attractor PHP (deliverable) |
+|---|---|---|
+| Generate DOT (streaming) | `/api/generate/stream` in [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt) + generator in [`../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt) | `POST /api/v1/dot/generate/stream` (P1.25, P3.4) |
+| Fix DOT (streaming) | `/api/fix-dot` in [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt) + `fixStream(...)` in [`../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt) | `POST /api/v1/dot/fix/stream` (P1.26, P3.5) |
+| Iterate DOT (streaming) | `/api/iterate/stream` in [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt) + `iterateStream(...)` in [`../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/DotGenerator.kt) | `POST /api/v1/dot/iterate/stream` (P1.27, P3.6) |
+| Iterate Run (new run, lineage) | `/api/iterate` in [`../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt`](../../coreys-attractor/src/main/kotlin/attractor/web/WebMonitorServer.kt) + intent in [`../../coreys-attractor/docs/sprints/drafts/SPRINT-002-INTENT.md`](../../coreys-attractor/docs/sprints/drafts/SPRINT-002-INTENT.md) | `POST /api/v1/pipelines/{id}/iterate` (P1.28, P2.9, P3.6) |
+
 ## API Shapes (Selected, Starting Point)
 The OpenAPI deliverable in Phase 0 is authoritative; these examples are here to remove ambiguity for implementers and test authors.
 
@@ -525,6 +537,89 @@ This section is a concrete starting point; the authoritative version must live i
 | DOT | `POST` | `/api/v1/dot/iterate` | Modify an existing DOT using NL changes | Create (Iterate mode) |
 | DOT | `POST` | `/api/v1/dot/iterate/stream` | Modify DOT (streaming) | Create (Iterate mode) |
 | Runs | `POST` | `/api/v1/pipelines/{id}/iterate` | Create a new run from modified DOT, inheriting the family | Monitor → Create |
+
+### DOT Operation Request/Response Shapes (Minimum)
+These shapes are also defined in OpenAPI (Phase 0). They are duplicated here to eliminate ambiguity and to force full agentic-loop implementation (generate/fix/iterate).
+
+#### Generate DOT (`POST /api/v1/dot/generate`)
+Request:
+```json
+{ "prompt": "Build a CI pipeline for a Go app" }
+```
+
+Response 200:
+```json
+{ "dotSource": "digraph P { ... }" }
+```
+
+#### Generate DOT (streaming) (`POST /api/v1/dot/generate/stream`)
+Request:
+```json
+{ "prompt": "Build a CI pipeline for a Go app" }
+```
+
+Response 200:
+- `Content-Type: text/event-stream`
+- Emits `data:` frames as defined in “DOT Agentic Loop Contract” above.
+
+#### Fix DOT (`POST /api/v1/dot/fix`)
+Request:
+```json
+{ "dotSource": "digraph P { a -> }", "error": "syntax error: expected ID" }
+```
+
+Response 200:
+```json
+{ "dotSource": "digraph P { a -> b }" }
+```
+
+#### Fix DOT (streaming) (`POST /api/v1/dot/fix/stream`)
+Request:
+```json
+{ "dotSource": "digraph P { a -> }", "error": "syntax error: expected ID" }
+```
+
+Response 200:
+- `Content-Type: text/event-stream`
+- Emits `data:` frames as defined in “DOT Agentic Loop Contract” above.
+
+#### Iterate DOT (`POST /api/v1/dot/iterate`)
+Request:
+```json
+{ "baseDot": "digraph P { ... }", "changes": "Add a human approval gate before deploy" }
+```
+
+Response 200:
+```json
+{ "dotSource": "digraph P { ... }" }
+```
+
+#### Iterate DOT (streaming) (`POST /api/v1/dot/iterate/stream`)
+Request:
+```json
+{ "baseDot": "digraph P { ... }", "changes": "Add a human approval gate before deploy" }
+```
+
+Response 200:
+- `Content-Type: text/event-stream`
+- Emits `data:` frames as defined in “DOT Agentic Loop Contract” above.
+
+#### Iterate Run (`POST /api/v1/pipelines/{id}/iterate`)
+Behavioral contract:
+- Creates a **new run** from the provided `dotSource`.
+- Copies display metadata from the source run (unless explicitly overridden).
+- Preserves lineage: the new run’s `familyId` must match the source run’s `familyId` (or be bootstrapped from the source run’s id).
+- The source run must remain unchanged.
+
+Request:
+```json
+{ "dotSource": "digraph P { ... }", "originalPrompt": "Add a human approval gate before deploy" }
+```
+
+Response 200:
+```json
+{ "newId": "run-1700000000000-2" }
+```
 
 ### Create Run Request (`POST /api/v1/pipelines`)
 Request body:
