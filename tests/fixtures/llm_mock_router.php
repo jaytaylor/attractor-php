@@ -97,12 +97,43 @@ function buildDot(string $prompt): string
 SVG;
     }
     if (str_contains($normalized, 'repair') || str_contains($normalized, 'validation error')) {
-        return "digraph fixed_pipeline {\n  start -> repaired;\n  repaired -> exit;\n}\n";
+        return <<<DOT
+digraph fixed_pipeline {
+  rankdir=LR;
+  start -> repaired;
+  repaired -> validate_fix;
+  validate_fix -> exit [label="pass"];
+  validate_fix -> repaired_retry [label="fail"];
+  repaired_retry -> validate_retry -> exit;
+}
+DOT;
     }
     if (str_contains($normalized, 'modify') || str_contains($normalized, 'changes')) {
-        return "digraph iterated_pipeline {\n  start -> update;\n  update -> exit;\n}\n";
+        return <<<DOT
+digraph iterated_pipeline {
+  rankdir=LR;
+  start -> update;
+  update -> validate_changes;
+  validate_changes -> exit [label="pass"];
+  validate_changes -> replan [label="fail"];
+  replan -> update_retry -> validate_retry -> exit;
+}
+DOT;
     }
-    return "digraph generated_pipeline {\n  start -> plan;\n  plan -> implement;\n  implement -> exit;\n}\n";
+    return <<<DOT
+digraph generated_pipeline {
+  rankdir=LR;
+  start -> plan;
+  plan -> implement;
+  implement -> validate_initial;
+  validate_initial -> proof [label="pass"];
+  validate_initial -> rework [label="fail"];
+  rework -> implement_retry -> validate_final;
+  validate_final -> proof [label="pass"];
+  validate_final -> escalation [label="fail"];
+  escalation -> proof [label="manual decision"];
+}
+DOT;
 }
 
 function respondJson(int $status, array $payload): void

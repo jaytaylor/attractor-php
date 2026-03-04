@@ -162,9 +162,21 @@ digraph generated_pipeline {
   node [shape=box, style="rounded,filled", fillcolor="#eef6ff", color="#4a6fa5"];
   request [label="Request\\n{$title}"];
   concept [label="Concept sketch"];
-  dog [shape=ellipse, fillcolor="#fff3e0", label="Dog (stylized)"];
+  dog_draft [shape=ellipse, fillcolor="#fff3e0", label="Dog draft"];
+  validate_initial [shape=diamond, fillcolor="#e8fff2", label="Validate anatomy + style"];
+  rework [label="Kick back to concept/implementor"];
+  dog_revised [shape=ellipse, fillcolor="#fff3e0", label="Dog revised"];
+  validate_final [shape=diamond, fillcolor="#e8fff2", label="Final validation"];
+  escalate [label="Escalate for planning review"];
+  review_plan [label="Planning adjustment"];
   preview [label="Preview output"];
-  request -> concept -> dog -> preview;
+  request -> concept -> dog_draft -> validate_initial;
+  validate_initial -> preview [label="pass"];
+  validate_initial -> rework [label="fail"];
+  rework -> dog_revised -> validate_final;
+  validate_final -> preview [label="pass"];
+  validate_final -> escalate [label="fail"];
+  escalate -> review_plan -> preview;
 }
 DOT;
         }
@@ -174,9 +186,27 @@ digraph generated_pipeline {
   rankdir=LR;
   node [shape=box, style="rounded,filled", fillcolor="#eef6ff", color="#4a6fa5"];
   request [label="Request\\n{$title}"];
-  plan [label="Plan graph"];
-  render [label="Render preview"];
-  request -> plan -> render;
+  plan [label="Planning phase"];
+  implement [label="Implementation phase"];
+  validate_initial [shape=diamond, fillcolor="#e8fff2", label="Validate requirements"];
+  rework [label="Kick back to planner/implementor"];
+  implement_retry [label="Re-implement changes"];
+  validate_final [shape=diamond, fillcolor="#e8fff2", label="Final validation"];
+  plan_reset [label="Planning reset"];
+  implement_retry2 [label="Implementation retry"];
+  validate_escalated [shape=diamond, fillcolor="#e8fff2", label="Escalated validation"];
+  escalation [label="Escalate to reviewer"];
+  proof [label="Produce validation evidence"];
+  request -> plan -> implement -> validate_initial;
+  validate_initial -> proof [label="pass"];
+  validate_initial -> rework [label="fail"];
+  rework -> implement_retry -> validate_final;
+  validate_final -> proof [label="pass"];
+  validate_final -> plan_reset [label="fail"];
+  plan_reset -> implement_retry2 -> validate_escalated;
+  validate_escalated -> proof [label="pass"];
+  validate_escalated -> escalation [label="fail"];
+  escalation -> proof [label="manual decision"];
 }
 DOT;
     }

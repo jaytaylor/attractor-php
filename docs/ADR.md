@@ -48,6 +48,14 @@
   - Prompt flows like "create a svg of a dog" remain renderable in DOT preview and run paths.
   - DOT endpoints become resilient to provider formatting drift without introducing stubs.
 
+## ADR-2026-03-04-010: Example-Primed, Validation-First DOT Generation Prompt
+- Status: Accepted
+- Context: Generated DOT graphs should consistently encode validation and rework behavior, and prompt quality should match known high-quality Attractor-style graphs.
+- Decision: For generation requests, embed a curated corpus of seven DOT exemplar files in the base system prompt and require explicit validation nodes with pass/fail branches that kick work back to planning/implementation before final proof.
+- Consequences:
+  - New generated graphs preserve Attractor’s validation-driven execution intent.
+  - Prompt quality improves through concrete in-context DOT patterns.
+
 ## ADR-2026-03-04-005: Run Directory as Source of Truth
 - Status: Accepted
 - Context: NLSpec aligns around durable run artifacts and resumable state snapshots.

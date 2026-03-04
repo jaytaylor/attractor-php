@@ -127,6 +127,12 @@ async function main() {
     if (!String(openaiDot.dotSource || '').includes('digraph')) {
       throw new Error('openai dot generate did not return dotSource');
     }
+    if (!/validate/i.test(String(openaiDot.dotSource || ''))) {
+      throw new Error('openai dot generate did not include validation stage');
+    }
+    if (!/fail/i.test(String(openaiDot.dotSource || ''))) {
+      throw new Error('openai dot generate did not include fail branch');
+    }
 
     const anthropicDot = await api('POST', '/api/v1/dot/generate', {
       provider: 'anthropic',
@@ -134,6 +140,9 @@ async function main() {
     });
     if (!String(anthropicDot.dotSource || '').includes('digraph')) {
       throw new Error('anthropic dot generate did not return dotSource');
+    }
+    if (!/validate/i.test(String(anthropicDot.dotSource || ''))) {
+      throw new Error('anthropic dot generate did not include validation stage');
     }
 
     const dogPromptDot = await api('POST', '/api/v1/dot/generate', {
@@ -145,6 +154,9 @@ async function main() {
     }
     if (String(dogPromptDot.dotSource || '').includes('<svg')) {
       throw new Error('dog svg prompt leaked raw svg into dotSource');
+    }
+    if (!/validate/i.test(String(dogPromptDot.dotSource || ''))) {
+      throw new Error('dog svg prompt did not include validation stage');
     }
     const dogPromptRender = await api('POST', '/api/v1/dot/render', { dotSource: dogPromptDot.dotSource });
     if (!String(dogPromptRender.svg || '').includes('<svg')) {

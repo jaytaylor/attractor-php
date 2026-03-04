@@ -9,6 +9,8 @@ use AttractorPhp\Http\ApiError;
 
 final class DotLlmService
 {
+    private ?string $cachedGenerationExamples = null;
+
     public function __construct(private readonly DotService $dotService)
     {
     }
@@ -17,7 +19,7 @@ final class DotLlmService
     public function generateFromPrompt(string $prompt, array $options = []): string
     {
         $userPrompt = "Create a Graphviz DOT digraph for this request:\n" . trim($prompt);
-        return $this->requestValidDot($userPrompt, $options);
+        return $this->requestValidDot($userPrompt, $options, true);
     }
 
     /** @param array<string,mixed> $options */
@@ -29,26 +31,35 @@ final class DotLlmService
         }
 
         $userPrompt = "Repair this DOT digraph.\nValidation error:\n{$details}\n\nCurrent DOT:\n{$dotSource}";
-        return $this->requestValidDot($userPrompt, $options);
+        return $this->requestValidDot($userPrompt, $options, false);
     }
 
     /** @param array<string,mixed> $options */
     public function iterateDot(string $baseDot, string $changes, array $options = []): string
     {
         $userPrompt = "Modify this DOT digraph using the requested changes.\nChanges:\n" . trim($changes) . "\n\nCurrent DOT:\n{$baseDot}";
-        return $this->requestValidDot($userPrompt, $options);
+        return $this->requestValidDot($userPrompt, $options, false);
     }
 
     /** @param array<string,mixed> $options */
-    private function requestValidDot(string $userPrompt, array $options): string
+    private function requestValidDot(string $userPrompt, array $options, bool $isGenerationRequest): string
     {
         $systemPrompt = implode("\n", [
             'You are a Graphviz DOT expert.',
             'Return only raw DOT source for exactly one digraph.',
             'Do not include markdown fences or prose.',
             'Ensure braces are balanced and all edges have valid targets.',
+            'Generated workflows must model validation explicitly.',
+            'Include at least one validation node plus pass/fail branching.',
+            'The fail branch must kick work back to planning or implementation and then return through a follow-up validation node.',
             'If the request asks for SVG, image, or drawing content, still respond with DOT that models the concept as a graph.',
         ]);
+        if ($isGenerationRequest) {
+            $examples = $this->generationExamplesPrompt();
+            if ($examples !== '') {
+                $systemPrompt .= "\n\nUse these high-quality DOT examples as style and structure references:\n\n" . $examples;
+            }
+        }
 
         $diagnosticsHint = '';
         $lastCompletion = '';
@@ -75,6 +86,41 @@ final class DotLlmService
         }
 
         throw new ApiError(502, 'INVALID_PROVIDER_RESPONSE', 'provider returned DOT that failed validation');
+    }
+
+    private function generationExamplesPrompt(): string
+    {
+        if ($this->cachedGenerationExamples !== null) {
+            return $this->cachedGenerationExamples;
+        }
+
+        $root = dirname(__DIR__, 2);
+        $dir = $root . '/prompts/dot-examples';
+        $files = [
+            'consensus_task_parity.dot',
+            'megaplan_quality.dot',
+            'semport.dot',
+            'vulnerability_analyzer.dot',
+            'consensus_task.dot',
+            'megaplan.dot',
+            'sprint_exec.dot',
+        ];
+
+        $sections = [];
+        foreach ($files as $fileName) {
+            $path = $dir . '/' . $fileName;
+            if (!is_file($path)) {
+                continue;
+            }
+            $content = trim((string) file_get_contents($path));
+            if ($content === '') {
+                continue;
+            }
+            $sections[] = "Example: {$fileName}\n```dot\n{$content}\n```";
+        }
+
+        $this->cachedGenerationExamples = implode("\n\n", $sections);
+        return $this->cachedGenerationExamples;
     }
 
     private function normalizeCandidate(string $completion, string $prompt): string

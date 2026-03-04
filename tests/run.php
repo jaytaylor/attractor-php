@@ -233,16 +233,23 @@ $h->run('dot validate and render', function () use ($h, $app): void {
 $h->run('dot generate/fix/iterate sync + stream', function () use ($h, $app): void {
     $generate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'Create build pipeline']);
     $h->assertSame(200, $generate['status'], 'generate should work');
-    $h->assertContains('digraph', (string) ($generate['json']['dotSource'] ?? ''), 'dot content expected');
+    $generateDot = (string) ($generate['json']['dotSource'] ?? '');
+    $h->assertContains('digraph', $generateDot, 'dot content expected');
+    $h->assertContains('validate', strtolower($generateDot), 'generated dot should include validation stages');
+    $h->assertContains('fail', strtolower($generateDot), 'generated dot should include fail branch');
 
     $anthropicGenerate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'Create approval pipeline', 'provider' => 'anthropic']);
     $h->assertSame(200, $anthropicGenerate['status'], 'anthropic generate should work');
-    $h->assertContains('digraph', (string) ($anthropicGenerate['json']['dotSource'] ?? ''), 'anthropic dot content expected');
+    $anthropicDot = (string) ($anthropicGenerate['json']['dotSource'] ?? '');
+    $h->assertContains('digraph', $anthropicDot, 'anthropic dot content expected');
+    $h->assertContains('validate', strtolower($anthropicDot), 'anthropic generated dot should include validation stages');
 
     $dogGenerate = callApi($app, 'POST', '/api/v1/dot/generate', ['prompt' => 'create a svg of a dog']);
     $h->assertSame(200, $dogGenerate['status'], 'dog svg prompt should still generate DOT');
-    $h->assertContains('digraph', (string) ($dogGenerate['json']['dotSource'] ?? ''), 'dog prompt should normalize to DOT');
-    $dogRender = callApi($app, 'POST', '/api/v1/dot/render', ['dotSource' => (string) ($dogGenerate['json']['dotSource'] ?? '')]);
+    $dogDot = (string) ($dogGenerate['json']['dotSource'] ?? '');
+    $h->assertContains('digraph', $dogDot, 'dog prompt should normalize to DOT');
+    $h->assertContains('validate', strtolower($dogDot), 'dog prompt should include validation stages');
+    $dogRender = callApi($app, 'POST', '/api/v1/dot/render', ['dotSource' => $dogDot]);
     $h->assertSame(200, $dogRender['status'], 'dog prompt DOT should render');
     $h->assertContains('<svg', (string) ($dogRender['json']['svg'] ?? ''), 'dog prompt render should produce svg');
     $h->assertTrue(strpos((string) ($dogRender['json']['svg'] ?? ''), 'Graph Preview Unavailable') === false, 'dog prompt render should not fall back to error svg');
