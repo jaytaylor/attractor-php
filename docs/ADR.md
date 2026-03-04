@@ -46,3 +46,13 @@
 - Consequences:
   - Positive: Reliable offline CI and local verification.
   - Tradeoff: Real-provider behavior differences still require follow-on validation in later sprints.
+
+## ADR-006: Provider prompt parity by vendoring OmniKit prompt sources
+- Date: 2026-03-04
+- Status: Accepted
+- Context: The coding-agent stack requires provider-native system prompts to preserve behavior and quality across OpenAI/Codex, Anthropic/Claude, and Gemini model families.
+- Decision: Vendor prompt assets from `swift-omnikit` at a pinned commit and build provider system prompts in PHP using the same layering model: provider base prompt + environment context + project docs + user instructions. Keep Codex markdown prompts byte-for-byte, and source Claude/Gemini prompt content from vendored upstream prompt definitions.
+- Consequences:
+  - Positive: Prompt behavior remains aligned with upstream OmniKit and easier to audit.
+  - Positive: Prompt drift is detectable via provenance metadata and checksum manifest.
+  - Tradeoff: Upstream prompt updates require explicit refresh and parity verification.
