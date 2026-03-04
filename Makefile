@@ -8,4 +8,5 @@ build: precommit
 	@echo "build ok"
 
 test: precommit
+	@timeout 135 php tests/check_sprint_evidence.php
 	@timeout 135 php tests/run.php
