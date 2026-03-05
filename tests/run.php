@@ -400,6 +400,82 @@ $h->run('run artifacts/graph/checkpoint/context', function () use ($h, $app): vo
     $h->assertSame(404, $missingContext['status'], 'missing run context should 404');
 });
 
+$h->run('codergen materializes requested file outputs', function () use ($h, $app): void {
+    $create = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph F {
+  start -> WriteCode;
+  WriteCode [label="Write hello_world.py", prompt="Write a complete hello_world.py python program that prints Hello, World!"];
+  WriteCode -> ValidateCode;
+  ValidateCode [shape=diamond, label="Validate generated file", prompt="Verify hello_world.py prints Hello, World!"];
+  ValidateCode -> exit [label="pass"];
+  ValidateCode -> WriteCode [label="fail"];
+}',
+        'displayName' => 'File Materialization Run',
+        'originalPrompt' => 'write a hello_world.py python program',
+    ]);
+    $runId = (string) ($create['json']['id'] ?? '');
+    waitForRunStatus($app, $runId, ['completed']);
+
+    $artifacts = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts');
+    $h->assertSame(200, $artifacts['status'], 'artifact list should work');
+    $paths = array_map(static fn(array $item): string => (string) ($item['path'] ?? ''), (array) $artifacts['json']);
+    $h->assertTrue(in_array('outputs/hello_world.py', $paths, true), 'requested output file should be materialized');
+
+    $output = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts/outputs/hello_world.py');
+    $h->assertSame(200, $output['status'], 'materialized file should be downloadable');
+    $h->assertContains('Hello, World!', $output['body'], 'materialized file should include expected program text');
+});
+
+$h->run('codergen materializes generic and nested outputs', function () use ($h, $app): void {
+    $nested = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph F {
+  start -> BuildNestedFile;
+  BuildNestedFile [label="Build nested artifact", prompt="Create src/hello/world.py that prints Hello, World!"];
+  BuildNestedFile -> VerifyNested;
+  VerifyNested [shape=diamond, label="Verify nested artifact", prompt="Verify src/hello/world.py is valid and prints Hello, World!"];
+  VerifyNested -> exit [label="pass"];
+  VerifyNested -> BuildNestedFile [label="fail"];
+}',
+        'displayName' => 'Nested File Materialization Run',
+        'originalPrompt' => 'create nested python output',
+    ]);
+    $nestedRunId = (string) ($nested['json']['id'] ?? '');
+    waitForRunStatus($app, $nestedRunId, ['completed']);
+
+    $nestedArtifacts = callApi($app, 'GET', '/api/v1/pipelines/' . $nestedRunId . '/artifacts');
+    $h->assertSame(200, $nestedArtifacts['status'], 'nested artifact list should work');
+    $nestedPaths = array_map(static fn(array $item): string => (string) ($item['path'] ?? ''), (array) $nestedArtifacts['json']);
+    $h->assertTrue(in_array('outputs/src/hello/world.py', $nestedPaths, true), 'nested output file should be materialized');
+
+    $nestedOutput = callApi($app, 'GET', '/api/v1/pipelines/' . $nestedRunId . '/artifacts/outputs/src/hello/world.py');
+    $h->assertSame(200, $nestedOutput['status'], 'nested output file should be downloadable');
+    $h->assertContains('Hello, World!', $nestedOutput['body'], 'nested output file should contain expected text');
+
+    $languageOnly = callApi($app, 'POST', '/api/v1/pipelines', [
+        'dotSource' => 'digraph J {
+  start -> DraftScript;
+  DraftScript [label="Draft JS script", prompt="Write JavaScript that logs Hello, World!"];
+  DraftScript -> ValidateScript;
+  ValidateScript [shape=diamond, label="Validate JS script", prompt="Verify output logs Hello, World!"];
+  ValidateScript -> exit [label="pass"];
+  ValidateScript -> DraftScript [label="fail"];
+}',
+        'displayName' => 'Language-only Materialization Run',
+        'originalPrompt' => 'create javascript hello world program',
+    ]);
+    $languageRunId = (string) ($languageOnly['json']['id'] ?? '');
+    waitForRunStatus($app, $languageRunId, ['completed']);
+
+    $languageArtifacts = callApi($app, 'GET', '/api/v1/pipelines/' . $languageRunId . '/artifacts');
+    $h->assertSame(200, $languageArtifacts['status'], 'language-only artifact list should work');
+    $languagePaths = array_map(static fn(array $item): string => (string) ($item['path'] ?? ''), (array) $languageArtifacts['json']);
+    $h->assertTrue(in_array('outputs/output.js', $languagePaths, true), 'language-only output should infer .js artifact path');
+
+    $languageOutput = callApi($app, 'GET', '/api/v1/pipelines/' . $languageRunId . '/artifacts/outputs/output.js');
+    $h->assertSame(200, $languageOutput['status'], 'language-only output should be downloadable');
+    $h->assertContains('console.log', $languageOutput['body'], 'language-only output should contain js program text');
+});
+
 $h->run('sse snapshot then events (run + global)', function () use ($h, $app): void {
     $create = callApi($app, 'POST', '/api/v1/pipelines', [
         'dotSource' => 'digraph S { start -> implement; implement -> exit; }',

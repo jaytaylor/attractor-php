@@ -13,7 +13,15 @@ final class Router
 
     public function add(string $method, string $pattern, Closure $handler): void
     {
-        $regex = preg_replace('#\{([a-zA-Z0-9_]+)\}#', '(?P<$1>[^/]+)', $pattern);
+        $regex = preg_replace_callback(
+            '#\{([a-zA-Z0-9_]+)(\+)?\}#',
+            static function (array $match): string {
+                $name = (string) ($match[1] ?? '');
+                $isCatchAll = ($match[2] ?? '') === '+';
+                return $isCatchAll ? '(?P<' . $name . '>.+)' : '(?P<' . $name . '>[^/]+)';
+            },
+            $pattern
+        );
         $regex = '#^' . $regex . '$#';
         $this->routes[] = [
             'method' => strtoupper($method),
@@ -36,7 +44,7 @@ final class Router
             $params = [];
             foreach ($matches as $key => $value) {
                 if (is_string($key)) {
-                    $params[$key] = $value;
+                    $params[$key] = rawurldecode((string) $value);
                 }
             }
 

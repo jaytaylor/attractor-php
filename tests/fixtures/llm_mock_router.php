@@ -87,6 +87,51 @@ function buildDot(string $prompt): string
         return "PASS: validation succeeded for current node output.\n";
     }
     if (str_contains($normalized, 'executing one node of a software-factory pipeline') || str_contains($normalized, 'node id:')) {
+        $executionPrompt = $prompt;
+        if (preg_match('/Node ID:[\s\S]*$/', $prompt, $scopeMatch) === 1) {
+            $executionPrompt = (string) ($scopeMatch[0] ?? $prompt);
+        }
+        $executionNormalized = strtolower($executionPrompt);
+
+        if (preg_match('/\b([A-Za-z0-9][A-Za-z0-9_\/.-]*\.[A-Za-z][A-Za-z0-9]{0,11})\b/', $executionPrompt, $match) === 1) {
+            $path = (string) ($match[1] ?? 'output.txt');
+            $extension = strtolower((string) pathinfo($path, PATHINFO_EXTENSION));
+            $content = "Generated artifact.\n";
+            if ($extension === 'py') {
+                $content = "print(\"Hello, World!\")\n";
+            } elseif ($extension === 'js') {
+                $content = "console.log(\"Hello, World!\");\n";
+            } elseif ($extension === 'md') {
+                $content = "# Generated Artifact\n\nHello from the mock LLM.\n";
+            }
+            return "<<<FILE:{$path}>>>\n{$content}<<<END FILE>>>";
+        }
+
+        if (str_contains($executionNormalized, 'javascript') || str_contains($executionNormalized, 'node.js')) {
+            return <<<JS
+```javascript
+console.log("Hello, World!");
+```
+JS;
+        }
+
+        if (str_contains($executionNormalized, 'python')) {
+            return <<<PY
+```python
+print("Hello, World!")
+```
+PY;
+        }
+
+        if (str_contains($executionNormalized, 'svg')) {
+            return <<<SVG
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40">
+  <text x="8" y="24">generated</text>
+</svg>
+SVG;
+        }
+    }
+    if (str_contains($normalized, 'executing one node of a software-factory pipeline') || str_contains($normalized, 'node id:')) {
         return "Task completed with concrete output for the current node.\n";
     }
     if (str_contains($normalized, 'svg of a dog')) {

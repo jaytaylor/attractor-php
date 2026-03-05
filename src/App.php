@@ -86,7 +86,7 @@ final class App
         $this->router->add('GET', '/api/v1/pipelines/{id}/graph', fn(Request $req, array $p) => $this->graphForRun($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts', fn(Request $req, array $p) => $this->listArtifacts($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts.zip', fn(Request $req, array $p) => $this->downloadArtifactsZip($p['id']));
-        $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts/{path}', fn(Request $req, array $p) => $this->artifactFile($p['id'], $p['path']));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts/{path+}', fn(Request $req, array $p) => $this->artifactFile($p['id'], $p['path']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/checkpoint', fn(Request $req, array $p) => $this->checkpointForRun($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/context', fn(Request $req, array $p) => $this->contextForRun($p['id']));
         $this->router->add('POST', '/api/v1/pipelines/{id}/iterate', fn(Request $req, array $p) => $this->iterateRun($req, $p['id']));

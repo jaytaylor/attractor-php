@@ -468,11 +468,11 @@ final class PipelineService
         }
 
         if ($this->isValidationNode($shape, $nodeId, $label)) {
-            $result = $this->validateWithLlm($runId, $runtime, $nodeId, $label, $run);
+            $result = $this->validateWithLlm($runId, $runtime, $nodeId, $label, $attrs, $run);
             return $result;
         }
 
-        $taskOutput = $this->runCodergenNode($runId, $runtime, $nodeId, $label, $run);
+        $taskOutput = $this->runCodergenNode($runId, $runtime, $nodeId, $label, $attrs, $run);
         return [
             'routeLabel' => 'pass',
             'output' => $taskOutput,
@@ -483,7 +483,7 @@ final class PipelineService
      * @param array<string,mixed> $run
      * @return array<string,mixed>
      */
-    private function validateWithLlm(string $runId, array $runtime, string $nodeId, string $label, array $run): array
+    private function validateWithLlm(string $runId, array $runtime, string $nodeId, string $label, array $attrs, array $run): array
     {
         $lastOutput = trim((string) ($runtime['lastNodeOutput'] ?? ''));
         if ($lastOutput === '') {
@@ -500,10 +500,15 @@ final class PipelineService
             'Assess whether prior node output satisfies the validation objective.',
             'Reply with PASS or FAIL as the first token, then one short reason.',
         ]);
-        $userPrompt = "Validation node: {$nodeId}\nValidation objective: {$label}\nWorkflow goal: {$goal}\n\nCandidate output:\n{$lastOutput}";
+        $nodeDirective = trim((string) ($attrs['prompt'] ?? ''));
+        $validationObjective = $nodeDirective !== '' ? $nodeDirective : $label;
+        $userPrompt = "Validation node: {$nodeId}\nValidation objective: {$validationObjective}\nWorkflow goal: {$goal}\n\nCandidate output:\n{$lastOutput}";
+        if ($nodeDirective !== '') {
+            $userPrompt .= "\n\nNode directive:\n{$nodeDirective}";
+        }
 
         try {
-            $text = $this->taskLlmService->completeTask($systemPrompt, $userPrompt, $this->runtimeLlmOptions($run));
+            $text = $this->taskLlmService->completeTask($systemPrompt, $userPrompt, $this->runtimeLlmOptions($run, $attrs));
         } catch (ApiError $error) {
             return ['failed' => true, 'error' => $error->getMessage()];
         }
@@ -523,7 +528,7 @@ final class PipelineService
     /** @param array<string,mixed> $runtime
       * @param array<string,mixed> $run
       */
-    private function runCodergenNode(string $runId, array $runtime, string $nodeId, string $label, array $run): string
+    private function runCodergenNode(string $runId, array $runtime, string $nodeId, string $label, array $attrs, array $run): string
     {
         $goal = trim((string) ($run['originalPrompt'] ?? ''));
         if ($goal === '') {
@@ -535,17 +540,35 @@ final class PipelineService
             $previous = '(no prior output)';
         }
 
+        $nodeDirective = trim((string) ($attrs['prompt'] ?? ''));
         $systemPrompt = implode("\n", [
             'You are executing one node of a software-factory pipeline.',
             'Return concise, concrete output for this node only.',
+            'If the node should create or update files, return file blocks using this exact format:',
+            '<<<FILE:path/to/file.ext>>>',
+            '<file content>',
+            '<<<END FILE>>>',
+            'You may return multiple FILE blocks.',
+            'If no file changes are needed, return concise plain text.',
             'Do not include markdown fences.',
         ]);
         $userPrompt = "Node ID: {$nodeId}\nNode label: {$label}\nWorkflow goal: {$goal}\n\nPrevious node output:\n{$previous}";
+        if ($nodeDirective !== '') {
+            $userPrompt .= "\n\nNode directive:\n{$nodeDirective}";
+        }
 
-        $text = $this->taskLlmService->completeTask($systemPrompt, $userPrompt, $this->runtimeLlmOptions($run));
-        $this->writeNodeArtifact($runId, $runtime, $nodeId, 'codergen', $text . "\n");
-        $this->applyNodeContext($runId, $nodeId, $text, 'ok');
-        return $text;
+        $text = $this->taskLlmService->completeTask($systemPrompt, $userPrompt, $this->runtimeLlmOptions($run, $attrs));
+        $materialized = $this->materializeGeneratedOutputs($runId, $nodeId, $label, $goal, $nodeDirective, $text);
+
+        $content = $text;
+        if ($materialized !== []) {
+            $content .= "\n\nGenerated files:\n- " . implode("\n- ", $materialized);
+            $this->store->emitEvent($runId, 'ArtifactMaterialized', ['nodeId' => $nodeId, 'paths' => $materialized]);
+        }
+
+        $this->writeNodeArtifact($runId, $runtime, $nodeId, 'codergen', $content . "\n");
+        $this->applyNodeContext($runId, $nodeId, $content, 'ok');
+        return $content;
     }
 
     /**
@@ -605,12 +628,12 @@ final class PipelineService
     }
 
     /** @param array<string,mixed> $run */
-    private function runtimeLlmOptions(array $run): array
+    private function runtimeLlmOptions(array $run, array $nodeAttrs = []): array
     {
         $runtime = is_array($run['_runtime'] ?? null) ? $run['_runtime'] : [];
         $opts = is_array($runtime['llmOptions'] ?? null) ? $runtime['llmOptions'] : [];
-        $provider = trim((string) ($opts['provider'] ?? $run['provider'] ?? ''));
-        $model = trim((string) ($opts['model'] ?? $run['model'] ?? ''));
+        $provider = trim((string) ($nodeAttrs['llm_provider'] ?? $nodeAttrs['provider'] ?? $opts['provider'] ?? $run['provider'] ?? ''));
+        $model = trim((string) ($nodeAttrs['llm_model'] ?? $nodeAttrs['model'] ?? $opts['model'] ?? $run['model'] ?? ''));
         $result = [];
         if ($provider !== '') {
             $result['provider'] = $provider;
@@ -619,6 +642,211 @@ final class PipelineService
             $result['model'] = $model;
         }
         return $result;
+    }
+
+    /** @return list<string> */
+    private function materializeGeneratedOutputs(
+        string $runId,
+        string $nodeId,
+        string $nodeLabel,
+        string $goal,
+        string $nodeDirective,
+        string $rawText
+    ): array {
+        $files = $this->extractFileBlocks($rawText);
+        if ($files === []) {
+            $inferredPath = $this->inferOutputPath($goal, $nodeLabel, $nodeDirective, $rawText);
+            if ($inferredPath !== '') {
+                $content = $this->stripSingleCodeFence($rawText);
+                if (trim($content) !== '') {
+                    $files[] = ['path' => $inferredPath, 'content' => rtrim($content) . "\n"];
+                }
+            }
+        }
+
+        if ($files === []) {
+            return [];
+        }
+
+        $base = $this->store->runDir($runId) . '/artifacts/outputs';
+        if (!is_dir($base)) {
+            mkdir($base, 0777, true);
+        }
+
+        $written = [];
+        foreach ($files as $file) {
+            $path = trim((string) ($file['path'] ?? ''));
+            $content = (string) ($file['content'] ?? '');
+            $safe = $this->sanitizeOutputPath($path);
+            if ($safe === '') {
+                continue;
+            }
+            $full = $base . '/' . $safe;
+            $dir = dirname($full);
+            if (!is_dir($dir)) {
+                mkdir($dir, 0777, true);
+            }
+            file_put_contents($full, $content);
+            $written[] = 'outputs/' . str_replace('\\', '/', $safe);
+        }
+
+        if ($written !== []) {
+            $context = $this->store->readContext($runId);
+            $context['node.' . $nodeId . '.files'] = $written;
+            $context['last.files'] = $written;
+            $this->store->saveContext($runId, $context);
+        }
+
+        return $written;
+    }
+
+    /** @return list<array{path:string,content:string}> */
+    private function extractFileBlocks(string $rawText): array
+    {
+        $files = [];
+        if (preg_match_all('/<<<FILE:([^\n>]+)>>>\s*\n([\s\S]*?)\n?<<<END FILE>>>/i', $rawText, $matches, PREG_SET_ORDER) === false) {
+            return [];
+        }
+
+        foreach ($matches as $match) {
+            $path = trim((string) ($match[1] ?? ''));
+            $content = (string) ($match[2] ?? '');
+            if ($path === '') {
+                continue;
+            }
+            $files[] = [
+                'path' => $path,
+                'content' => rtrim($content) . "\n",
+            ];
+        }
+
+        if ($files !== []) {
+            return $files;
+        }
+
+        if (preg_match_all('/```file:([^\n]+)\n([\s\S]*?)```/i', $rawText, $matches, PREG_SET_ORDER) === false) {
+            return [];
+        }
+        foreach ($matches as $match) {
+            $path = trim((string) ($match[1] ?? ''));
+            $content = (string) ($match[2] ?? '');
+            if ($path === '') {
+                continue;
+            }
+            $files[] = [
+                'path' => $path,
+                'content' => rtrim($content) . "\n",
+            ];
+        }
+
+        return $files;
+    }
+
+    private function inferOutputPath(string $goal, string $nodeLabel, string $nodeDirective, string $rawText): string
+    {
+        foreach ([$nodeDirective, $goal, $nodeLabel] as $candidate) {
+            if (preg_match('/(?:^|[\s"`\'(])([A-Za-z0-9][A-Za-z0-9_\/.-]*\.[A-Za-z][A-Za-z0-9]{0,11})(?=$|[\s"`\',;:)])/m', $candidate, $match) === 1) {
+                return trim((string) ($match[1] ?? ''), " \t\n\r\0\x0B.,:;\"'");
+            }
+        }
+
+        return $this->inferOutputPathFromContent($rawText);
+    }
+
+    private function stripSingleCodeFence(string $text): string
+    {
+        $trimmed = trim($text);
+        if (preg_match('/^```[A-Za-z0-9_-]*\n([\s\S]*?)\n```$/', $trimmed, $match) === 1) {
+            return (string) ($match[1] ?? '');
+        }
+        return $text;
+    }
+
+    private function sanitizeOutputPath(string $path): string
+    {
+        $normalized = str_replace('\\', '/', trim($path));
+        $normalized = ltrim($normalized, '/');
+        if ($normalized === '') {
+            return '';
+        }
+
+        $parts = [];
+        foreach (explode('/', $normalized) as $part) {
+            $segment = trim($part);
+            if ($segment === '' || $segment === '.' || $segment === '..') {
+                continue;
+            }
+            $segment = preg_replace('/[^A-Za-z0-9._-]/', '_', $segment) ?? '';
+            if ($segment === '') {
+                continue;
+            }
+            $parts[] = $segment;
+        }
+
+        if ($parts === []) {
+            return '';
+        }
+
+        return implode('/', $parts);
+    }
+
+    private function inferOutputPathFromContent(string $rawText): string
+    {
+        $trimmed = trim($rawText);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        if (stripos($trimmed, '<svg') !== false) {
+            return 'output.svg';
+        }
+        if (stripos($trimmed, '<?php') !== false) {
+            return 'output.php';
+        }
+        if (preg_match('/^\s*(<!doctype html|<html\b)/i', $trimmed) === 1) {
+            return 'output.html';
+        }
+        if (preg_match('/^\s*[\{\[]/m', $trimmed) === 1 && json_decode($trimmed, true) !== null) {
+            return 'output.json';
+        }
+
+        if (preg_match('/^```([A-Za-z0-9_+-]+)\s*\n/m', $trimmed, $match) === 1) {
+            $lang = strtolower((string) ($match[1] ?? ''));
+            $map = [
+                'bash' => 'sh',
+                'c' => 'c',
+                'cpp' => 'cpp',
+                'css' => 'css',
+                'go' => 'go',
+                'html' => 'html',
+                'java' => 'java',
+                'javascript' => 'js',
+                'js' => 'js',
+                'json' => 'json',
+                'markdown' => 'md',
+                'md' => 'md',
+                'node' => 'js',
+                'php' => 'php',
+                'py' => 'py',
+                'python' => 'py',
+                'rs' => 'rs',
+                'rust' => 'rs',
+                'shell' => 'sh',
+                'sh' => 'sh',
+                'sql' => 'sql',
+                'toml' => 'toml',
+                'ts' => 'ts',
+                'typescript' => 'ts',
+                'xml' => 'xml',
+                'yaml' => 'yaml',
+                'yml' => 'yaml',
+            ];
+            if (isset($map[$lang])) {
+                return 'output.' . $map[$lang];
+            }
+        }
+
+        return '';
     }
 
     /** @param array<string,mixed> $input

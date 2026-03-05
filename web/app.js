@@ -385,7 +385,12 @@
       li.textContent = `${item.path} (${item.sizeBytes} bytes)`;
       const showArtifact = async () => {
         try {
-          const resp = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/artifacts/${item.path}`);
+          const encodedPath = String(item.path || '')
+            .split('/')
+            .filter((segment) => segment.length > 0)
+            .map((segment) => encodeURIComponent(segment))
+            .join('/');
+          const resp = await fetch(`/api/v1/pipelines/${encodeURIComponent(run.id)}/artifacts/${encodedPath}`);
           const text = await resp.text();
           const preview = text.length > 5000 ? `${text.slice(0, 5000)}\n...[truncated]` : text;
           el('artifact-preview').textContent = preview;
