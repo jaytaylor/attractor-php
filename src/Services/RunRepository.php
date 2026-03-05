@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Agent\Exec\LocalExecutionEnvironment;
 use App\Support\Time;
 
 final class RunRepository
 {
+    private LocalExecutionEnvironment $executionEnv;
+
     /**
      * @var array<string,list<string>>
      */
@@ -28,6 +31,7 @@ final class RunRepository
         private readonly string $projectRoot,
         private readonly DotService $dotService,
     ) {
+        $this->executionEnv = new LocalExecutionEnvironment($this->projectRoot);
     }
 
     public function ensureStorage(): void
@@ -252,12 +256,14 @@ final class RunRepository
                     $providerUsed = 'engine';
                     $modelUsed = 'engine';
                 } else {
+                    $stageProvider = trim(strtolower((string) ($node['attrs']['llm_provider'] ?? (string) ($run['provider'] ?? ''))));
+                    $stageModel = trim((string) ($node['attrs']['llm_model'] ?? (string) ($run['model'] ?? '')));
                     $completion = $this->dotService->completeText(
                         systemPrompt: $this->stageSystemPrompt(),
                         userPrompt: $prompt,
                         options: [
-                            'provider' => (string) ($run['provider'] ?? ''),
-                            'model' => (string) ($run['model'] ?? ''),
+                            'provider' => $stageProvider,
+                            'model' => $stageModel,
                         ],
                     );
                     $completionText = (string) ($completion['text'] ?? '');
@@ -276,15 +282,35 @@ final class RunRepository
 
             $durationMs = max(1, Time::nowMs() - $startedAtMs);
             $this->markStageCompleted($run, $currentNodeId, $durationMs);
+
+            $actionResult = [
+                'artifactPaths' => [],
+                'commandLogs' => [],
+                'summary' => '',
+            ];
+            if (!$this->isControlNode($currentNodeId, $node)) {
+                $actionResult = $this->executeStageActions($id, $currentNodeId, $completionText);
+            }
+
             $this->writeStageResponse(
                 $id,
                 $currentNodeId,
-                $this->formatStageResponse($completionText, $providerUsed, $modelUsed),
+                $this->formatStageResponse(
+                    $completionText,
+                    $providerUsed,
+                    $modelUsed,
+                    $actionResult['artifactPaths'],
+                    $actionResult['commandLogs'],
+                    $actionResult['summary'],
+                ),
             );
             $this->appendEvent($id, 'StageCompleted', ['nodeId' => $currentNodeId, 'durationMs' => $durationMs]);
 
             $context = $this->context($id) ?? [];
             $context['stage.' . $currentNodeId . '.response'] = $this->truncate($completionText, 4000);
+            if ($actionResult['artifactPaths'] !== []) {
+                $context['stage.' . $currentNodeId . '.artifacts'] = $actionResult['artifactPaths'];
+            }
 
             $validationOutcome = null;
             if ($this->isValidationNode($currentNodeId, $node)) {
@@ -689,6 +715,7 @@ final class RunRepository
         $context = $this->context((string) ($run['id'] ?? '')) ?? [];
         $label = trim((string) ($node['label'] ?? $nodeId));
         $goal = trim((string) ($run['originalPrompt'] ?? ''));
+        $nodePrompt = trim((string) ($node['attrs']['prompt'] ?? ''));
 
         $prompt = "Run ID: " . (string) ($run['id'] ?? '') . "\n"
             . "Stage Node: {$nodeId}\n"
@@ -701,7 +728,17 @@ final class RunRepository
                 . "{\"outcome\":\"pass\"|\"fail\",\"reason\":\"short reason\",\"evidence\":[\"item\",\"item\"]}\n"
                 . "Use outcome=fail when requirements are missing, incorrect, or unverified.\n";
         } else {
-            $prompt .= "\nProduce the best possible output for this stage in plain text. Be concrete and actionable.\n";
+            if ($nodePrompt !== '') {
+                $prompt .= "\nStage-specific instruction from DOT node `prompt` attribute:\n"
+                    . $nodePrompt . "\n";
+            }
+            $prompt .= "\nReturn STRICT JSON only using this schema:\n"
+                . "{\"summary\":\"short summary\",\"outcome\":\"success\"|\"fail\",\"artifacts\":[{\"path\":\"relative/path.ext\",\"content\":\"full file content\"}],\"commands\":[{\"command\":\"shell command\"}],\"failure_reason\":\"when outcome=fail\"}\n"
+                . "Rules:\n"
+                . "- Use `artifacts` to deliver requested outputs/files (code, config, docs, images as SVG/XML text, etc.).\n"
+                . "- If the user asks for a specific file (example: hello_world.py), include that exact artifact path.\n"
+                . "- Commands are optional and should be used only when needed to validate or generate outputs.\n"
+                . "- Do not wrap JSON in markdown fences.\n";
         }
 
         if ($outgoing !== []) {
@@ -722,7 +759,7 @@ final class RunRepository
     {
         return "You are Attractor runtime stage executor.\n"
             . "Follow the stage prompt exactly.\n"
-            . "Do not return markdown code fences unless explicitly requested.\n"
+            . "For non-validation stages, return strict JSON action payloads as requested by the prompt.\n"
             . "When validating, return strict JSON as instructed.\n";
     }
 
@@ -974,9 +1011,188 @@ final class RunRepository
         return ['outcome' => 'fail', 'reason' => 'keyword fail/default'];
     }
 
-    private function formatStageResponse(string $response, string $provider, string $model): string
+    /**
+     * @param list<string> $artifactPaths
+     * @param list<array{command:string,exitCode:int,logPath:string}> $commandLogs
+     */
+    private function formatStageResponse(
+        string $response,
+        string $provider,
+        string $model,
+        array $artifactPaths,
+        array $commandLogs,
+        string $summary,
+    ): string {
+        $lines = [
+            "Provider: {$provider}",
+            "Model: {$model}",
+        ];
+        if ($summary !== '') {
+            $lines[] = 'Summary: ' . $summary;
+        }
+        if ($artifactPaths !== []) {
+            $lines[] = 'Artifacts:';
+            foreach ($artifactPaths as $path) {
+                $lines[] = '- ' . $path;
+            }
+        }
+        if ($commandLogs !== []) {
+            $lines[] = 'Commands:';
+            foreach ($commandLogs as $log) {
+                $lines[] = '- [' . $log['exitCode'] . '] ' . $log['command'] . ' -> ' . $log['logPath'];
+            }
+        }
+        $lines[] = '';
+        $lines[] = trim($response);
+        $lines[] = '';
+        return implode("\n", $lines);
+    }
+
+    /**
+     * @return array{
+     *   artifactPaths:list<string>,
+     *   commandLogs:list<array{command:string,exitCode:int,logPath:string}>,
+     *   summary:string
+     * }
+     */
+    private function executeStageActions(string $runId, string $nodeId, string $completionText): array
     {
-        return "Provider: {$provider}\nModel: {$model}\n\n" . trim($response) . "\n";
+        $parsed = $this->parseStageActionPayload($completionText);
+        $summary = trim((string) ($parsed['summary'] ?? ''));
+
+        $artifactPaths = [];
+        $artifacts = is_array($parsed['artifacts'] ?? null) ? $parsed['artifacts'] : [];
+        foreach ($artifacts as $index => $artifact) {
+            if (!is_array($artifact)) {
+                continue;
+            }
+            $rawPath = trim((string) ($artifact['path'] ?? ''));
+            $content = (string) ($artifact['content'] ?? '');
+            $relative = $this->normalizeArtifactPath($rawPath, $nodeId, $index);
+            $fullPath = $this->runPath($runId) . '/artifacts/' . $relative;
+            $parent = dirname($fullPath);
+            if (!is_dir($parent)) {
+                mkdir($parent, 0777, true);
+            }
+            file_put_contents($fullPath, $content);
+            $artifactPaths[] = 'artifacts/' . str_replace('\\', '/', $relative);
+        }
+
+        if ($artifactPaths === []) {
+            $fallbackRelative = $this->normalizeArtifactPath($nodeId . '/model_output.txt', $nodeId, 0);
+            $fallbackFull = $this->runPath($runId) . '/artifacts/' . $fallbackRelative;
+            $parent = dirname($fallbackFull);
+            if (!is_dir($parent)) {
+                mkdir($parent, 0777, true);
+            }
+            file_put_contents($fallbackFull, $completionText);
+            $artifactPaths[] = 'artifacts/' . str_replace('\\', '/', $fallbackRelative);
+        }
+
+        $commandLogs = [];
+        $commands = is_array($parsed['commands'] ?? null) ? $parsed['commands'] : [];
+        foreach ($commands as $index => $commandItem) {
+            $command = '';
+            if (is_string($commandItem)) {
+                $command = trim($commandItem);
+            } elseif (is_array($commandItem)) {
+                $command = trim((string) ($commandItem['command'] ?? ''));
+            }
+            if ($command === '') {
+                continue;
+            }
+
+            $result = $this->executionEnv->execCommand($command, 120_000, $this->projectRoot);
+            $logRelative = 'commands/' . $nodeId . '-' . ($index + 1) . '.log';
+            $logFullPath = $this->runPath($runId) . '/artifacts/' . $logRelative;
+            $parent = dirname($logFullPath);
+            if (!is_dir($parent)) {
+                mkdir($parent, 0777, true);
+            }
+            $logBody = "Command: {$command}\nExitCode: {$result->exitCode}\n\nSTDOUT:\n{$result->stdout}\n\nSTDERR:\n{$result->stderr}\n";
+            file_put_contents($logFullPath, $logBody);
+            $commandLogs[] = [
+                'command' => $command,
+                'exitCode' => $result->exitCode,
+                'logPath' => 'artifacts/' . $logRelative,
+            ];
+            $artifactPaths[] = 'artifacts/' . $logRelative;
+        }
+
+        return [
+            'artifactPaths' => array_values(array_unique($artifactPaths)),
+            'commandLogs' => $commandLogs,
+            'summary' => $summary,
+        ];
+    }
+
+    /**
+     * @return array{summary?:string,artifacts?:array<int,mixed>,commands?:array<int,mixed>}
+     */
+    private function parseStageActionPayload(string $completionText): array
+    {
+        $trimmed = trim($completionText);
+        if ($trimmed === '') {
+            return [];
+        }
+
+        $candidate = $trimmed;
+        if (preg_match('/\{.*\}/s', $trimmed, $match) === 1) {
+            $candidate = (string) ($match[0] ?? $trimmed);
+        }
+        $decoded = json_decode($candidate, true);
+        if (is_array($decoded)) {
+            return $decoded;
+        }
+
+        $fencedArtifacts = [];
+        if (preg_match_all('/```([A-Za-z0-9_.+-]*)\n(.*?)```/s', $trimmed, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $index => $match) {
+                $lang = strtolower(trim((string) ($match[1] ?? '')));
+                $body = (string) ($match[2] ?? '');
+                if ($body === '') {
+                    continue;
+                }
+                $ext = match ($lang) {
+                    'py', 'python' => 'py',
+                    'js', 'javascript' => 'js',
+                    'ts', 'typescript' => 'ts',
+                    'sh', 'bash', 'shell' => 'sh',
+                    'json' => 'json',
+                    'yaml', 'yml' => 'yaml',
+                    'xml', 'svg' => $lang,
+                    'md', 'markdown' => 'md',
+                    default => 'txt',
+                };
+                $fencedArtifacts[] = [
+                    'path' => 'generated/output-' . ($index + 1) . '.' . $ext,
+                    'content' => trim($body) . "\n",
+                ];
+            }
+        }
+
+        if ($fencedArtifacts !== []) {
+            return [
+                'summary' => 'Parsed fenced output',
+                'artifacts' => $fencedArtifacts,
+            ];
+        }
+
+        return [
+            'summary' => 'Raw model output',
+            'artifacts' => [
+                ['path' => 'generated/output.txt', 'content' => $trimmed . "\n"],
+            ],
+        ];
+    }
+
+    private function normalizeArtifactPath(string $rawPath, string $nodeId, int $index): string
+    {
+        $path = trim(str_replace('\\', '/', $rawPath));
+        if ($path === '' || str_starts_with($path, '/') || str_contains($path, '..')) {
+            $path = $nodeId . '/artifact-' . ($index + 1) . '.txt';
+        }
+        return ltrim($path, '/');
     }
 
     /**
@@ -1020,6 +1236,10 @@ final class RunRepository
      */
     private function isValidationNode(string $nodeId, array $node): bool
     {
+        $goalGate = strtolower(trim((string) ($node['attrs']['goal_gate'] ?? '')));
+        if (in_array($goalGate, ['true', '1', 'yes'], true)) {
+            return true;
+        }
         $needle = strtolower($nodeId . ' ' . (string) ($node['label'] ?? '') . ' ' . (string) ($node['attrs']['type'] ?? ''));
         return $this->containsAny($needle, ['validate', 'validation', 'verify', 'review', 'qa', 'check', 'test', 'audit']);
     }

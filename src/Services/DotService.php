@@ -207,7 +207,11 @@ final class DotService
             . "Attractor critical requirement:\n"
             . "- Include explicit validation/checkpoint stages that verify output quality and requirement compliance.\n"
             . "- Include at least one failure branch from a validation stage back to planning or implementation rework.\n"
-            . "- Include a success branch from validation toward completion.";
+            . "- Include a success branch from validation toward completion.\n\n"
+            . "Complexity policy:\n"
+            . "- Prefer the SMALLEST graph that satisfies requirements.\n"
+            . "- For simple prompts, default to: start -> draft -> verify -> done, with verify -> draft on fail.\n"
+            . "- Do not add extra phases (revise, follow-up validation, feedback, etc.) unless explicitly requested by the user.";
         return $this->runOperation('generate', $operationPrompt, $options);
     }
 
@@ -391,12 +395,17 @@ final class DotService
             . "- Include a terminal node named done with shape=Msquare unless an explicit terminal node is already defined.\n"
             . "- Model validation as a first-class stage in the workflow.\n"
             . "- Add explicit pass/fail branching at validation nodes.\n"
-            . "- Ensure failed validation routes back to planning or implementation rework.\n\n"
+            . "- Ensure failed validation routes back to the draft/implementation stage.\n\n"
+            . "Complexity minimization (high priority):\n"
+            . "- Prefer the smallest useful graph.\n"
+            . "- Default template for simple requests: start -> draft -> verify -> done; verify -> draft on fail.\n"
+            . "- Use only one validation node unless the user explicitly asks for multiple validation checkpoints.\n"
+            . "- Avoid extra intermediary stages unless required by explicit user requirements.\n\n"
             . "Validation design conventions expected in generated graphs:\n"
-            . "- Planning/implementation nodes should produce candidate output.\n"
+            . "- Draft/implementation node should produce candidate output.\n"
             . "- Validation/check nodes verify candidate output against requirements.\n"
             . "- Pass path advances toward completion.\n"
-            . "- Fail path loops to planner/implementor/rework and then back to validation.\n";
+            . "- Fail path loops back to draft/implementation.\n";
 
         $examples = $this->dotReferenceExamplesSection();
         self::$dotSystemPromptCache = $examples === '' ? $base : $base . "\n" . $examples;
@@ -527,9 +536,8 @@ final class DotService
             $existing['done'] = true;
         }
 
-        $validationNode = $this->uniqueNodeId('validation_gate', $existing);
-        $plannerNode = $this->uniqueNodeId('planning_rework', $existing);
-        $implementNode = $this->uniqueNodeId('implement_rework', $existing);
+        $draftNode = $this->uniqueNodeId('draft_output', $existing);
+        $validationNode = $this->uniqueNodeId('verify_output', $existing);
 
         $predecessors = [];
         if (preg_match_all('/([A-Za-z_][A-Za-z0-9_]*)\s*->\s*done\b/i', $prefix, $predMatches, PREG_SET_ORDER)) {
@@ -556,16 +564,14 @@ final class DotService
         }
 
         $appendLines = [];
-        $appendLines[] = "{$validationNode} [label=\"Validate requirements and quality\"];";
-        $appendLines[] = "{$plannerNode} [label=\"Plan rework\"];";
-        $appendLines[] = "{$implementNode} [label=\"Implement rework\"];";
+        $appendLines[] = "{$draftNode} [label=\"Draft output\"];";
+        $appendLines[] = "{$validationNode} [label=\"Verify output quality\"];";
         foreach (array_keys($predecessors) as $fromNode) {
-            $appendLines[] = "{$fromNode} -> {$validationNode};";
+            $appendLines[] = "{$fromNode} -> {$draftNode};";
         }
+        $appendLines[] = "{$draftNode} -> {$validationNode};";
         $appendLines[] = "{$validationNode} -> done [label=\"pass\"];";
-        $appendLines[] = "{$validationNode} -> {$plannerNode} [label=\"fail\"];";
-        $appendLines[] = "{$plannerNode} -> {$implementNode};";
-        $appendLines[] = "{$implementNode} -> {$validationNode};";
+        $appendLines[] = "{$validationNode} -> {$draftNode} [label=\"fail\"];";
 
         return $prefix . "\n\n  " . implode("\n  ", $appendLines) . "\n" . $suffix;
     }
@@ -618,6 +624,7 @@ final class DotService
 
         return "Reference quality DOT examples (authoritative style guides):\n"
             . "- Use these to match graph structure quality, validation rigor, and rework-loop modeling.\n"
+            . "- Do NOT copy their size/complexity when the user request is simple.\n"
             . implode("\n\n", $sections);
     }
 

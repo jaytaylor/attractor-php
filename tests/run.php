@@ -314,6 +314,7 @@ assertTrue(is_array($artifacts) && count($artifacts) > 0, 'artifacts should not 
 $artifactPaths = array_map(static fn (array $a): string => (string) ($a['path'] ?? ''), $artifacts);
 assertTrue(in_array('work/prompt.md', $artifactPaths, true), 'runtime artifacts should include work/prompt.md');
 assertTrue(in_array('work/response.md', $artifactPaths, true), 'runtime artifacts should include work/response.md');
+assertTrue(count(array_filter($artifactPaths, static fn (string $p): bool => str_starts_with($p, 'artifacts/'))) > 0, 'runtime should write generated outputs under artifacts/');
 
 $promptRes = request('GET', $base . '/api/v1/pipelines/' . rawurlencode($runId) . '/artifacts/work/prompt.md');
 assertTrue($promptRes['status'] === 200, 'prompt artifact should return 200');
