@@ -160,23 +160,13 @@ SVG;
 digraph generated_pipeline {
   rankdir=LR;
   node [shape=box, style="rounded,filled", fillcolor="#eef6ff", color="#4a6fa5"];
-  request [label="Request\\n{$title}"];
-  concept [label="Concept sketch"];
-  dog_draft [shape=ellipse, fillcolor="#fff3e0", label="Dog draft"];
-  validate_initial [shape=diamond, fillcolor="#e8fff2", label="Validate anatomy + style"];
-  rework [label="Kick back to concept/implementor"];
-  dog_revised [shape=ellipse, fillcolor="#fff3e0", label="Dog revised"];
-  validate_final [shape=diamond, fillcolor="#e8fff2", label="Final validation"];
-  escalate [label="Escalate for planning review"];
-  review_plan [label="Planning adjustment"];
-  preview [label="Preview output"];
-  request -> concept -> dog_draft -> validate_initial;
-  validate_initial -> preview [label="pass"];
-  validate_initial -> rework [label="fail"];
-  rework -> dog_revised -> validate_final;
-  validate_final -> preview [label="pass"];
-  validate_final -> escalate [label="fail"];
-  escalate -> review_plan -> preview;
+  draft_svg [shape=ellipse, fillcolor="#fff3e0", label="Draft SVG\\n{$title}"];
+  validate_dog [shape=diamond, fillcolor="#e8fff2", label="Verify it looks like a dog"];
+  exit [shape=Msquare, label="Exit"];
+  start [shape=Mdiamond, label="Start"];
+  start -> draft_svg -> validate_dog;
+  validate_dog -> exit [label="pass"];
+  validate_dog -> draft_svg [label="fail"];
 }
 DOT;
         }

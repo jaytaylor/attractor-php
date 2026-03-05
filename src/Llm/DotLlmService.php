@@ -59,11 +59,21 @@ final class DotLlmService
             'Generated workflows must model validation explicitly.',
             'Include at least one validation node plus pass/fail branching.',
             'The fail branch must kick work back to planning or implementation and then return through a follow-up validation node.',
+            'Prefer the smallest sensible workflow that satisfies the request.',
+            'Do not add extra retries, escalations, human gates, or multiple validation stages unless the prompt explicitly asks for them.',
             'Use sensible retry loops: fail -> rework -> revised artifact -> follow-up validation.',
             'If a Draft node exists, retry/fail loops should route back through Draft (or RevisedDraft) before re-validation.',
             'Avoid trivial loops that jump from fail directly back to the same validator without substantive rework.',
             'If the request asks for SVG, image, or drawing content, still respond with DOT that models the concept as a graph.',
         ]);
+        $simpleVisualGoal = $isGenerationRequest && $this->isSimpleVisualGoalPrompt($userPrompt);
+        if ($simpleVisualGoal) {
+            $systemPrompt .= "\n\nFor simple SVG/image drawing prompts, use this minimal pattern:\n"
+                . "- Start -> DraftSVG -> VerifyOutput\n"
+                . "- VerifyOutput -> Exit [label=\"pass\"]\n"
+                . "- VerifyOutput -> DraftSVG [label=\"fail\"]\n"
+                . "Use exactly one verification node unless the user explicitly asks for more stages.";
+        }
         if ($isGenerationRequest) {
             $examples = $this->generationExamplesPrompt();
             if ($examples !== '') {
@@ -81,7 +91,7 @@ final class DotLlmService
             if ((bool) $validation['valid']) {
                 $candidate = (string) $validation['dotSource'];
                 if ($isGenerationRequest) {
-                    $qualityDiagnostics = $this->generationQualityDiagnostics($candidate);
+                    $qualityDiagnostics = $this->generationQualityDiagnostics($candidate, $simpleVisualGoal);
                     if ($qualityDiagnostics !== []) {
                         $diagnosticsHint = "\n\nThe previous output was syntactically valid but failed workflow quality checks. Fix these issues:\n- " . implode("\n- ", $qualityDiagnostics);
                         continue;
@@ -107,7 +117,7 @@ final class DotLlmService
     }
 
     /** @return list<string> */
-    private function generationQualityDiagnostics(string $dotSource): array
+    private function generationQualityDiagnostics(string $dotSource, bool $simpleVisualGoal): array
     {
         try {
             $graph = $this->graphParser->parse($dotSource);
@@ -141,8 +151,12 @@ final class DotLlmService
             }
         }
 
-        if (count($validationNodeIds) < 2) {
-            $diagnostics[] = 'Include at least two validation nodes (initial + follow-up validation).';
+        if (count($validationNodeIds) < 1) {
+            $diagnostics[] = 'Include at least one validation node.';
+        }
+
+        if ($simpleVisualGoal && count($validationNodeIds) !== 1) {
+            $diagnostics[] = 'For simple SVG/image prompts, include exactly one verification/validation node.';
         }
 
         $failEdges = [];
@@ -186,7 +200,7 @@ final class DotLlmService
                 $diagnostics[] = "FAIL branch target {$to} should be a planning/rework/implementation node.";
             }
 
-            $pathToValidation = $this->findPathToNextValidation($to, $from, $outgoing, $validationNodeIds, 4);
+            $pathToValidation = $this->findPathToValidation($to, $outgoing, $validationNodeIds, 4);
             if ($pathToValidation === null) {
                 if ($this->isEscalationLikeText($targetText)) {
                     continue;
@@ -207,9 +221,8 @@ final class DotLlmService
       * @param array<string,bool> $validationNodeIds
       * @return list<string>|null
       */
-    private function findPathToNextValidation(
+    private function findPathToValidation(
         string $startNodeId,
-        string $sourceValidationId,
         array $outgoing,
         array $validationNodeIds,
         int $maxDepth
@@ -231,7 +244,7 @@ final class DotLlmService
             $depth = (int) ($current['depth'] ?? 0);
             $path = is_array($current['path'] ?? null) ? $current['path'] : [$nodeId];
 
-            if ($depth > 0 && isset($validationNodeIds[$nodeId]) && $nodeId !== $sourceValidationId) {
+            if ($depth > 0 && isset($validationNodeIds[$nodeId])) {
                 return array_values(array_filter(array_map(static fn(mixed $id): string => (string) $id, $path), static fn(string $id): bool => $id !== ''));
             }
 
@@ -310,6 +323,28 @@ final class DotLlmService
             || str_contains($text, 'human')
             || str_contains($text, 'approve')
             || str_contains($text, 'decision');
+    }
+
+    private function isSimpleVisualGoalPrompt(string $prompt): bool
+    {
+        $text = strtolower($prompt);
+        $hasVisualIntent = str_contains($text, 'svg')
+            || str_contains($text, 'image')
+            || str_contains($text, 'icon')
+            || str_contains($text, 'logo')
+            || str_contains($text, 'draw');
+        if (!$hasVisualIntent) {
+            return false;
+        }
+
+        $isComplexWorkflow = str_contains($text, 'pipeline')
+            || str_contains($text, 'workflow')
+            || str_contains($text, 'multi-stage')
+            || str_contains($text, 'approval')
+            || str_contains($text, 'escalat')
+            || str_contains($text, 'review');
+
+        return !$isComplexWorkflow;
     }
 
     private function generationExamplesPrompt(): string
