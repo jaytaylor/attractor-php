@@ -677,6 +677,12 @@ final class PipelineService
         foreach ($files as $file) {
             $path = trim((string) ($file['path'] ?? ''));
             $content = (string) ($file['content'] ?? '');
+            if ($this->isPlaceholderOutputPath($path)) {
+                $inferred = $this->inferOutputPath($goal, $nodeLabel, $nodeDirective, $content !== '' ? $content : $rawText);
+                if ($inferred !== '') {
+                    $path = $inferred;
+                }
+            }
             $safe = $this->sanitizeOutputPath($path);
             if ($safe === '') {
                 continue;
@@ -846,7 +852,31 @@ final class PipelineService
             }
         }
 
+        $normalized = strtolower($trimmed);
+        if (str_contains($normalized, 'def ') || str_contains($normalized, 'print(') || str_contains($normalized, 'import ')) {
+            return 'output.py';
+        }
+        if (str_contains($normalized, 'console.log(') || str_contains($normalized, 'function ') || str_contains($normalized, 'const ')) {
+            return 'output.js';
+        }
+        if (str_contains($normalized, '#!/bin/bash') || str_contains($normalized, '#!/usr/bin/env bash')) {
+            return 'output.sh';
+        }
+
         return '';
+    }
+
+    private function isPlaceholderOutputPath(string $path): bool
+    {
+        $normalized = strtolower(trim(str_replace('\\', '/', $path), '/'));
+        if ($normalized === '') {
+            return true;
+        }
+
+        return $normalized === 'path/to/file.ext'
+            || $normalized === 'file.ext'
+            || str_starts_with($normalized, 'path/to/')
+            || str_starts_with($normalized, 'path/');
     }
 
     /** @param array<string,mixed> $input
