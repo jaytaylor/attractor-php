@@ -296,27 +296,18 @@ final class RunStore
             throw new ApiError(404, 'NOT_FOUND', 'run not found');
         }
 
-        $zipPath = $runDir . '/artifacts.zip';
-        $zip = new ZipArchive();
-        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
-            throw new ApiError(500, 'INTERNAL_ERROR', 'unable to create zip');
-        }
-
         $artifactDir = $runDir . '/artifacts';
-        if (is_dir($artifactDir)) {
-            $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($artifactDir, \FilesystemIterator::SKIP_DOTS));
-            foreach ($files as $file) {
-                if (!$file instanceof \SplFileInfo || !$file->isFile()) {
-                    continue;
-                }
-                $full = $file->getPathname();
-                $rel = ltrim(str_replace($artifactDir, '', $full), '/');
-                $zip->addFile($full, $rel);
-            }
+        return $this->createZipFromDirectory($artifactDir, $runDir . '/artifacts.zip');
+    }
+
+    public function createRunZip(string $runId): string
+    {
+        $runDir = $this->runDir($runId);
+        if (!is_dir($runDir)) {
+            throw new ApiError(404, 'NOT_FOUND', 'run not found');
         }
 
-        $zip->close();
-        return $zipPath;
+        return $this->createZipFromDirectory($runDir, $runDir . '/run.zip', ['run.zip', 'artifacts.zip']);
     }
 
     /** @return array<string,mixed> */
@@ -338,5 +329,46 @@ final class RunStore
             throw new ApiError(500, 'INTERNAL_ERROR', 'unable to encode json');
         }
         file_put_contents($path, $encoded . "\n");
+    }
+
+    /** @param list<string> $skipRelativePaths */
+    private function createZipFromDirectory(string $sourceDir, string $zipPath, array $skipRelativePaths = []): string
+    {
+        if (!is_dir($sourceDir)) {
+            throw new ApiError(404, 'NOT_FOUND', 'run not found');
+        }
+
+        $zip = new ZipArchive();
+        if ($zip->open($zipPath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== true) {
+            throw new ApiError(500, 'INTERNAL_ERROR', 'unable to create zip');
+        }
+
+        $base = realpath($sourceDir);
+        if ($base === false) {
+            $zip->close();
+            throw new ApiError(404, 'NOT_FOUND', 'run not found');
+        }
+
+        $skip = [];
+        foreach ($skipRelativePaths as $path) {
+            $skip[str_replace('\\', '/', ltrim($path, '/'))] = true;
+        }
+
+        $files = new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($base, \FilesystemIterator::SKIP_DOTS));
+        foreach ($files as $file) {
+            if (!$file instanceof \SplFileInfo || !$file->isFile()) {
+                continue;
+            }
+            $full = $file->getPathname();
+            $relative = ltrim(str_replace($base, '', $full), '/');
+            $relative = str_replace('\\', '/', $relative);
+            if (isset($skip[$relative])) {
+                continue;
+            }
+            $zip->addFile($full, $relative);
+        }
+
+        $zip->close();
+        return $zipPath;
     }
 }

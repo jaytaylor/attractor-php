@@ -108,6 +108,35 @@ function parseSse(string $raw): array
     return $events;
 }
 
+/** @return list<string> */
+function zipEntriesFromBody(string $body): array
+{
+    $tmp = tempnam(sys_get_temp_dir(), 'attractor-zip-');
+    if ($tmp === false) {
+        throw new RuntimeException('unable to create temp file for zip inspection');
+    }
+
+    file_put_contents($tmp, $body);
+    $zip = new ZipArchive();
+    if ($zip->open($tmp) !== true) {
+        @unlink($tmp);
+        throw new RuntimeException('unable to open zip payload');
+    }
+
+    $entries = [];
+    for ($i = 0; $i < $zip->numFiles; $i++) {
+        $name = $zip->getNameIndex($i);
+        if (is_string($name) && $name !== '') {
+            $entries[] = str_replace('\\', '/', $name);
+        }
+    }
+    $zip->close();
+    @unlink($tmp);
+
+    sort($entries);
+    return $entries;
+}
+
 /** @param list<string> $terminalStatuses
   * @return array{status:int,headers:array<string,string>,body:string,json:array<string,mixed>|list<mixed>|null}
   */
@@ -387,6 +416,17 @@ $h->run('run artifacts/graph/checkpoint/context', function () use ($h, $app): vo
     $zip = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/artifacts.zip');
     $h->assertSame(200, $zip['status'], 'zip should work');
     $h->assertContains('application/zip', $zip['headers']['content-type'] ?? '', 'zip content type');
+    $artifactZipEntries = zipEntriesFromBody((string) $zip['body']);
+    $h->assertTrue(count($artifactZipEntries) >= 1, 'artifact zip should contain files');
+
+    $runZip = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/run.zip');
+    $h->assertSame(200, $runZip['status'], 'run zip should work');
+    $h->assertContains('application/zip', $runZip['headers']['content-type'] ?? '', 'run zip content type');
+    $runZipEntries = zipEntriesFromBody((string) $runZip['body']);
+    $h->assertTrue(in_array('manifest.json', $runZipEntries, true), 'run zip should include manifest');
+    $h->assertTrue(in_array('context.json', $runZipEntries, true), 'run zip should include context');
+    $h->assertTrue(in_array('artifacts/summary.txt', $runZipEntries, true), 'run zip should include artifacts subtree');
+    $h->assertTrue(!in_array('run.zip', $runZipEntries, true), 'run zip should not contain itself');
 
     $checkpoint = callApi($app, 'GET', '/api/v1/pipelines/' . $runId . '/checkpoint');
     $h->assertSame(200, $checkpoint['status'], 'checkpoint should work');

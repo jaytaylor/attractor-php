@@ -899,9 +899,14 @@
       URL.revokeObjectURL(url);
     });
 
-    el('download-zip').addEventListener('click', () => {
+    el('download-artifacts-zip').addEventListener('click', () => {
       if (!state.selectedRun) return;
       window.open(`/api/v1/pipelines/${encodeURIComponent(state.selectedRun.id)}/artifacts.zip`, '_blank');
+    });
+
+    el('download-run-zip').addEventListener('click', () => {
+      if (!state.selectedRun) return;
+      window.open(`/api/v1/pipelines/${encodeURIComponent(state.selectedRun.id)}/run.zip`, '_blank');
     });
 
     el('validate-dot').addEventListener('click', () => {

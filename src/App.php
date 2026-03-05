@@ -86,6 +86,7 @@ final class App
         $this->router->add('GET', '/api/v1/pipelines/{id}/graph', fn(Request $req, array $p) => $this->graphForRun($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts', fn(Request $req, array $p) => $this->listArtifacts($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts.zip', fn(Request $req, array $p) => $this->downloadArtifactsZip($p['id']));
+        $this->router->add('GET', '/api/v1/pipelines/{id}/run.zip', fn(Request $req, array $p) => $this->downloadRunZip($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/artifacts/{path+}', fn(Request $req, array $p) => $this->artifactFile($p['id'], $p['path']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/checkpoint', fn(Request $req, array $p) => $this->checkpointForRun($p['id']));
         $this->router->add('GET', '/api/v1/pipelines/{id}/context', fn(Request $req, array $p) => $this->contextForRun($p['id']));
@@ -105,6 +106,8 @@ final class App
         $this->router->add('GET', '/pipelines/{id}/events', fn(Request $req, array $p) => $this->runEventsStream($req, $p['id']));
         $this->router->add('POST', '/pipelines/{id}/cancel', fn(Request $req, array $p) => Response::json($this->pipelineService->cancel($p['id'])));
         $this->router->add('GET', '/pipelines/{id}/graph', fn(Request $req, array $p) => $this->graphForRun($p['id']));
+        $this->router->add('GET', '/pipelines/{id}/artifacts.zip', fn(Request $req, array $p) => $this->downloadArtifactsZip($p['id']));
+        $this->router->add('GET', '/pipelines/{id}/run.zip', fn(Request $req, array $p) => $this->downloadRunZip($p['id']));
         $this->router->add('GET', '/pipelines/{id}/questions', fn(Request $req, array $p) => $this->questionsForRun($p['id']));
         $this->router->add('POST', '/pipelines/{id}/questions/{qid}/answer', fn(Request $req, array $p) => $this->answerQuestion($req, $p));
         $this->router->add('GET', '/pipelines/{id}/checkpoint', fn(Request $req, array $p) => $this->checkpointForRun($p['id']));
@@ -200,6 +203,21 @@ final class App
         return new Response(200, [
             'content-type' => 'application/zip',
             'content-disposition' => 'attachment; filename="' . $runId . '-artifacts.zip"',
+        ], $contents);
+    }
+
+    private function downloadRunZip(string $runId): Response
+    {
+        $this->pipelineService->tickRun($runId);
+        $zipPath = $this->store->createRunZip($runId);
+        $contents = file_get_contents($zipPath);
+        if ($contents === false) {
+            throw new ApiError(500, 'INTERNAL_ERROR', 'unable to read zip file');
+        }
+
+        return new Response(200, [
+            'content-type' => 'application/zip',
+            'content-disposition' => 'attachment; filename="' . $runId . '-run.zip"',
         ], $contents);
     }
 
